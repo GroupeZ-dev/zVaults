@@ -89,6 +89,12 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         if(this.storage != null) {
             this.storage.onDisable();
         }
+        if(this.messageResolver != null) {
+            this.messageResolver.close();
+        }
+        if(this.scheduler != null) {
+            this.scheduler.cancelAllTasks();
+        }
         VaultsLogger.success("&e=== DISABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
     }
 
