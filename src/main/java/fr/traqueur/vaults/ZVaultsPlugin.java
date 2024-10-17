@@ -12,13 +12,21 @@ import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.VaultsLogger;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.messages.MessageResolver;
 import fr.traqueur.vaults.api.storage.Storage;
+import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
+import fr.traqueur.vaults.users.ZUserManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public final class ZVaultsPlugin extends VaultsPlugin {
 
@@ -27,11 +35,13 @@ public final class ZVaultsPlugin extends VaultsPlugin {
     private InventoryManager inventoryManager;
     private ButtonManager buttonManager;
     private MessageResolver messageResolver;
+    private Set<Saveable> saveables;
 
     @Override
     public void onEnable() {
         long start = System.currentTimeMillis();
         VaultsLogger.info("&e=== ENABLE START ===");
+        this.saveables = new HashSet<>();
         this.scheduler = new FoliaLib(this).getScheduler();
         this.inventoryManager = this.getProvider(InventoryManager.class);
         this.buttonManager = this.getProvider(ButtonManager.class);
@@ -72,12 +82,17 @@ public final class ZVaultsPlugin extends VaultsPlugin {
             }
         });
 
+        UserManager userManager = this.registerManager(new ZUserManager(), UserManager.class);
+
         this.storage.onEnable();
 
+        this.scheduler.runTimerAsync(() -> this.saveables.forEach(Saveable::save), 1, 1, TimeUnit.HOURS);
 
         if(this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new ZPlaceholder(this).register();
         }
+
+        Bukkit.getOnlinePlayers().forEach(userManager::handleJoin);
 
         VaultsLogger.success("&e=== ENABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
     }
@@ -94,6 +109,9 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         }
         if(this.scheduler != null) {
             this.scheduler.cancelAllTasks();
+        }
+        if(this.saveables != null) {
+            this.saveables.forEach(Saveable::save);
         }
         VaultsLogger.success("&e=== DISABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
     }
@@ -128,11 +146,15 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         return this.messageResolver;
     }
 
-    private <I extends Manager, T extends I> void registerManager(T instance, Class<I> clazz) {
+    private <I extends Manager, T extends I> I registerManager(T instance, Class<I> clazz) {
         this.getServer().getServicesManager().register(clazz, instance, this, ServicePriority.Normal);
         if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
             VaultsLogger.info("Registered manager: " + clazz.getSimpleName());
         }
+        if(instance instanceof Saveable saveable) {
+            this.saveables.add(saveable);
+        }
+        return instance;
     }
 
     private <T> T getProvider(Class<T> clazz) {
