@@ -12,6 +12,7 @@ import fr.traqueur.vaults.api.VaultsLogger;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.LangConfiguration;
+import fr.traqueur.vaults.api.config.NonLoadable;
 import fr.traqueur.vaults.api.messages.Message;
 
 import java.io.File;
@@ -23,9 +24,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ZLangConfiguration implements LangConfiguration {
 
+    @NonLoadable
     private final VaultsPlugin plugin;
+    @NonLoadable
     private final Map<String, YamlDocument> langs;
+    @NonLoadable
     private YamlDocument lang;
+    @NonLoadable
     private boolean load;
 
     public ZLangConfiguration(VaultsPlugin plugin) {

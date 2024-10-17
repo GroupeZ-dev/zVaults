@@ -12,6 +12,7 @@ import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.VaultsLogger;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.messages.MessageResolver;
@@ -20,6 +21,7 @@ import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
 import fr.traqueur.vaults.users.ZUserManager;
+import fr.traqueur.vaults.vaults.ZVaultsConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -56,8 +58,8 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         LangConfiguration langConfiguration = Configuration.registerConfiguration(LangConfiguration.class, new ZLangConfiguration(this));
         MainConfiguration config = Configuration.registerConfiguration(MainConfiguration.class, new ZMainConfiguration(this));
-        config.loadConfig();
-        langConfiguration.loadConfig();
+        config.load();
+        langConfiguration.load();
 
         this.storage = new SQLStorage(this, config.getDatabaseConfiguration());
 
@@ -76,9 +78,11 @@ public final class ZVaultsPlugin extends VaultsPlugin {
             }
         });
 
+        Configuration.registerConfiguration(VaultsConfiguration.class, new ZVaultsConfiguration());
+
         Configuration.REGISTRY.values().forEach(configuration -> {
             if(!configuration.isLoad()) {
-                configuration.loadConfig();
+                configuration.load();
             }
         });
 

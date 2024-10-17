@@ -5,12 +5,16 @@ import fr.maxlego08.sarah.DatabaseConfiguration;
 import fr.maxlego08.sarah.database.DatabaseType;
 import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.config.NonLoadable;
 
 public class ZMainConfiguration implements MainConfiguration {
 
+    @NonLoadable
     private final VaultsPlugin plugin;
+    @NonLoadable
     private boolean loaded;
 
+    @NonLoadable
     private DatabaseConfiguration databaseConfiguration;
     private boolean debug;
 
@@ -27,7 +31,6 @@ public class ZMainConfiguration implements MainConfiguration {
     @Override
     public void loadConfig() {
         YamlDocument config = this.getConfig(this.plugin);
-        this.debug = config.getBoolean("debug", false);
 
         this.databaseConfiguration = new DatabaseConfiguration(
                 config.getString("storage-config.table-prefix"),

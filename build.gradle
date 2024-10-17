@@ -110,7 +110,8 @@ processResources {
     def props = [version: version,
                  main_config_version: main_config_version,
                  lang_settings_config_version: lang_settings_config_version,
-                 lang_config_version: lang_config_version]
+                 lang_config_version: lang_config_version,
+                 vaults_config_version: vaults_config_version]
     inputs.properties props
     filteringCharset 'UTF-8'
     filesMatching('**/*.yml') {

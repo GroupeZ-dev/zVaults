@@ -1,0 +1,16 @@
+config-version: "${vaults_config_version}"
+
+# Nombre maximum de vaults par joueur (mettre -1 pour illimité)
+max_vaults_per_player: 5
+# Si true, les joueurs peuvent avoir un stock illimité par items dans leurs vaults
+infinite_vaults: false
+
+# Taille par défaut d'un vault (nombre de slots)
+default_size: 27
+
+# Taille des vaults
+# Mode de gestion des tailles des vaults. Options :
+# - "default" : Toutes les vaults ont la même taille. Impossible de faire des vaults de tailles différentes
+# - "min_size" : Chaque vault a une taille configurable, mais ne peut pas être plus petite que 'default_size'.
+# - "max_size" : Chaque vault a une taille configurable, mais ne peut pas être plus grande que 'default_size'.
+size_mode: DEFAULT
