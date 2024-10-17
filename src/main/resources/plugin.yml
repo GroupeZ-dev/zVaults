@@ -1,0 +1,4 @@
+name: zVaults
+version: '${version}'
+main: fr.traqueur.vaults.ZVaults
+api-version: '1.21'
