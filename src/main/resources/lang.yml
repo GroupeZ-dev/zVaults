@@ -1,0 +1,6 @@
+config-version: '${lang_settings_config_version}'
+lang: fr_FR
+
+langs:
+  fr_FR: "languages/fr_FR.yml"
+  en_US: "languages/en_US.yml"

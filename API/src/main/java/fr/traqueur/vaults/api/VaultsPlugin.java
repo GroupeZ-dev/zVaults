@@ -4,6 +4,7 @@ import com.tcoded.folialib.impl.PlatformScheduler;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
 import fr.traqueur.vaults.api.managers.Manager;
+import fr.traqueur.vaults.api.messages.MessageResolver;
 import fr.traqueur.vaults.api.storage.Storage;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,5 +19,7 @@ public abstract class VaultsPlugin extends JavaPlugin {
     public abstract ButtonManager getButtonManager();
 
     public abstract <T extends Manager> T getManager(Class<T> clazz);
+
+    public abstract MessageResolver getMessageResolver();
 
 }

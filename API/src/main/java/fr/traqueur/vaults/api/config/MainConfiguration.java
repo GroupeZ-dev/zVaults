@@ -1,7 +1,6 @@
-package fr.traqueur.vaults.api;
+package fr.traqueur.vaults.api.config;
 
 import fr.maxlego08.sarah.DatabaseConfiguration;
-import fr.traqueur.vaults.api.config.Configuration;
 
 public interface MainConfiguration extends Configuration {
 

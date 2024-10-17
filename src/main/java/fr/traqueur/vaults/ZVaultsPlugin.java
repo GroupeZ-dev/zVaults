@@ -6,12 +6,16 @@ import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
 import fr.traqueur.commands.api.CommandManager;
 import fr.traqueur.commands.api.logging.Logger;
-import fr.traqueur.vaults.api.MainConfiguration;
+import fr.traqueur.vaults.api.commands.CommandsHandler;
+import fr.traqueur.vaults.api.config.LangConfiguration;
+import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.VaultsLogger;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.managers.Manager;
+import fr.traqueur.vaults.api.messages.MessageResolver;
 import fr.traqueur.vaults.api.storage.Storage;
+import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -22,6 +26,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
     private Storage storage;
     private InventoryManager inventoryManager;
     private ButtonManager buttonManager;
+    private MessageResolver messageResolver;
 
     @Override
     public void onEnable() {
@@ -37,13 +42,18 @@ public final class ZVaultsPlugin extends VaultsPlugin {
             return;
         }
 
+        this.messageResolver = new MessageResolver(this);
+
+        LangConfiguration langConfiguration = Configuration.registerConfiguration(LangConfiguration.class, new ZLangConfiguration(this));
         MainConfiguration config = Configuration.registerConfiguration(MainConfiguration.class, new ZMainConfiguration(this));
         config.loadConfig();
+        langConfiguration.loadConfig();
 
         this.storage = new SQLStorage(this, config.getDatabaseConfiguration());
 
         CommandManager commandManager = new CommandManager(this);
         commandManager.setDebug(config.isDebug());
+        commandManager.setMessageHandler(new CommandsHandler());
         commandManager.setLogger(new Logger() {
             @Override
             public void error(String s) {
@@ -65,7 +75,9 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         this.storage.onEnable();
 
 
-        new ZPlaceholder(this).register();
+        if(this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new ZPlaceholder(this).register();
+        }
 
         VaultsLogger.success("&e=== ENABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
     }
@@ -74,7 +86,9 @@ public final class ZVaultsPlugin extends VaultsPlugin {
     public void onDisable() {
         long start = System.currentTimeMillis();
         VaultsLogger.info("&e=== DISABLE START ===");
-        this.storage.onDisable();
+        if(this.storage != null) {
+            this.storage.onDisable();
+        }
         VaultsLogger.success("&e=== DISABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
     }
 
@@ -101,6 +115,11 @@ public final class ZVaultsPlugin extends VaultsPlugin {
     @Override
     public <T extends Manager> T getManager(Class<T> clazz) {
         return this.getProvider(clazz);
+    }
+
+    @Override
+    public MessageResolver getMessageResolver() {
+        return this.messageResolver;
     }
 
     private <I extends Manager, T extends I> void registerManager(T instance, Class<I> clazz) {

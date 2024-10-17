@@ -3,7 +3,7 @@ package fr.traqueur.vaults;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import fr.maxlego08.sarah.DatabaseConfiguration;
 import fr.maxlego08.sarah.database.DatabaseType;
-import fr.traqueur.vaults.api.MainConfiguration;
+import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.VaultsPlugin;
 
 public class ZMainConfiguration implements MainConfiguration {

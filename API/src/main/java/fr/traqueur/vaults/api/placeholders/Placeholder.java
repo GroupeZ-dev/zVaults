@@ -1,5 +1,9 @@
 package fr.traqueur.vaults.api.placeholders;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,9 +20,17 @@ public abstract class Placeholder {
         }
     }
 
+    public static String parse(Player player, String message) {
+        if(Bukkit.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            return PlaceholderAPI.setPlaceholders(player, message);
+        }
+        return message;
+    }
+
     private final String identifier;
 
     public Placeholder(String identifier) {
         this.identifier = identifier;
     }
+
 }

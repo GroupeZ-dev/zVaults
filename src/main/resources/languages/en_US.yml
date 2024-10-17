@@ -1,0 +1,7 @@
+config-version: '${lang_config_version}'
+
+no_permission_message: "<red>You do not have permission to do that."
+only_in_game_message: "<red>You can only use this command in game."
+missing_args_message: "<red>You are missing arguments."
+arg_not_recognized_message: "<red>The argument %arg% you entered is not recognized."
+no_requirement_message: "<red>You do not meet the requirements to do that."
