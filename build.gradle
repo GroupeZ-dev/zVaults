@@ -108,7 +108,7 @@ shadowJar.dependsOn subprojects.build
 compileJava.dependsOn childProjects.values().shadowJar
 
 processResources {
-    def props = [version: version]
+    def props = [version: version, main_config_version: main_config_version]
     inputs.properties props
     filteringCharset 'UTF-8'
     filesMatching('**/*.yml') {

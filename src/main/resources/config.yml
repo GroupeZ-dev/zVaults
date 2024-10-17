@@ -1,0 +1,12 @@
+config-version: '${main_config_version}'
+
+debug: true
+
+storage-config:
+  type: SQLITE
+  host: "127.0.0.1"
+  port: 3306
+  table-prefix: "zvaults_"
+  database: "zvaults"
+  username: "root"
+  password: ""
