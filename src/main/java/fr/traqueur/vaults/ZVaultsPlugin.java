@@ -1,8 +1,8 @@
 package fr.traqueur.vaults;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import fr.traqueur.vaults.api.VaultsPlugin;
 
-public final class ZVaults extends JavaPlugin {
+public final class ZVaultsPlugin extends VaultsPlugin {
 
     @Override
     public void onEnable() {

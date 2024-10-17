@@ -1,4 +1,7 @@
 name: zVaults
 version: '${version}'
-main: fr.traqueur.vaults.ZVaults
+main: fr.traqueur.vaults.ZVaultsPlugin
 api-version: '1.21'
+author: Traqueur
+depend: [zMenu]
+softdepend: [PlaceholderAPI]

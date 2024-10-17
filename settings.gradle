@@ -1,3 +1,8 @@
 rootProject.name = 'zVaults'
 include 'API'
+include 'platforms'
+include 'platforms:paper'
+findProject(':platforms:paper')?.name = 'paper'
+include 'platforms:spigot'
+findProject(':platforms:spigot')?.name = 'spigot'
 

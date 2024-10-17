@@ -1,0 +1,12 @@
+group 'platforms:paper'
+
+repositories {
+    maven {
+        name = "papermc"
+        url = "https://papermc.io/repo/repository/maven-public/"
+    }
+}
+
+dependencies {
+    compileOnly "io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT"
+}
