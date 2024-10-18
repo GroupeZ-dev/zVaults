@@ -1,11 +1,21 @@
 package fr.traqueur.vaults.vaults;
 
+import fr.maxlego08.menu.MenuItemStack;
+import fr.maxlego08.menu.exceptions.InventoryException;
+import fr.maxlego08.menu.loader.MenuItemStackLoader;
+import fr.maxlego08.menu.zcore.utils.loader.Loader;
+import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.NonLoadable;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.vaults.SizeMode;
 import fr.traqueur.vaults.api.gui.VaultIcon;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ZVaultsConfiguration implements VaultsConfiguration {
 
@@ -16,9 +26,11 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private int maxVaultsPerPlayer;
     private boolean infiniteVaults;
     private SizeMode sizeMode;
-    private List<VaultIcon> vaultsIcons;
+    @NonLoadable
+    private final Map<String, MenuItemStack> vaultsIcons;
 
     public ZVaultsConfiguration() {
+        this.vaultsIcons = new HashMap<>();
         this.load = false;
     }
 
@@ -29,6 +41,17 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
 
     @Override
     public void loadConfig() {
+        VaultsPlugin plugin = JavaPlugin.getPlugin(VaultsPlugin.class);
+        var file = new File(plugin.getDataFolder(), this.getFile());
+        var config = YamlConfiguration.loadConfiguration(file);
+        Loader<MenuItemStack> loader = new MenuItemStackLoader(plugin.getInventoryManager());
+        config.getConfigurationSection("vaults_icons").getKeys(false).forEach(key -> {
+            try {
+                this.vaultsIcons.put(key, loader.load(config, "vaults_icons." + key+ ".", file));
+            } catch (InventoryException e) {
+                throw new RuntimeException(e);
+            }
+        });
         this.load = true;
     }
 
@@ -58,12 +81,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     }
 
     @Override
-    public List<VaultIcon> getIcons() {
-        return vaultsIcons;
-    }
-
-    @Override
-    public VaultIcon getIcon(String id) {
-        return this.vaultsIcons.stream().filter(icon -> icon.id().equals(id)).findFirst().orElseThrow();
+    public MenuItemStack getIcon(String id) {
+        return this.vaultsIcons.getOrDefault(id, null);
     }
 }

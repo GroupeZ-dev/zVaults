@@ -49,7 +49,7 @@ public class VaultButton extends ZButton implements PaginateButton {
             int slot = slots.get(i);
             Vault vault = buttons.get(i);
 
-            inventory.addItem(slot, configuration.getIcon("open_vault").toItem(this.plugin)).setClick(event -> {
+            inventory.addItem(slot, configuration.getIcon("open_vault").build(player)).setClick(event -> {
                 event.getWhoClicked().sendMessage("In progress");
             });
         }

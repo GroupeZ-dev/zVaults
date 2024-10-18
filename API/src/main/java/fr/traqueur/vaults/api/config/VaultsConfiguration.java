@@ -1,5 +1,6 @@
 package fr.traqueur.vaults.api.config;
 
+import fr.maxlego08.menu.MenuItemStack;
 import fr.traqueur.vaults.api.gui.VaultIcon;
 import fr.traqueur.vaults.api.vaults.SizeMode;
 
@@ -15,7 +16,5 @@ public interface VaultsConfiguration extends Configuration {
 
     boolean isVaultsInfinity();
 
-    List<VaultIcon> getIcons();
-
-    VaultIcon getIcon(String id);
+    MenuItemStack getIcon(String id);
 }
