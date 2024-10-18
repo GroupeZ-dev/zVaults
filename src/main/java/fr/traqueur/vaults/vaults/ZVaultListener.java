@@ -1,7 +1,6 @@
 package fr.traqueur.vaults.vaults;
 
 import fr.traqueur.vaults.api.vaults.Vault;
-import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.gui.VaultMenu;
 import org.bukkit.event.EventHandler;

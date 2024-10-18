@@ -67,7 +67,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         if(this.openedVaults.containsKey(vault.getUniqueId())) {
             inventory = this.openedVaults.get(vault.getUniqueId());
         } else {
-            VaultMenu menu = new VaultMenu(vault);
+            VaultMenu menu = new VaultMenu(this.getPlugin(), vault);
             inventory = menu.getInventory();
             this.openedVaults.put(vault.getUniqueId(), inventory);
         }

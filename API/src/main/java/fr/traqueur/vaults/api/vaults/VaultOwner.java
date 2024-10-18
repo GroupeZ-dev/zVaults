@@ -3,7 +3,6 @@ package fr.traqueur.vaults.api.vaults;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
-import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
