@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -32,29 +33,50 @@ public class ZVaultListener implements Listener {
             return;
         }
         Vault vault = menu.getVault();
+        ClickType click = event.getClick();
+        ItemStack cursor = event.getCursor() == null ? new ItemStack(Material.AIR) : event.getCursor().clone();
+        int firstEmpty = inventory.firstEmpty();
+        int correspondingSlot = -1;
         if(vault.isInfinite() && event.getRawSlot() <= vault.getSize()) {
             event.setCancelled(true);
-            ItemStack cursor = event.getCursor() == null ? null : event.getCursor().clone();
-            if(cursor == null || cursor.getType().isAir()) {
+            if (firstEmpty == -1) {
                 return;
             }
-            var corresponding = inventory.first(cursor.getType());
-            if(corresponding == -1) {
-                int firstEmpty = inventory.firstEmpty();
-                if(firstEmpty == -1) {
-                    return;
+            if(!cursor.getType().isAir()) {
+                correspondingSlot = inventory.first(cursor.getType());
+            }
+            if(correspondingSlot == -1) {
+                return;
+            }
+        }
+
+        int slot = correspondingSlot == -1 ? firstEmpty : correspondingSlot;
+
+        switch (click) {
+            case RIGHT -> {
+                if(vault.isInfinite() && event.getRawSlot() <= vault.getSize()) {
+                    addToItem(inventory, slot, 1, player);
+                    if (cursor.getAmount() == 1) {
+                        event.getView().setCursor(new ItemStack(Material.AIR));
+                    } else {
+                        cursor.setAmount(cursor.getAmount() - 1);
+                        event.getView().setCursor(cursor);
+                    }
                 }
-                VaultItem vaultItem = new VaultItem(cursor, cursor.getAmount());
-                inventory.setItem(firstEmpty, vaultItem.toItem(player, true));
-                event.getView().setCursor(new ItemStack(Material.AIR));
-            } else {
-                this.addToItem(inventory, corresponding, cursor, player);
-                event.getView().setCursor(new ItemStack(Material.AIR));
+            }
+            case LEFT -> {
+                if(vault.isInfinite() && event.getRawSlot() <= vault.getSize()) {
+                    addToItem(inventory, slot, cursor.getAmount(), player);
+                    event.getView().setCursor(new ItemStack(Material.AIR));
+                }
+            }
+            default -> {
+                player.sendMessage("Not implemented yet");
             }
         }
     }
 
-    private void addToItem(Inventory inventory, int slot, ItemStack cursor, Player player) {
+    private void addToItem(Inventory inventory, int slot, int amount, Player player) {
         ItemStack current = inventory.getItem(slot);
         if(current == null) {
             return;
@@ -64,7 +86,7 @@ public class ZVaultListener implements Listener {
             return;
         }
         int oldAmount = meta.getPersistentDataContainer().getOrDefault(vaultsManager.getAmountKey(), PersistentDataType.INTEGER, 0);
-        int newAmount = oldAmount + cursor.getAmount();
+        int newAmount = oldAmount + amount;
         VaultItem vaultItem = new VaultItem(current, newAmount);
         inventory.setItem(slot, vaultItem.toItem(player, true));
     }
