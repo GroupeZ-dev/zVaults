@@ -5,14 +5,14 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class PlayerOwner extends VaultOwner {
+public class ZPlayerOwner extends VaultOwner {
 
-    public PlayerOwner(UUID uniqueId) {
+    public ZPlayerOwner(UUID uniqueId) {
         super(uniqueId);
     }
 
     @Override
-    public boolean isOwner(Player player) {
+    public boolean hasAccess(Player player) {
         return player.getUniqueId().equals(this.getUniqueId());
     }
 }

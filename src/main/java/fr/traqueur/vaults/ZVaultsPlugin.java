@@ -18,10 +18,12 @@ import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.messages.MessageResolver;
 import fr.traqueur.vaults.api.storage.Storage;
 import fr.traqueur.vaults.api.users.UserManager;
+import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
 import fr.traqueur.vaults.users.ZUserManager;
 import fr.traqueur.vaults.vaults.ZVaultsConfiguration;
+import fr.traqueur.vaults.vaults.ZVaultsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -87,6 +89,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         });
 
         UserManager userManager = this.registerManager(new ZUserManager(), UserManager.class);
+        this.registerManager(new ZVaultsManager(), VaultsManager.class);
 
         this.storage.onEnable();
 

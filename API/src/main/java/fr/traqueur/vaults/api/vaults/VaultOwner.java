@@ -16,6 +16,6 @@ public abstract class VaultOwner {
         return this.uniqueId;
     }
 
-    public abstract boolean isOwner(Player player);
+    public abstract boolean hasAccess(Player player);
 
 }
