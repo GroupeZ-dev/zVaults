@@ -26,7 +26,8 @@ vaults_icons:
       - "&7Clic droit pour ouvrir"
       - "&7votre vault personnel"
   vault_item:
-    name: "&6&lStock de %material%"
+    name: "&6&lStock de %material_name%"
+    material: "%material%"
     lore:
       - "Stock: %amount%"
       - ""

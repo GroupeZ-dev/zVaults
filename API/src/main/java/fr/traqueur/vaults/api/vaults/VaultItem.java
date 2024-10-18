@@ -1,6 +1,7 @@
 package fr.traqueur.vaults.api.vaults;
 
 import fr.maxlego08.menu.MenuItemStack;
+import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
@@ -38,21 +39,17 @@ public record VaultItem(ItemStack item, int amount) {
             VaultsManager manager = JavaPlugin.getPlugin(VaultsPlugin.class).getManager(VaultsManager.class);
             MenuItemStack item = Configuration.getConfiguration(VaultsConfiguration.class).getIcon("vault_item");
 
-            String oldName = item.getDisplayName();
-            List<String> oldLore = item.getLore();
+            Placeholders placeholders = new Placeholders();
+            placeholders.register("material_name", getTranslateName(this.item.getType()));
+            placeholders.register("amount", String.valueOf(this.amount));
+            placeholders.register("material", this.item.getType().name());
 
-            item.setDisplayName(item.getDisplayName().replace("%material%", this.getTranslateName(this.item.getType())));
-            item.setLore(new ArrayList<>(item.getLore()));
-            item.getLore().replaceAll(s -> s.replace("%amount%", String.valueOf(this.amount)));
-            item.setMaterial(this.item.getType().toString());
-            ItemStack itemStack = item.build(player);
+            ItemStack itemStack = item.build(player, true, placeholders);
             ItemMeta meta = itemStack.getItemMeta();
             PersistentDataContainer container = meta.getPersistentDataContainer();
             container.set(manager.getAmountKey(), PersistentDataType.INTEGER, this.amount);
             itemStack.setItemMeta(meta);
 
-            item.setDisplayName(oldName);
-            item.setLore(oldLore);
 
             return itemStack;
         } else {
