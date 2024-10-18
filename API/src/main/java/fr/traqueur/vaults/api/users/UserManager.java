@@ -3,6 +3,7 @@ package fr.traqueur.vaults.api.users;
 import fr.traqueur.vaults.api.managers.Manager;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,4 +21,5 @@ public interface UserManager extends Manager {
 
     void saveUser(User user);
 
+    List<User> getUsers();
 }

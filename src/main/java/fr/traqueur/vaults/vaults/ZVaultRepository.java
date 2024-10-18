@@ -7,10 +7,8 @@ import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultOwner;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public class ZVaultRepository implements Repository<Vault, VaultDTO> {
 

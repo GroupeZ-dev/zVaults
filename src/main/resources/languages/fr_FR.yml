@@ -5,3 +5,8 @@ only_in_game_message: "<red>Vous ne pouvez utiliser cette commande qu'en jeu."
 missing_args_message: "<red>Un argument est manquant."
 arg_not_recognized_message: "<red>L'argument %arg% que vous avez entré n'est pas reconnu."
 no_requirement_message: "<red>Vous ne remplissez pas les conditions pour faire cela."
+
+max_vaults_reached: "<red>Ce joueur a atteint le nombre maximum de coffres qu'il peut avoir."
+vault_created: "<green>Coffre créé."
+receive_new_vault: "<green>Vous avez reçu un nouveau coffre."
+size_not_available: "<red>La taille de %size% n'est pas disponible."

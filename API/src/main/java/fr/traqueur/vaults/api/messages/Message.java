@@ -11,7 +11,7 @@ public enum Message {
     ONLY_IN_GAME_MESSAGE,
     MISSING_ARGS_MESSAGE,
     ARG_NOT_RECOGNIZED_MESSAGE,
-    NO_REQUIREMENT_MESSAGE;
+    NO_REQUIREMENT_MESSAGE, MAX_VAULTS_REACHED, VAULT_CREATED, RECEIVE_NEW_VAULT, SIZE_NOT_AVAILABLE;
 
     public String translate(Formatter... formatters) {
         return translate(false, formatters);

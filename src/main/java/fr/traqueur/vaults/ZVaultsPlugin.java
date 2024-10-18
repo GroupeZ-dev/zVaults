@@ -6,19 +6,22 @@ import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
 import fr.traqueur.commands.api.CommandManager;
 import fr.traqueur.commands.api.logging.Logger;
-import fr.traqueur.vaults.api.commands.CommandsHandler;
-import fr.traqueur.vaults.api.config.LangConfiguration;
-import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.VaultsLogger;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.commands.CommandsHandler;
 import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.LangConfiguration;
+import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.messages.MessageResolver;
 import fr.traqueur.vaults.api.storage.Storage;
+import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
+import fr.traqueur.vaults.commands.arguments.OwnerTypeArgument;
+import fr.traqueur.vaults.commands.arguments.UserArgument;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
 import fr.traqueur.vaults.users.ZUserManager;
@@ -80,7 +83,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
             }
         });
 
-        Configuration.registerConfiguration(VaultsConfiguration.class, new ZVaultsConfiguration());
+        var vaultConfig = Configuration.registerConfiguration(VaultsConfiguration.class, new ZVaultsConfiguration());
 
         Configuration.REGISTRY.values().forEach(configuration -> {
             if(!configuration.isLoad()) {
@@ -89,7 +92,10 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         });
 
         UserManager userManager = this.registerManager(new ZUserManager(), UserManager.class);
-        this.registerManager(new ZVaultsManager(), VaultsManager.class);
+        VaultsManager vaultsManager = this.registerManager(new ZVaultsManager(vaultConfig), VaultsManager.class);
+
+        commandManager.registerConverter(String.class, "ownerType", new OwnerTypeArgument(vaultsManager.getOwnerResolver()));
+        commandManager.registerConverter(User.class, "user", new UserArgument(userManager));
 
         this.storage.onEnable();
 

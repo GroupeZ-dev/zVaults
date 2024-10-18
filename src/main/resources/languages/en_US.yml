@@ -5,3 +5,8 @@ only_in_game_message: "<red>You can only use this command in game."
 missing_args_message: "<red>You are missing arguments."
 arg_not_recognized_message: "<red>The argument %arg% you entered is not recognized."
 no_requirement_message: "<red>You do not meet the requirements to do that."
+
+max_vaults_reached: "<red>This player have reached the maximum amount of vaults he can have."
+vault_created: "<green>Vault created."
+receive_new_vault: "<green>You have received a new vault."
+size_not_available: "<red>The size of %size% is not available."

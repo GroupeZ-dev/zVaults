@@ -65,6 +65,11 @@ public class ZUserManager implements UserManager, Saveable {
         this.userService.save(user);
     }
 
+    @Override
+    public List<User> getUsers() {
+        return new ArrayList<>(this.users.values());
+    }
+
     private void generateUser(Player player) {
         if(this.users.containsKey(player.getUniqueId())) {
             return;

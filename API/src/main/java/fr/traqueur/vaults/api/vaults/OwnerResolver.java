@@ -1,5 +1,8 @@
 package fr.traqueur.vaults.api.vaults;
 
+import fr.traqueur.vaults.api.users.User;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -28,6 +31,14 @@ public class OwnerResolver {
         }
     }
 
+    public VaultOwner resolveOwnerFromUser(String type, User receiver) {
+        try {
+            return this.ownerTypes.get(type).getConstructor(User.class).newInstance(receiver);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public String getType(Class<? extends VaultOwner> aClass) {
         for (Map.Entry<String, Class<? extends VaultOwner>> entry : ownerTypes.entrySet()) {
             if (entry.getValue().equals(aClass)) {
@@ -35,5 +46,13 @@ public class OwnerResolver {
             }
         }
         throw new IllegalArgumentException("Unknown owner type: " + aClass);
+    }
+
+    public Map<String, Class<? extends VaultOwner>> getOwnerTypes() {
+        return ownerTypes;
+    }
+
+    public boolean isPresent(String s) {
+        return this.ownerTypes.containsKey(s.toLowerCase());
     }
 }
