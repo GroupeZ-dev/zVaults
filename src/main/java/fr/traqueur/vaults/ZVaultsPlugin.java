@@ -20,6 +20,7 @@ import fr.traqueur.vaults.api.storage.Storage;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
+import fr.traqueur.vaults.commands.VaultsCommand;
 import fr.traqueur.vaults.commands.arguments.OwnerTypeArgument;
 import fr.traqueur.vaults.commands.arguments.UserArgument;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
@@ -96,6 +97,8 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         commandManager.registerConverter(String.class, "ownerType", new OwnerTypeArgument(vaultsManager.getOwnerResolver()));
         commandManager.registerConverter(User.class, "user", new UserArgument(userManager));
+
+        commandManager.registerCommand(new VaultsCommand(this));
 
         this.storage.onEnable();
 
