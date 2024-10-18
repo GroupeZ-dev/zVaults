@@ -1,4 +1,4 @@
-package fr.traqueur.vaults.gui;
+package fr.traqueur.vaults.gui.buttons;
 
 import fr.maxlego08.menu.api.button.PaginateButton;
 import fr.maxlego08.menu.button.ZButton;
@@ -21,6 +21,7 @@ public class VaultButton extends ZButton implements PaginateButton {
     private final VaultsPlugin plugin;
     private final VaultsManager vaultsManager;
     private final UserManager userManager;
+    private Vault vault;
 
     public VaultButton(Plugin plugin) {
         this.plugin = (VaultsPlugin) plugin;
@@ -50,7 +51,7 @@ public class VaultButton extends ZButton implements PaginateButton {
             Vault vault = buttons.get(i);
 
             inventory.addItem(slot, configuration.getIcon("open_vault").build(player)).setClick(event -> {
-                event.getWhoClicked().sendMessage("In progress");
+                this.vaultsManager.openVault(user, vault);
             });
         }
     }

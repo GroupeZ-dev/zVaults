@@ -17,4 +17,6 @@ public interface VaultsConfiguration extends Configuration {
     boolean isVaultsInfinity();
 
     MenuItemStack getIcon(String id);
+
+    String getVaultTitle();
 }

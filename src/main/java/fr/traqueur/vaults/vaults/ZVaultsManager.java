@@ -8,13 +8,15 @@ import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
-import fr.traqueur.vaults.api.vaults.OwnerResolver;
-import fr.traqueur.vaults.api.vaults.Vault;
-import fr.traqueur.vaults.api.vaults.VaultOwner;
-import fr.traqueur.vaults.api.vaults.VaultsManager;
+import fr.traqueur.vaults.api.vaults.*;
+import fr.traqueur.vaults.gui.VaultMenu;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
+import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -23,7 +25,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     private final VaultsConfiguration configuration;
     private final OwnerResolver ownerResolver;
     private final Service<Vault, VaultDTO> vaultService;
-    private final Map<UUID, List<Vault>> vaults;
+    private final Map<UUID, Vault> vaults;
+    private final Map<UUID, Inventory> openedVaults;
 
     public ZVaultsManager(VaultsConfiguration configuration) {
         this.configuration = configuration;
@@ -31,13 +34,45 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         this.registerResolvers(this.ownerResolver);
 
         this.vaults = new HashMap<>();
+        this.openedVaults = new HashMap<>();
 
         this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this.ownerResolver), VAULT_TABLE_NAME);
         MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
 
-        this.vaultService.findAll().forEach(vault -> {
-            this.vaults.computeIfAbsent(vault.getOwner().getUniqueId(), k -> new ArrayList<>()).add(vault);
-        });
+        this.vaultService.findAll().forEach(vault -> this.vaults.put(vault.getUniqueId(), vault));
+
+        this.getPlugin().getServer().getPluginManager().registerEvents(new ZVaultListener(this), this.getPlugin());
+    }
+
+    @Override
+    public void saveVault(Vault vault) {
+        this.vaultService.save(vault);
+    }
+
+    @Override
+    public void closeVault(Vault vault) {
+        if(this.openedVaults.containsKey(vault.getUniqueId())) {
+            var inv = this.openedVaults.get(vault.getUniqueId());
+            if(inv.getViewers().size() == 1) {
+                vault.setContent(Arrays.stream(inv.getContents()).map(item -> item == null ? new VaultItem(new ItemStack(Material.AIR), 1) : new VaultItem(item, item.getAmount())).collect(Collectors.toList()));
+                this.openedVaults.remove(vault.getUniqueId());
+                this.saveVault(vault);
+            }
+        }
+    }
+
+    @Override
+    public void openVault(User user, Vault vault) {
+        Inventory inventory;
+        if(this.openedVaults.containsKey(vault.getUniqueId())) {
+            inventory = this.openedVaults.get(vault.getUniqueId());
+        } else {
+            VaultMenu menu = new VaultMenu(vault);
+            inventory = menu.getInventory();
+            this.openedVaults.put(vault.getUniqueId(), inventory);
+        }
+
+        user.getPlayer().openInventory(inventory);
     }
 
     @Override
@@ -50,7 +85,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         Vault vault = new ZVault(owner, size, configuration.isVaultsInfinity());
         vaults.add(vault);
         this.vaultService.save(vault);
-        this.vaults.put(owner.getUniqueId(), vaults);
+        this.vaults.put(vault.getUniqueId(), vault);
         creator.sendMessage(Message.VAULT_CREATED);
         owner.sendMessage(Message.RECEIVE_NEW_VAULT);
     }
@@ -105,7 +140,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public List<Vault> getVaults(User user) {
-        return this.vaults.values().stream().flatMap(List::stream).filter(vault -> vault.hasAccess(user)).toList();
+        return this.vaults.values().stream().filter(vault -> vault.hasAccess(user)).toList();
     }
 
     @Override
@@ -115,16 +150,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void save() {
-        this.vaults.values().stream().flatMap(List::stream).forEach(this.vaultService::save);
+        this.vaults.values().forEach(this.vaultService::save);
     }
 
     private List<Vault> getVaults(UUID owner) {
-        var vaults = this.vaults.getOrDefault(owner, new ArrayList<>());
-        if (vaults.isEmpty()) {
-            vaults.addAll(this.vaultService.where("owner", owner.toString()));
-            this.vaults.put(owner, vaults);
-        }
-        return vaults;
+        return this.vaults.values().stream().filter(vault -> vault.getOwner().getUniqueId().equals(owner)).toList();
     }
 
     private void registerResolvers(OwnerResolver ownerResolver) {

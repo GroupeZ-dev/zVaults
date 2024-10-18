@@ -6,10 +6,19 @@ import fr.traqueur.vaults.api.users.User;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface VaultsManager extends Manager {
 
     String VAULT_TABLE_NAME = "vaults";
+
+
+
+    void saveVault(Vault vault);
+
+    void closeVault(Vault vault);
+
+    void openVault(User user, Vault vault);
 
     void createVault(User creator, VaultOwner owner, int size);
 

@@ -1,6 +1,7 @@
 package fr.traqueur.vaults.api.users;
 
 import fr.traqueur.vaults.api.managers.Manager;
+import fr.traqueur.vaults.api.vaults.Vault;
 import org.bukkit.entity.Player;
 
 import java.util.List;

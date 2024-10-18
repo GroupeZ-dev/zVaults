@@ -2,15 +2,16 @@ package fr.traqueur.vaults.gui;
 
 import fr.maxlego08.menu.ZInventory;
 import fr.maxlego08.menu.api.button.Button;
+import fr.traqueur.vaults.gui.buttons.VaultButton;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 import java.util.Optional;
 
-public class VaultsMenu extends ZInventory {
+public class VaultsChooseMenu extends ZInventory {
 
-    public VaultsMenu(Plugin plugin, String name, String fileName, int size, List<Button> buttons) {
+    public VaultsChooseMenu(Plugin plugin, String name, String fileName, int size, List<Button> buttons) {
         super(plugin, name, fileName, size, buttons);
     }
 

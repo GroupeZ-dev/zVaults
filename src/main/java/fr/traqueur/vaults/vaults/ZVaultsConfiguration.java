@@ -8,13 +8,11 @@ import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.NonLoadable;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.vaults.SizeMode;
-import fr.traqueur.vaults.api.gui.VaultIcon;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ZVaultsConfiguration implements VaultsConfiguration {
@@ -26,6 +24,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private int maxVaultsPerPlayer;
     private boolean infiniteVaults;
     private SizeMode sizeMode;
+    private String vaultTitle;
     @NonLoadable
     private final Map<String, MenuItemStack> vaultsIcons;
 
@@ -83,5 +82,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public MenuItemStack getIcon(String id) {
         return this.vaultsIcons.getOrDefault(id, null);
+    }
+
+    @Override
+    public String getVaultTitle() {
+        return vaultTitle;
     }
 }

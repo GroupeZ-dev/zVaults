@@ -24,6 +24,6 @@ public class VaultsCommand extends Command<VaultsPlugin> {
 
     @Override
     public void execute(CommandSender commandSender, Arguments arguments) {
-        this.getPlugin().getInventoryManager().openInventory((Player) commandSender, "vaults_menu");
+        this.getPlugin().getInventoryManager().openInventory((Player) commandSender, "vaults_choose_menu");
     }
 }
