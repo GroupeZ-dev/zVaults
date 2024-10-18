@@ -1,7 +1,0 @@
-group 'platforms'
-
-allprojects {
-    dependencies {
-        compileOnly project(':API')
-    }
-}

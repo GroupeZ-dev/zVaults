@@ -54,6 +54,8 @@ allprojects {
     }
 
     dependencies {
+        compileOnly "org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT"
+
         implementation 'com.github.Maxlego08:Sarah:1.12'
         implementation "com.github.technicallycoded:FoliaLib:main-SNAPSHOT"
         implementation "com.github.Traqueur-dev:CommandsAPI:1.5.1"
@@ -69,11 +71,7 @@ allprojects {
 }
 
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT"
     implementation(project(':API'))
-    rootProject.subprojects.findAll { it.path.startsWith(':platforms:') }.each { subproject ->
-        implementation project(subproject.path)
-    }
 }
 
 shadowJar {

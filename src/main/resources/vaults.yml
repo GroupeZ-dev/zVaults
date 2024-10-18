@@ -25,3 +25,8 @@ vaults_icons:
     lore:
       - "&7Clic droit pour ouvrir"
       - "&7votre vault personnel"
+  vault_item:
+    name: "&6&lStock de %material%"
+    lore:
+      - "&7Clic droit pour prendre 1"
+      - "&7Shift + clic droit pour prendre 64"

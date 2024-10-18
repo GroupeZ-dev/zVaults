@@ -6,6 +6,7 @@ import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.vaults.Vault;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -14,10 +15,12 @@ import org.jetbrains.annotations.NotNull;
 public class VaultMenu implements InventoryHolder {
 
     private VaultsPlugin plugin;
+    private final Player player;
     private final Vault vault;
 
-    public VaultMenu(VaultsPlugin plugin, Vault vault) {
+    public VaultMenu(VaultsPlugin plugin, Player player, Vault vault) {
         this.plugin = plugin;
+        this.player = player;
         this.vault = vault;
     }
 
@@ -27,7 +30,7 @@ public class VaultMenu implements InventoryHolder {
         String title = Configuration.getConfiguration(VaultsConfiguration.class).getVaultTitle();
         title = plugin.getMessageResolver().convertToLegacyFormat(title);
         var inv = Bukkit.createInventory(this, vault.getSize(), ChatColor.translateAlternateColorCodes('&', title));
-        inv.setContents(vault.getContent().stream().map(vaultItem -> vaultItem.toItem(vault.isInfinite())).toArray(ItemStack[]::new));
+        inv.setContents(vault.getContent().stream().map(vaultItem -> vaultItem.toItem(this.player, vault.isInfinite())).toArray(ItemStack[]::new));
         return inv;
     }
 

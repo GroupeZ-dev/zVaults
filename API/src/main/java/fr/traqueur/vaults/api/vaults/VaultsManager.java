@@ -3,6 +3,7 @@ package fr.traqueur.vaults.api.vaults;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.users.User;
+import org.bukkit.NamespacedKey;
 
 import java.util.List;
 
@@ -31,4 +32,6 @@ public interface VaultsManager extends Manager {
     Vault getVault(User receiver, int vaultNum) throws IndexOutOfBoundVaultException;
 
     List<Vault> getVaults(User user);
+
+    NamespacedKey getAmountKey();
 }

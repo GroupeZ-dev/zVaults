@@ -23,7 +23,7 @@ public class ZVaultListener implements Listener {
             return;
         }
         Vault vault = menu.getVault();
-        if(vault.isInfinite()) {
+        if(vault.isInfinite() && event.getRawSlot() <= vault.getSize()) {
             event.setCancelled(true);
         }
     }
@@ -34,7 +34,7 @@ public class ZVaultListener implements Listener {
             return;
         }
         Vault vault = menu.getVault();
-        if(vault.isInfinite()) {
+        if(vault.isInfinite() && event.getRawSlots().stream().anyMatch(slot -> slot <= vault.getSize())) {
             event.setCancelled(true);
         }
     }

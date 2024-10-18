@@ -12,6 +12,7 @@ import fr.traqueur.vaults.api.vaults.*;
 import fr.traqueur.vaults.gui.VaultMenu;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -67,7 +68,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         if(this.openedVaults.containsKey(vault.getUniqueId())) {
             inventory = this.openedVaults.get(vault.getUniqueId());
         } else {
-            VaultMenu menu = new VaultMenu(this.getPlugin(), vault);
+            VaultMenu menu = new VaultMenu(this.getPlugin(), user.getPlayer(), vault);
             inventory = menu.getInventory();
             this.openedVaults.put(vault.getUniqueId(), inventory);
         }
@@ -78,7 +79,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public void createVault(User creator, VaultOwner owner, int size) {
         var vaults = this.getVaults(owner.getUniqueId());
-        if(vaults.size() >= this.configuration.getMaxVaultsByPlayer()) {
+        if(this.configuration.getMaxVaultsByPlayer() != -1 && vaults.size() >= this.configuration.getMaxVaultsByPlayer()) {
             creator.sendMessage(Message.MAX_VAULTS_REACHED);
             return;
         }
@@ -149,12 +150,17 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
+    public NamespacedKey getAmountKey() {
+        return new NamespacedKey(this.getPlugin(), "zvaults_amount");
+    }
+
+    @Override
     public void save() {
         this.vaults.values().forEach(this.vaultService::save);
     }
 
     private List<Vault> getVaults(UUID owner) {
-        return this.vaults.values().stream().filter(vault -> vault.getOwner().getUniqueId().equals(owner)).toList();
+        return this.vaults.values().stream().filter(vault -> vault.getOwner().getUniqueId().equals(owner)).collect(Collectors.toList());
     }
 
     private void registerResolvers(OwnerResolver ownerResolver) {
