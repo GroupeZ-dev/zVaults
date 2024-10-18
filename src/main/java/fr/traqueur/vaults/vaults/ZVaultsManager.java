@@ -14,6 +14,7 @@ import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 
 import java.util.*;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ZVaultsManager implements VaultsManager, Saveable {
@@ -71,8 +72,12 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     public List<String> getSizeTabulation() {
         return switch (configuration.getSizeMode()) {
             case DEFAULT -> Stream.of(configuration.getDefaultSize()).map(String::valueOf).toList();
-            case MIN_SIZE -> Stream.iterate(configuration.getDefaultSize(), i -> i - 9).limit(configuration.getDefaultSize()).map(String::valueOf).toList();
-            case MAX_SIZE -> Stream.iterate(0, i -> i + 9).limit(configuration.getDefaultSize()).map(String::valueOf).toList();
+            case MIN_SIZE -> IntStream.iterate(configuration.getDefaultSize(), n -> n + 9)
+                    .limit((54 - configuration.getDefaultSize()) / 9 + 1)
+                    .filter(n -> n <= 54).mapToObj(String::valueOf).toList();
+            case MAX_SIZE -> IntStream.iterate(9, n -> n + 9)
+                    .limit((configuration.getDefaultSize() - 9) / 9 + 1)
+                    .filter(n -> n <= configuration.getDefaultSize()).mapToObj(String::valueOf).toList();
         };
     }
 

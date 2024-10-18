@@ -33,7 +33,7 @@ public class OwnerResolver {
 
     public VaultOwner resolveOwnerFromUser(String type, User receiver) {
         try {
-            return this.ownerTypes.get(type).getConstructor(User.class).newInstance(receiver);
+            return this.ownerTypes.get(type.toLowerCase()).getConstructor(User.class).newInstance(receiver);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

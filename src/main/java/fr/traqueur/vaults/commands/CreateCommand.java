@@ -28,7 +28,7 @@ public class CreateCommand extends Command<VaultsPlugin> {
 
         this.addArgs("receiver:user");
         this.addArgs("size:int", (sender) -> this.vaultsManager.getSizeTabulation());
-        this.addArgs("type:ownerType");
+        this.addOptinalArgs("type:ownerType");
         this.setGameOnly(true);
     }
 
@@ -39,7 +39,7 @@ public class CreateCommand extends Command<VaultsPlugin> {
         int size = arguments.get("size");
         Optional<String> opt = arguments.getOptional("type");
         String type = opt.orElse("player");
-        if (this.vaultsManager.sizeIsAvailable(size)) {
+        if (!this.vaultsManager.sizeIsAvailable(size)) {
             user.sendMessage(Message.SIZE_NOT_AVAILABLE, Formatter.format("%size%", size));
             return;
         }
