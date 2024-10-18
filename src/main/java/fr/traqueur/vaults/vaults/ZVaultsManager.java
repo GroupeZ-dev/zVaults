@@ -15,6 +15,9 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,10 +58,29 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         if(this.openedVaults.containsKey(vault.getUniqueId())) {
             var inv = this.openedVaults.get(vault.getUniqueId());
             if(inv.getViewers().size() == 1) {
-                vault.setContent(Arrays.stream(inv.getContents()).map(item -> item == null ? new VaultItem(new ItemStack(Material.AIR), 1) : new VaultItem(item, item.getAmount())).collect(Collectors.toList()));
+                var content = Arrays.stream(inv.getContents())
+                        .map(this::createVaultItemFromItemStack)
+                        .collect(Collectors.toList());
+                vault.setContent(content);
                 this.openedVaults.remove(vault.getUniqueId());
                 this.saveVault(vault);
             }
+        }
+    }
+
+    private VaultItem createVaultItemFromItemStack(ItemStack item) {
+        if(item == null || item.getType() == Material.AIR) {
+            return new VaultItem(new ItemStack(Material.AIR), 1);
+        }
+        ItemMeta meta = item.getItemMeta();
+        if(meta == null) {
+            return new VaultItem(item, item.getAmount());
+        }
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        if(!container.has(this.getAmountKey(), PersistentDataType.INTEGER)) {
+            return new VaultItem(item, item.getAmount());
+        } else {
+            return new VaultItem(item, container.getOrDefault(this.getAmountKey(), PersistentDataType.INTEGER, 0));
         }
     }
 

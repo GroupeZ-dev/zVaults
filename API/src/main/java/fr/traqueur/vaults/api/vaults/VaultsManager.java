@@ -4,6 +4,8 @@ import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.users.User;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
