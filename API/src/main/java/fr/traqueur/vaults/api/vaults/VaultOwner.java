@@ -1,5 +1,6 @@
 package fr.traqueur.vaults.api.vaults;
 
+import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import org.bukkit.entity.Player;
@@ -24,8 +25,8 @@ public abstract class VaultOwner {
 
     public abstract UUID fromUser(User user);
 
-    public abstract boolean hasAccess(Player player);
+    public abstract boolean hasAccess(UUID player);
 
-    public abstract void sendMessage(Message message);
+    public abstract void sendMessage(Message message, Formatter... formatters);
 
 }

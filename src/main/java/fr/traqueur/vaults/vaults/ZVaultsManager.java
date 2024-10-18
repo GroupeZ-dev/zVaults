@@ -4,6 +4,7 @@ import fr.maxlego08.sarah.MigrationManager;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.VaultDTO;
+import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
@@ -14,6 +15,7 @@ import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -33,6 +35,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
         this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this.ownerResolver), VAULT_TABLE_NAME);
         MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
+
+        this.vaultService.findAll().forEach(vault -> {
+            this.vaults.computeIfAbsent(vault.getOwner().getUniqueId(), k -> new ArrayList<>()).add(vault);
+        });
     }
 
     @Override
@@ -58,7 +64,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
         return switch (configuration.getSizeMode()) {
             case DEFAULT -> size == configuration.getDefaultSize();
-            case MIN_SIZE -> size >= configuration.getDefaultSize();
+            case MIN_SIZE -> size >= configuration.getDefaultSize() && size <= 54;
             case MAX_SIZE -> size <= configuration.getDefaultSize();
         };
     }
@@ -79,6 +85,23 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     .limit((configuration.getDefaultSize() - 9) / 9 + 1)
                     .filter(n -> n <= configuration.getDefaultSize()).mapToObj(String::valueOf).toList();
         };
+    }
+
+    @Override
+    public List<String> getNumVaultsTabulation() {
+        int maxVaults = this.configuration.getMaxVaultsByPlayer() == -1 ? 20 : this.configuration.getMaxVaultsByPlayer();
+        return IntStream.iterate(0, n -> n + 1)
+                .limit(maxVaults + 1)
+                .filter(n -> n <= maxVaults).mapToObj(String::valueOf).toList();
+    }
+
+    @Override
+    public Vault getVault(User receiver, int vaultNum) throws IndexOutOfBoundVaultException {
+        var list = this.vaults.values().stream().flatMap(List::stream).filter(vault -> vault.hasAccess(receiver)).toList();
+        if(vaultNum < 0 || vaultNum >= list.size()) {
+            throw new IndexOutOfBoundVaultException();
+        }
+        return list.get(vaultNum);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fr.traqueur.vaults.api.vaults;
 
+import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.users.User;
 
@@ -18,4 +19,8 @@ public interface VaultsManager extends Manager {
     List<String> getSizeTabulation();
 
     VaultOwner generateOwner(String type, User receiver);
+
+    List<String> getNumVaultsTabulation();
+
+    Vault getVault(User receiver, int vaultNum) throws IndexOutOfBoundVaultException;
 }

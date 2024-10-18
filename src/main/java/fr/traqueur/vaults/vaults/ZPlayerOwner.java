@@ -1,6 +1,7 @@
 package fr.traqueur.vaults.vaults;
 
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
@@ -25,15 +26,15 @@ public class ZPlayerOwner extends VaultOwner {
     }
 
     @Override
-    public boolean hasAccess(Player player) {
-        return player.getUniqueId().equals(this.getUniqueId());
+    public boolean hasAccess(UUID player) {
+        return player.equals(this.getUniqueId());
     }
 
     @Override
-    public void sendMessage(Message message) {
+    public void sendMessage(Message message, Formatter... formatters) {
         JavaPlugin.getPlugin(VaultsPlugin.class)
                 .getManager(UserManager.class)
                 .getUser(this.getUniqueId())
-                .ifPresent(user -> user.sendMessage(message));
+                .ifPresent(user -> user.sendMessage(message, formatters));
     }
 }

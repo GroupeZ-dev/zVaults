@@ -10,3 +10,8 @@ max_vaults_reached: "<red>Ce joueur a atteint le nombre maximum de coffres qu'il
 vault_created: "<green>Coffre créé."
 receive_new_vault: "<green>Vous avez reçu un nouveau coffre."
 size_not_available: "<red>La taille de %size% n'est pas disponible."
+vault_growed: "<green>Votre coffre a été agrandi à la taille %size%."
+vault_growed_success: "<green>Coffre agrandi à la taille %size%."
+vault_not_found: "<red>Coffre introuvable."
+vault_set_size: "<green>Taille du coffre définie à %size%."
+vault_set_size_success: "<green>Taille du coffre définie à %size%."
