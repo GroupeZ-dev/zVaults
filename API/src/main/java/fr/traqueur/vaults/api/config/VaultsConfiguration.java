@@ -1,6 +1,9 @@
 package fr.traqueur.vaults.api.config;
 
+import fr.traqueur.vaults.api.gui.VaultIcon;
 import fr.traqueur.vaults.api.vaults.SizeMode;
+
+import java.util.List;
 
 public interface VaultsConfiguration extends Configuration {
 
@@ -12,4 +15,7 @@ public interface VaultsConfiguration extends Configuration {
 
     boolean isVaultsInfinity();
 
+    List<VaultIcon> getIcons();
+
+    VaultIcon getIcon(String id);
 }

@@ -7,6 +7,7 @@ import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.vaults.SizeMode;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class VaultsCommand extends Command<VaultsPlugin> {
 
@@ -18,10 +19,11 @@ public class VaultsCommand extends Command<VaultsPlugin> {
             this.addSubCommand(new GrowSizeCommand(plugin), new SetSizeCommand(plugin));
         }
 
+        this.setGameOnly(true);
     }
 
     @Override
     public void execute(CommandSender commandSender, Arguments arguments) {
-
+        this.getPlugin().getInventoryManager().openInventory((Player) commandSender, "vaults_menu");
     }
 }

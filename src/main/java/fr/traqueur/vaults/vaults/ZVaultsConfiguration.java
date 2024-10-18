@@ -3,6 +3,9 @@ package fr.traqueur.vaults.vaults;
 import fr.traqueur.vaults.api.config.NonLoadable;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.vaults.SizeMode;
+import fr.traqueur.vaults.api.gui.VaultIcon;
+
+import java.util.List;
 
 public class ZVaultsConfiguration implements VaultsConfiguration {
 
@@ -13,6 +16,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private int maxVaultsPerPlayer;
     private boolean infiniteVaults;
     private SizeMode sizeMode;
+    private List<VaultIcon> vaultsIcons;
 
     public ZVaultsConfiguration() {
         this.load = false;
@@ -51,5 +55,15 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public boolean isVaultsInfinity() {
         return infiniteVaults;
+    }
+
+    @Override
+    public List<VaultIcon> getIcons() {
+        return vaultsIcons;
+    }
+
+    @Override
+    public VaultIcon getIcon(String id) {
+        return this.vaultsIcons.stream().filter(icon -> icon.id().equals(id)).findFirst().orElseThrow();
     }
 }

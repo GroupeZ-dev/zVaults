@@ -15,7 +15,6 @@ import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -97,11 +96,16 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public Vault getVault(User receiver, int vaultNum) throws IndexOutOfBoundVaultException {
-        var list = this.vaults.values().stream().flatMap(List::stream).filter(vault -> vault.hasAccess(receiver)).toList();
+        var list = this.getVaults(receiver);
         if(vaultNum < 0 || vaultNum >= list.size()) {
             throw new IndexOutOfBoundVaultException();
         }
         return list.get(vaultNum);
+    }
+
+    @Override
+    public List<Vault> getVaults(User user) {
+        return this.vaults.values().stream().flatMap(List::stream).filter(vault -> vault.hasAccess(user)).toList();
     }
 
     @Override

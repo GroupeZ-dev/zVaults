@@ -14,3 +14,12 @@ default_size: 27
 # - "min_size" : Chaque vault a une taille configurable, mais ne peut pas être plus petite que 'default_size'.
 # - "max_size" : Chaque vault a une taille configurable, mais ne peut pas être plus grande que 'default_size'.
 size_mode: DEFAULT
+
+vaults_icons:
+    - material: CHEST
+      id: "open_vault"
+      custom_model_data: 1
+      name: "&6&lVault"
+      lore:
+        - "&7Clic droit pour ouvrir"
+        - "&7votre vault personnel"

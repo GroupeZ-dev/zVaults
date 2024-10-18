@@ -1,0 +1,46 @@
+name: "&8Vaults [%page%/%maxPage%]"
+size: 27
+items:
+  decoration:
+    isPermanent: true
+    item:
+      material: GRAY_STAINED_GLASS_PANE
+      name: "&e"
+    slots:
+      - 0-9
+      - 17
+      - 19-25
+  next:
+    type: NEXT
+    isPermanent: true
+    slot: 26
+    item:
+      material: ARROW
+      name: "&fNext"
+    else:
+      slot: 26
+      type: NONE
+      isPermanent: true
+      item:
+        material: GRAY_STAINED_GLASS_PANE
+        name: "&e"
+  previous:
+    type: PREVIOUS
+    isPermanent: true
+    slot: 18
+    item:
+      material: ARROW
+      name: "&fPrevious"
+    else:
+      slot: 18
+      type: NONE
+      isPermanent: true
+      item:
+        material: GRAY_STAINED_GLASS_PANE
+        name: "&e"
+  items:
+    isPermanent: true
+    update: true
+    type: ZVAULTS_VAULTS
+    slots:
+      - 10-16

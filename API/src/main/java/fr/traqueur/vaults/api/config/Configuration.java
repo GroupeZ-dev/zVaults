@@ -126,7 +126,7 @@ public interface Configuration {
             for (int i = 0; i < parameters.length; i++) {
                 Class<?> paramType = parameters[i].getType();
                 String paramName = parameters[i].getName();
-                Object value = map.get(paramName);
+                Object value = map.get(toLinearCase(paramName));
 
                 if (value != null) {
                     try {

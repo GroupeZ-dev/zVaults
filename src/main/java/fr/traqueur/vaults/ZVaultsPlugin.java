@@ -4,6 +4,8 @@ import com.tcoded.folialib.FoliaLib;
 import com.tcoded.folialib.impl.PlatformScheduler;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
+import fr.maxlego08.menu.button.loader.NoneLoader;
+import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.traqueur.commands.api.CommandManager;
 import fr.traqueur.commands.api.logging.Logger;
 import fr.traqueur.vaults.api.VaultsLogger;
@@ -23,6 +25,8 @@ import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.commands.VaultsCommand;
 import fr.traqueur.vaults.commands.arguments.OwnerTypeArgument;
 import fr.traqueur.vaults.commands.arguments.UserArgument;
+import fr.traqueur.vaults.gui.VaultButton;
+import fr.traqueur.vaults.gui.VaultsMenu;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
 import fr.traqueur.vaults.users.ZUserManager;
@@ -94,6 +98,16 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         UserManager userManager = this.registerManager(new ZUserManager(), UserManager.class);
         VaultsManager vaultsManager = this.registerManager(new ZVaultsManager(vaultConfig), VaultsManager.class);
+
+        buttonManager.unregisters(this);
+        buttonManager.register(new NoneLoader(this, VaultButton.class, "zvaults_vaults"));
+
+        inventoryManager.deleteInventories(this);
+        try {
+            this.inventoryManager.loadInventoryOrSaveResource(this,"vaults_menu.yml", VaultsMenu.class);
+        } catch (InventoryException e) {
+            throw new RuntimeException(e);
+        }
 
         commandManager.registerConverter(String.class, "ownerType", new OwnerTypeArgument(vaultsManager.getOwnerResolver()));
         commandManager.registerConverter(User.class, "user", new UserArgument(userManager));
