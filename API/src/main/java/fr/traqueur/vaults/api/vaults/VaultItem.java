@@ -30,6 +30,10 @@ public record VaultItem(ItemStack item, int amount) {
     }
 
     public ItemStack toItem(Player player, boolean infinite) {
+        if(item == null) {
+            return new ItemStack(Material.AIR);
+        }
+
         if(infinite) {
             if(item.getType().isAir()) {
                 return item;

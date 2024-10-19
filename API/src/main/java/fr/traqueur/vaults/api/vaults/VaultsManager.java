@@ -21,6 +21,8 @@ public interface VaultsManager extends Manager {
 
     void openVault(User user, Vault vault);
 
+    int getAmountFromItem(ItemStack item);
+
     void createVault(User creator, VaultOwner owner, int size);
 
     boolean sizeIsAvailable(int size);

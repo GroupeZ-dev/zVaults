@@ -17,6 +17,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class VaultItemButton extends ZButton {
@@ -59,6 +62,18 @@ public class VaultItemButton extends ZButton {
     @Override
     public void onInventoryClose(Player player, InventoryDefault inventory) {
         User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
+        var inv = inventory.getSpigotInventory();
+        List<VaultItem> content = new ArrayList<>();
+        for (int i = 0; i < vault.getSize(); i++) {
+            ItemStack item = inv.getItem(i);
+            if (item == null || item.getType() == Material.AIR) {
+                content.add(new VaultItem(new ItemStack(Material.AIR), 1));
+            } else {
+                content.add(new VaultItem(item, this.vaultsManager.getAmountFromItem(item)));
+            }
+
+        }
+        this.vault.setContent(content);
         this.vaultsManager.closeVault(user, vault);
     }
 

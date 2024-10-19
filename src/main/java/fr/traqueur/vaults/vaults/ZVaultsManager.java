@@ -10,7 +10,6 @@ import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.vaults.*;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -70,6 +69,19 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         if(this.openedVaults.getOrDefault(vault.getUniqueId(), Collections.emptyList()).isEmpty()) {
             this.saveVault(vault);
         }
+    }
+
+    @Override
+    public int getAmountFromItem(ItemStack item) {
+        if(item == null || item.getType().isAir()) {
+            return 1;
+        }
+        ItemMeta meta = item.getItemMeta();
+        if(meta == null) {
+            return item.getAmount();
+        }
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        return container.getOrDefault(this.getAmountKey(), PersistentDataType.INTEGER, item.getAmount());
     }
 
     @Override
