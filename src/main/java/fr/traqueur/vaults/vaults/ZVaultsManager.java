@@ -332,7 +332,20 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
-
+        if(vault.isInfinite()) {
+            ItemStack hotbarItem = player.getInventory().getItem(event.getHotbarButton());
+            if(hotbarItem == null || hotbarItem.getType().isAir()) {
+                return;
+            }
+            int amountItem = hotbarItem.getAmount();
+            this.addItem(event, hotbarItem, vault, player, amountItem);
+            player.getInventory().setItem(event.getHotbarButton(), new ItemStack(Material.AIR));
+        } else {
+            ItemStack hotbarItem = player.getInventory().getItem(event.getHotbarButton());
+            ItemStack currentItem = (current == null || current.getType().isAir()) ? new ItemStack(Material.AIR) : new ItemStack(current.getType(), current.getAmount());
+            player.getInventory().setItem(event.getHotbarButton(), currentItem);
+            event.getInventory().setItem(slot, hotbarItem);
+        }
     }
 
     @Override
@@ -411,8 +424,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
         VaultItem vaultItem = new VaultItem(item, amount);
         event.getInventory().setItem(correspondingslot, vaultItem.toItem(player, vault.isInfinite()));
-        int newAmount = cursor.getAmount() - amountItem;
-        event.getView().setCursor(newAmount == 0 ? new ItemStack(Material.AIR) : new ItemStack(cursor.getType(), newAmount));
+        if (!cursor.getType().isAir()) {
+            int newAmount = cursor.getAmount() - amountItem;
+            event.getView().setCursor(newAmount == 0 ? new ItemStack(Material.AIR) : new ItemStack(cursor.getType(), newAmount));
+        }
     }
 
     private void registerResolvers(OwnerResolver ownerResolver) {
