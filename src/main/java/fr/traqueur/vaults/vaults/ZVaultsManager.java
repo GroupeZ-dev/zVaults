@@ -10,7 +10,11 @@ import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.vaults.*;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -160,6 +164,79 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public NamespacedKey getAmountKey() {
         return new NamespacedKey(this.getPlugin(), "zvaults_amount");
+    }
+
+    @Override
+    public void handleLeftClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+        InventoryAction action = event.getAction();
+        if(action == InventoryAction.PLACE_ALL) {
+            if (slot > vault.getSize()) {
+                return;
+            }
+            event.setCancelled(vault.isInfinite());
+            if(!vault.isInfinite()) {
+                return;
+            }
+            int correspondingslot = event.getInventory().first(cursor.getType());
+            if(correspondingslot == -1) {
+                correspondingslot = event.getInventory().firstEmpty();
+            }
+            if(correspondingslot == -1) {
+                return;
+            }
+            ItemStack item = event.getInventory().getItem(correspondingslot);
+            int amount;
+            if(item == null || item.getType().isAir()) {
+                item = new ItemStack(cursor.getType(), cursor.getAmount());
+                amount = cursor.getAmount();
+            } else {
+                amount = this.getAmountFromItem(item) + cursor.getAmount();
+            }
+            VaultItem vaultItem = new VaultItem(item, amount);
+            event.getInventory().setItem(correspondingslot, vaultItem.toItem(player, vault.isInfinite()));
+            event.getView().setCursor(new ItemStack(Material.AIR));
+        } else if (action == InventoryAction.SWAP_WITH_CURSOR) {
+            event.setCancelled(vault.isInfinite());
+        } else if (action == InventoryAction.PICKUP_ALL) {
+            if (slot > vault.getSize()) {
+                return;
+            }
+            if(!vault.isInfinite()) {
+                event.getInventory().setItem(slot, new ItemStack(Material.AIR));
+                event.getView().setCursor(new ItemStack(current.getType(), current.getAmount()));
+                return;
+            }
+            int amount = Math.min(current.getMaxStackSize(), this.getAmountFromItem(current) + cursor.getAmount());
+            int rest = this.getAmountFromItem(current) - amount;
+            VaultItem vaultItem;
+            if(rest > 0) {
+                vaultItem = new VaultItem(current, rest);
+                event.getInventory().setItem(slot, vaultItem.toItem(player, vault.isInfinite()));
+            } else {
+                event.getInventory().setItem(slot, new ItemStack(Material.AIR));
+            }
+            event.getView().setCursor(new ItemStack(current.getType(), amount));
+        }
+    }
+
+    @Override
+    public void handleRightClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+
+    }
+
+    @Override
+    public void handleShift(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+
+    }
+
+    @Override
+    public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean b) {
+
+    }
+
+    @Override
+    public void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+
     }
 
     @Override

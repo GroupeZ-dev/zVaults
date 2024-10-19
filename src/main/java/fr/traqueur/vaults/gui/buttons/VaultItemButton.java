@@ -13,7 +13,9 @@ import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -87,7 +89,11 @@ public class VaultItemButton extends ZButton {
                 if (this.vault.getContent().size() <= slot || this.vault.getContent().isEmpty()) {
                     item = new VaultItem(new ItemStack(Material.AIR), 1).toItem(player, this.vault.isInfinite());
                 } else {
-                    item = this.vault.getContent().get(slot).toItem(player, this.vault.isInfinite());
+                    var vaultItem = this.vault.getContent().get(slot);
+                    if(vaultItem.item() == null || vaultItem.item().getType().isAir()) {
+                        continue;
+                    }
+                    item = vaultItem.toItem(player, this.vault.isInfinite());
                 }
                 click = event -> {
                     if(this.vault.isInfinite()) {
@@ -97,11 +103,55 @@ public class VaultItemButton extends ZButton {
                 };
             } else {
                 item = configuration.getIcon("empty_item").build(player);
-                click = event -> {
-                    event.setCancelled(true);
-                };
+                click = event -> event.setCancelled(true);
             }
             inventory.addItem(slot, item).setClick(click);
+        }
+    }
+
+    @Override
+    public void onDrag(InventoryDragEvent event, Player player, InventoryDefault inventoryDefault) {
+        if(this.vault.isInfinite()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @Override
+    public void onInventoryClick(InventoryClickEvent event, Player player, InventoryDefault inventoryDefault) {
+
+        ClickType clickType = event.getClick();
+        ItemStack cursor = event.getCursor();
+        ItemStack current = event.getCurrentItem();
+        int slot = event.getRawSlot();
+        int inventorySize = inventoryDefault.getSpigotInventory().getSize();
+
+        if(slot >= inventorySize && !clickType.isShiftClick() || slot < 0) {
+            return;
+        }
+
+        if(this.vault.isInfinite() && clickType.isShiftClick()) {
+            event.setCancelled(true);
+        }
+
+        switch (clickType) {
+            case LEFT -> {
+                this.vaultsManager.handleLeftClick(event, player, cursor, current, slot, inventorySize, this.vault);
+            }
+            case RIGHT -> {
+                this.vaultsManager.handleRightClick(event, player, cursor, current, slot, inventorySize, this.vault);
+            }
+            case SHIFT_LEFT, SHIFT_RIGHT -> {
+                this.vaultsManager.handleShift(event, player, cursor, current, slot, inventorySize, this.vault);
+            }
+            case DROP, CONTROL_DROP -> {
+                this.vaultsManager.handleDrop(event, player, cursor, current, slot, inventorySize, this.vault, clickType == ClickType.CONTROL_DROP);
+            }
+            case NUMBER_KEY -> {
+                    this.vaultsManager.handleNumberKey(event, player, cursor, current, slot, inventorySize, this.vault);
+            }
+            default -> {
+                return;
+            }
         }
 
     }
