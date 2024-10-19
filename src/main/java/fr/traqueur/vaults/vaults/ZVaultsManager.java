@@ -10,11 +10,13 @@ import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.vaults.*;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -237,6 +239,102 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
     }
 
+    @Override
+    public void handleShift(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+        if(slot > vault.getSize() && slot < inventorySize || current == null || current.getType().isAir()) {
+            return;
+        }
+        if(slot >= inventorySize) {
+            if(vault.isInfinite()) {
+                int correspondingslot = event.getInventory().first(current.getType());
+                if(correspondingslot == -1) {
+                    correspondingslot = event.getInventory().firstEmpty();
+                }
+                if(correspondingslot == -1) {
+                    return;
+                }
+                ItemStack item = event.getInventory().getItem(correspondingslot);
+                int amount;
+                if(item == null || item.getType().isAir()) {
+                    item = new ItemStack(current.getType());
+                    amount = current.getAmount();
+                } else {
+                    amount = this.getAmountFromItem(item) + current.getAmount();
+                }
+                VaultItem vaultItem = new VaultItem(item, amount);
+                event.getInventory().setItem(correspondingslot, vaultItem.toItem(player, vault.isInfinite()));
+                event.setCurrentItem(new ItemStack(Material.AIR));
+            } else {
+                Inventory inventory = Bukkit.createInventory(null, inventorySize, "");
+                for(int i = 0; i < vault.getSize(); i++) {
+                    ItemStack item = event.getInventory().getItem(i);
+                    if(item == null || item.getType().isAir()) {
+                        continue;
+                    }
+
+                    inventory.setItem(i, item);
+                }
+
+                var notAdded = inventory.addItem(current);
+                ItemStack newCurrent = notAdded.isEmpty() ? new ItemStack(Material.AIR) : notAdded.values().iterator().next();
+                event.setCurrentItem(newCurrent);
+                for (int i = 0; i < vault.getSize(); i++) {
+                    ItemStack ref = event.getInventory().getItem(i);
+                    ItemStack item = inventory.getItem(i);
+                    if (ref != null && !ref.isSimilar(item)
+                            || item != null && !item.isSimilar(ref)
+                            || ref == null && item != null
+                            || ref != null && item == null
+                            || ref != null && ref.getAmount() != item.getAmount()) {
+                        event.getInventory().setItem(i, item);
+                    }
+                }
+            }
+
+        } else {
+            if(vault.isInfinite()) {
+                int amount = Math.min(current.getMaxStackSize(), this.getAmountFromItem(current));
+                ItemStack toAdd = new ItemStack(current.getType(), amount);
+                var notAdded = player.getInventory().addItem(toAdd);
+                int rest = notAdded.isEmpty() ? 0 : notAdded.values().iterator().next().getAmount();
+                int realAmount = amount - rest;
+                int newAmount = this.getAmountFromItem(current) - realAmount;
+                if(newAmount == 0) {
+                    event.getInventory().setItem(slot, new ItemStack(Material.AIR));
+                } else {
+                    VaultItem vaultItem = new VaultItem(current, newAmount);
+                    event.getInventory().setItem(slot, vaultItem.toItem(player, vault.isInfinite()));
+                }
+            } else {
+               var notAdded = player.getInventory().addItem(current);
+               ItemStack newCurrent = notAdded.isEmpty() ? new ItemStack(Material.AIR) : notAdded.values().iterator().next();
+               event.setCurrentItem(newCurrent);
+            }
+
+
+        }
+
+    }
+
+    @Override
+    public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean b) {
+
+    }
+
+    @Override
+    public void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+
+    }
+
+    @Override
+    public void save() {
+        this.vaults.values().forEach(this.vaultService::save);
+    }
+
+    private List<Vault> getVaults(UUID owner) {
+        return this.vaults.values().stream().filter(vault -> vault.getOwner().getUniqueId().equals(owner)).collect(Collectors.toList());
+    }
+
     private void placeOne(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, Vault vault) {
         if (slot > vault.getSize()) {
             return;
@@ -262,30 +360,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             event.getInventory().setItem(slot, new ItemStack(Material.AIR));
         }
         event.getView().setCursor(new ItemStack(current.getType(), amount));
-    }
-
-    @Override
-    public void handleShift(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
-
-    }
-
-    @Override
-    public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean b) {
-
-    }
-
-    @Override
-    public void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
-
-    }
-
-    @Override
-    public void save() {
-        this.vaults.values().forEach(this.vaultService::save);
-    }
-
-    private List<Vault> getVaults(UUID owner) {
-        return this.vaults.values().stream().filter(vault -> vault.getOwner().getUniqueId().equals(owner)).collect(Collectors.toList());
     }
 
     private void placeSome(InventoryClickEvent event, ItemStack cursor, ItemStack current, int slot) {
