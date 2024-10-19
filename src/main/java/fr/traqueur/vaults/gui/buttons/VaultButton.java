@@ -21,7 +21,6 @@ public class VaultButton extends ZButton implements PaginateButton {
     private final VaultsPlugin plugin;
     private final VaultsManager vaultsManager;
     private final UserManager userManager;
-    private Vault vault;
 
     public VaultButton(Plugin plugin) {
         this.plugin = (VaultsPlugin) plugin;

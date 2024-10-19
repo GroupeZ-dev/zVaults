@@ -9,11 +9,9 @@ import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.vaults.*;
-import fr.traqueur.vaults.gui.VaultMenu;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -30,7 +28,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     private final OwnerResolver ownerResolver;
     private final Service<Vault, VaultDTO> vaultService;
     private final Map<UUID, Vault> vaults;
-    private final Map<UUID, Inventory> openedVaults;
+    private final Map<UUID, Vault> openedVaults;
 
     public ZVaultsManager(VaultsConfiguration configuration) {
         this.configuration = configuration;
@@ -44,8 +42,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
 
         this.vaultService.findAll().forEach(vault -> this.vaults.put(vault.getUniqueId(), vault));
-
-        this.getPlugin().getServer().getPluginManager().registerEvents(new ZVaultListener(this), this.getPlugin());
     }
 
     @Override
@@ -54,18 +50,19 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
+    public void openVault(User user, Vault vault) {
+        this.openedVaults.put(user.getUniqueId(), vault);
+        this.getPlugin().getInventoryManager().openInventory(user.getPlayer(), "vault_menu");
+    }
+
+    @Override
+    public Vault getOpenedVault(User user) {
+        return this.openedVaults.get(user.getUniqueId());
+    }
+
+    @Override
     public void closeVault(Vault vault) {
-        if(this.openedVaults.containsKey(vault.getUniqueId())) {
-            var inv = this.openedVaults.get(vault.getUniqueId());
-            if(inv.getViewers().size() == 1) {
-                var content = Arrays.stream(inv.getContents())
-                        .map(this::createVaultItemFromItemStack)
-                        .collect(Collectors.toList());
-                vault.setContent(content);
-                this.openedVaults.remove(vault.getUniqueId());
-                this.saveVault(vault);
-            }
-        }
+
     }
 
     private VaultItem createVaultItemFromItemStack(ItemStack item) {
@@ -82,20 +79,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         } else {
             return new VaultItem(item, container.getOrDefault(this.getAmountKey(), PersistentDataType.INTEGER, 0));
         }
-    }
-
-    @Override
-    public void openVault(User user, Vault vault) {
-        Inventory inventory;
-        if(this.openedVaults.containsKey(vault.getUniqueId())) {
-            inventory = this.openedVaults.get(vault.getUniqueId());
-        } else {
-            VaultMenu menu = new VaultMenu(this.getPlugin(), user.getPlayer(), vault);
-            inventory = menu.getInventory();
-            this.openedVaults.put(vault.getUniqueId(), inventory);
-        }
-
-        user.getPlayer().openInventory(inventory);
     }
 
     @Override

@@ -1,0 +1,9 @@
+name: "&8Vaults [%page%/%maxPage%]"
+size: 54
+items:
+  items:
+    isPermanent: true
+    update: true
+    type: ZVAULTS_VAULT_ITEMS
+    slots:
+      - 0-53

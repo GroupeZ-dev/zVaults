@@ -33,3 +33,8 @@ vaults_icons:
       - ""
       - "&7Clic droit pour prendre 1"
       - "&7Shift + clic droit pour prendre 64"
+  empty_item:
+    material: BARRIER
+    name: "&c&lAucun objet"
+    lore:
+      - "&7Slot Interdit"

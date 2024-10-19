@@ -27,6 +27,7 @@ import fr.traqueur.vaults.commands.arguments.OwnerTypeArgument;
 import fr.traqueur.vaults.commands.arguments.UserArgument;
 import fr.traqueur.vaults.gui.VaultsChooseMenu;
 import fr.traqueur.vaults.gui.buttons.VaultButton;
+import fr.traqueur.vaults.gui.buttons.VaultItemButton;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
 import fr.traqueur.vaults.users.ZUserManager;
@@ -101,10 +102,12 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         buttonManager.unregisters(this);
         buttonManager.register(new NoneLoader(this, VaultButton.class, "zvaults_vaults"));
+        buttonManager.register(new NoneLoader(this, VaultItemButton.class, "zvaults_vault_items"));
 
         inventoryManager.deleteInventories(this);
         try {
             this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vaults_choose_menu.yml", VaultsChooseMenu.class);
+            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_menu.yml");
         } catch (InventoryException e) {
             throw new RuntimeException(e);
         }
