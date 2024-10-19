@@ -17,7 +17,7 @@ public interface VaultsManager extends Manager {
 
     Vault getOpenedVault(User user);
 
-    void closeVault(Vault vault);
+    void closeVault(User user, Vault vault);
 
     void openVault(User user, Vault vault);
 

@@ -15,5 +15,5 @@ public interface VaultsConfiguration extends Configuration {
 
     MenuItemStack getIcon(String id);
 
-    String getVaultTitle();
+    String getVaultTitle(String key);
 }

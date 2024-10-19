@@ -1,4 +1,4 @@
-name: "&8Vaults [%page%/%maxPage%]"
+name: "%vault_name%"
 size: 54
 items:
   items:

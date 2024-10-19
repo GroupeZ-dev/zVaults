@@ -15,7 +15,11 @@ default_size: 27
 # - "max_size" : Chaque vault a une taille configurable, mais ne peut pas être plus grande que 'default_size'.
 size_mode: DEFAULT
 
-vault_title: "<gold><bold>Vault"
+vault_title:
+  default: "<gold><bold>Vault"
+  9: "<gold><bold>Vault 9"
+  27: "<gold><bold>Vault 27"
+  54: "<gold><bold>Vault 54"
 
 vaults_icons:
   open_vault:

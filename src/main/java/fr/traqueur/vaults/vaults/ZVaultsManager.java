@@ -28,7 +28,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     private final OwnerResolver ownerResolver;
     private final Service<Vault, VaultDTO> vaultService;
     private final Map<UUID, Vault> vaults;
-    private final Map<UUID, Vault> openedVaults;
+    private final Map<UUID, List<UUID>> openedVaults;
 
     public ZVaultsManager(VaultsConfiguration configuration) {
         this.configuration = configuration;
@@ -51,33 +51,24 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void openVault(User user, Vault vault) {
-        this.openedVaults.put(user.getUniqueId(), vault);
+        this.openedVaults.computeIfAbsent(vault.getUniqueId(), uuid -> new ArrayList<>()).add(user.getUniqueId());
         this.getPlugin().getInventoryManager().openInventory(user.getPlayer(), "vault_menu");
     }
 
     @Override
     public Vault getOpenedVault(User user) {
-        return this.openedVaults.get(user.getUniqueId());
+        return this.vaults.values()
+                .stream()
+                .filter(vault -> this.openedVaults.getOrDefault(vault.getUniqueId(), Collections.emptyList()).contains(user.getUniqueId()))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
-    public void closeVault(Vault vault) {
-
-    }
-
-    private VaultItem createVaultItemFromItemStack(ItemStack item) {
-        if(item == null || item.getType() == Material.AIR) {
-            return new VaultItem(new ItemStack(Material.AIR), 1);
-        }
-        ItemMeta meta = item.getItemMeta();
-        if(meta == null) {
-            return new VaultItem(item, item.getAmount());
-        }
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        if(!container.has(this.getAmountKey(), PersistentDataType.INTEGER)) {
-            return new VaultItem(item, item.getAmount());
-        } else {
-            return new VaultItem(item, container.getOrDefault(this.getAmountKey(), PersistentDataType.INTEGER, 0));
+    public void closeVault(User user, Vault vault) {
+        this.openedVaults.computeIfAbsent(vault.getUniqueId(), k -> new ArrayList<>()).remove(user.getUniqueId());
+        if(this.openedVaults.getOrDefault(vault.getUniqueId(), Collections.emptyList()).isEmpty()) {
+            this.saveVault(vault);
         }
     }
 

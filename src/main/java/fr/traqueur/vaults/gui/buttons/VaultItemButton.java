@@ -23,6 +23,7 @@ public class VaultItemButton extends ZButton {
 
 
     private final VaultsPlugin plugin;
+    private final VaultsConfiguration configuration;
     private final VaultsManager vaultsManager;
     private final UserManager userManager;
     private Vault vault;
@@ -31,6 +32,7 @@ public class VaultItemButton extends ZButton {
         this.plugin = (VaultsPlugin) plugin;
         this.vaultsManager = this.plugin.getManager(VaultsManager.class);
         this.userManager =  this.plugin.getManager(UserManager.class);
+        this.configuration =  Configuration.getConfiguration(VaultsConfiguration.class);
     }
 
     @Override
@@ -39,7 +41,7 @@ public class VaultItemButton extends ZButton {
     }
 
     @Override
-    public void onInventoryOpen(Player player, InventoryDefault inventory) {
+    public void onInventoryOpen(Player player, InventoryDefault inventory, Placeholders placeholders) {
 
         inventory.setDisablePlayerInventoryClick(false);
         User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
@@ -47,11 +49,21 @@ public class VaultItemButton extends ZButton {
         if (this.vault == null) {
             player.closeInventory();
         }
+
+        int size = this.vault.getSize();
+        int rows = (int) Math.ceil(size / 9.0);
+        int slots = rows * 9;
+        placeholders.register("vault_name", configuration.getVaultTitle(slots + ""));
+    }
+
+    @Override
+    public void onInventoryClose(Player player, InventoryDefault inventory) {
+        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
+        this.vaultsManager.closeVault(user, vault);
     }
 
     @Override
     public void onRender(Player player, InventoryDefault inventory) {
-        VaultsConfiguration configuration = Configuration.getConfiguration(VaultsConfiguration.class);
         int vaultSize = this.vault.getSize();
         for (int slot : this.slots) {
             ItemStack item;
