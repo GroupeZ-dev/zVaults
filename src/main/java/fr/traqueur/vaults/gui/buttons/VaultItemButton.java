@@ -99,6 +99,7 @@ public class VaultItemButton extends ZButton {
                     if(this.vault.isInfinite()) {
                         event.setCancelled(true);
                     }
+                    player.sendMessage(event.getAction()+"");
                     player.sendMessage("You clicked on the item");
                 };
             } else {

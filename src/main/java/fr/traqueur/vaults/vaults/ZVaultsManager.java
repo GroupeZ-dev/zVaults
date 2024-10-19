@@ -195,8 +195,19 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             VaultItem vaultItem = new VaultItem(item, amount);
             event.getInventory().setItem(correspondingslot, vaultItem.toItem(player, vault.isInfinite()));
             event.getView().setCursor(new ItemStack(Material.AIR));
+        } else if(action == InventoryAction.PLACE_SOME) {
+            this.placeSome(event, cursor, current, slot);
         } else if (action == InventoryAction.SWAP_WITH_CURSOR) {
-            event.setCancelled(vault.isInfinite());
+            if(vault.isInfinite() || slot > vault.getSize()) {
+                return;
+            }
+            if(cursor.getType() == current.getType()) {
+                this.placeSome(event, cursor, current, slot);
+            } else {
+                ItemStack newCursor = new ItemStack(current.getType(), current.getAmount());
+                event.getInventory().setItem(slot, cursor);
+                event.getView().setCursor(newCursor);
+            }
         } else if (action == InventoryAction.PICKUP_ALL) {
             if (slot > vault.getSize()) {
                 return;
@@ -217,6 +228,18 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             }
             event.getView().setCursor(new ItemStack(current.getType(), amount));
         }
+    }
+
+    private void placeSome(InventoryClickEvent event, ItemStack cursor, ItemStack current, int slot) {
+        int currentAmount = current.getAmount();
+        int cursorAmount = cursor.getAmount();
+        int max = current.getMaxStackSize();
+        int newAmount = Math.min(max, currentAmount + cursorAmount);
+        int newCursorAmount = cursorAmount - (newAmount - currentAmount);
+        ItemStack newCursor = new ItemStack(cursor.getType(), newCursorAmount);
+        ItemStack newCurrent = new ItemStack(current.getType(), newAmount);
+        event.getInventory().setItem(slot, newCurrent);
+        event.getView().setCursor(newCursor);
     }
 
     @Override
