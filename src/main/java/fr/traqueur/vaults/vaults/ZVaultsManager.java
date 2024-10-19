@@ -298,27 +298,36 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 var notAdded = player.getInventory().addItem(toAdd);
                 int rest = notAdded.isEmpty() ? 0 : notAdded.values().iterator().next().getAmount();
                 int realAmount = amount - rest;
-                int newAmount = this.getAmountFromItem(current) - realAmount;
-                if(newAmount == 0) {
-                    event.getInventory().setItem(slot, new ItemStack(Material.AIR));
-                } else {
-                    VaultItem vaultItem = new VaultItem(current, newAmount);
-                    event.getInventory().setItem(slot, vaultItem.toItem(player, vault.isInfinite()));
-                }
+                this.changeCurrent(event, player, current, slot, vault, realAmount);
             } else {
                var notAdded = player.getInventory().addItem(current);
                ItemStack newCurrent = notAdded.isEmpty() ? new ItemStack(Material.AIR) : notAdded.values().iterator().next();
                event.setCurrentItem(newCurrent);
             }
-
-
         }
-
     }
 
     @Override
-    public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean b) {
-
+    public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean controlDrop) {
+        if(slot > vault.getSize()) {
+            return;
+        }
+        int amount = controlDrop ? Math.min(current.getMaxStackSize(), this.getAmountFromItem(current)) : 1;
+        if(vault.isInfinite()) {
+            ItemStack toDrop = new ItemStack(current.getType(), amount);
+            player.getWorld().dropItem(player.getLocation(), toDrop);
+            this.changeCurrent(event, player, current, slot, vault, amount);
+        } else {
+            ItemStack toDrop = new ItemStack(current.getType(), amount);
+            player.getWorld().dropItem(player.getLocation(), toDrop);
+            ItemStack newCurrent;
+            if(current.getAmount() - amount == 0) {
+                newCurrent = new ItemStack(Material.AIR);
+            } else {
+                newCurrent = new ItemStack(current.getType(), current.getAmount() - amount);
+            }
+            event.getInventory().setItem(slot, newCurrent);
+        }
     }
 
     @Override
@@ -333,6 +342,16 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     private List<Vault> getVaults(UUID owner) {
         return this.vaults.values().stream().filter(vault -> vault.getOwner().getUniqueId().equals(owner)).collect(Collectors.toList());
+    }
+
+    private void changeCurrent(InventoryClickEvent event, Player player, ItemStack current, int slot, Vault vault, int amount) {
+        int newAmount = this.getAmountFromItem(current) - amount;
+        if(newAmount == 0) {
+            event.getInventory().setItem(slot, new ItemStack(Material.AIR));
+        } else {
+            VaultItem vaultItem = new VaultItem(current, newAmount);
+            event.getInventory().setItem(slot, vaultItem.toItem(player, vault.isInfinite()));
+        }
     }
 
     private void placeOne(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, Vault vault) {
