@@ -246,23 +246,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
         if(slot >= inventorySize) {
             if(vault.isInfinite()) {
-                int correspondingslot = event.getInventory().first(current.getType());
-                if(correspondingslot == -1) {
-                    correspondingslot = event.getInventory().firstEmpty();
-                }
-                if(correspondingslot == -1) {
-                    return;
-                }
-                ItemStack item = event.getInventory().getItem(correspondingslot);
-                int amount;
-                if(item == null || item.getType().isAir()) {
-                    item = new ItemStack(current.getType());
-                    amount = current.getAmount();
-                } else {
-                    amount = this.getAmountFromItem(item) + current.getAmount();
-                }
-                VaultItem vaultItem = new VaultItem(item, amount);
-                event.getInventory().setItem(correspondingslot, vaultItem.toItem(player, vault.isInfinite()));
+                this.addItem(event, current, vault, player, current.getAmount());
                 event.setCurrentItem(new ItemStack(Material.AIR));
             } else {
                 Inventory inventory = Bukkit.createInventory(null, inventorySize, "");
