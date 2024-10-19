@@ -235,7 +235,12 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         } else if(action == InventoryAction.PLACE_ONE) {
             this.placeOne(event, player, cursor, current, slot, vault);
         } else if(action == InventoryAction.SWAP_WITH_CURSOR) {
-            this.placeOne(event, player, cursor, current, slot, vault);
+            if(this.isSimilar(cursor, current)) {
+                this.placeOne(event, player, cursor, current, slot, vault);
+            } else {
+                event.getInventory().setItem(slot, cursor);
+                event.getView().setCursor(new ItemStack(current.getType(), current.getAmount()));
+            }
         }
     }
 
