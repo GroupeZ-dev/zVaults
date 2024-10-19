@@ -191,7 +191,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             if(vault.isInfinite()) {
                 this.addItem(event, cursor, vault, player, cursor.getAmount());
             } else {
-                if(cursor.getType() == current.getType()) {
+                if(this.isSimilar(cursor, current)) {
                     this.placeSome(event, cursor, current, slot);
                 } else {
                     ItemStack newCursor = new ItemStack(current.getType(), current.getAmount());
@@ -333,12 +333,41 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
+    public void handleDoubleClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+
+    }
+
+    @Override
     public void save() {
         this.vaults.values().forEach(this.vaultService::save);
     }
 
     private List<Vault> getVaults(UUID owner) {
         return this.vaults.values().stream().filter(vault -> vault.getOwner().getUniqueId().equals(owner)).collect(Collectors.toList());
+    }
+
+    private boolean isSimilar(ItemStack item1, ItemStack item2) {
+        if(item1 == null && item2 != null || item1 != null && item2 == null) {
+            return false;
+        }
+        if(item2 == null && item1 == null) {
+            return true;
+        }
+
+        if(item1.getType() != item2.getType()) {
+            return false;
+        }
+        ItemMeta meta1 = item1.getItemMeta();
+        ItemMeta meta2 = item2.getItemMeta();
+        if(meta1 == null && meta2 != null || meta1 != null && meta2 == null) {
+            return false;
+        }
+        if(meta1 == null && meta2 == null) {
+            return true;
+        }
+        int customModelData1 = meta1.hasCustomModelData() ? meta1.getCustomModelData() : -1;
+        int customModelData2 = meta2.hasCustomModelData() ? meta2.getCustomModelData() : -1;
+        return customModelData1 == customModelData2;
     }
 
     private void changeCurrent(InventoryClickEvent event, Player player, ItemStack current, int slot, Vault vault, int amount) {
