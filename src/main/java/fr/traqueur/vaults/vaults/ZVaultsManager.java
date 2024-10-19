@@ -230,18 +230,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
     }
 
-    private void placeSome(InventoryClickEvent event, ItemStack cursor, ItemStack current, int slot) {
-        int currentAmount = current.getAmount();
-        int cursorAmount = cursor.getAmount();
-        int max = current.getMaxStackSize();
-        int newAmount = Math.min(max, currentAmount + cursorAmount);
-        int newCursorAmount = cursorAmount - (newAmount - currentAmount);
-        ItemStack newCursor = new ItemStack(cursor.getType(), newCursorAmount);
-        ItemStack newCurrent = new ItemStack(current.getType(), newAmount);
-        event.getInventory().setItem(slot, newCurrent);
-        event.getView().setCursor(newCursor);
-    }
-
     @Override
     public void handleRightClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
 
@@ -269,6 +257,18 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     private List<Vault> getVaults(UUID owner) {
         return this.vaults.values().stream().filter(vault -> vault.getOwner().getUniqueId().equals(owner)).collect(Collectors.toList());
+    }
+
+    private void placeSome(InventoryClickEvent event, ItemStack cursor, ItemStack current, int slot) {
+        int currentAmount = current.getAmount();
+        int cursorAmount = cursor.getAmount();
+        int max = current.getMaxStackSize();
+        int newAmount = Math.min(max, currentAmount + cursorAmount);
+        int newCursorAmount = cursorAmount - (newAmount - currentAmount);
+        ItemStack newCursor =  newCursorAmount == 0 ? new ItemStack(Material.AIR) : new ItemStack(cursor.getType(), newCursorAmount);
+        ItemStack newCurrent = new ItemStack(current.getType(), newAmount);
+        event.getInventory().setItem(slot, newCurrent);
+        event.getView().setCursor(newCursor);
     }
 
     private void registerResolvers(OwnerResolver ownerResolver) {
