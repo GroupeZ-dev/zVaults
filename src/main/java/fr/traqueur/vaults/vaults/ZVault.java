@@ -15,7 +15,7 @@ public class ZVault implements Vault {
     private final VaultOwner owner;
     private final List<VaultItem> content;
     private final boolean infinite;
-    private final Material material;
+    private Material material;
     private int size;
 
     public ZVault(VaultOwner owner, Material material, int size, boolean infinite) {
@@ -70,5 +70,10 @@ public class ZVault implements Vault {
     @Override
     public Material getIcon() {
         return material;
+    }
+
+    @Override
+    public void setIcon(Material icon) {
+        this.material = icon;
     }
 }

@@ -31,10 +31,7 @@ import fr.traqueur.vaults.gui.VaultAccessManagerMenu;
 import fr.traqueur.vaults.gui.VaultConfigMenu;
 import fr.traqueur.vaults.gui.VaultMenu;
 import fr.traqueur.vaults.gui.VaultsChooseMenu;
-import fr.traqueur.vaults.gui.buttons.UserAccessButton;
-import fr.traqueur.vaults.gui.buttons.VaultButton;
-import fr.traqueur.vaults.gui.buttons.VaultInviteButton;
-import fr.traqueur.vaults.gui.buttons.VaultItemButton;
+import fr.traqueur.vaults.gui.buttons.*;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
 import fr.traqueur.vaults.users.ZUserManager;
@@ -114,6 +111,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         buttonManager.register(new NoneLoader(this, VaultItemButton.class, "zvaults_vault_items"));
         buttonManager.register(new NoneLoader(this, VaultInviteButton.class, "zvaults_invite_player"));
         buttonManager.register(new NoneLoader(this, UserAccessButton.class, "zvaults_vault_users_access"));
+        buttonManager.register(new NoneLoader(this, CustomizeIconButton.class, "zvaults_customize_icon"));
 
         inventoryManager.deleteInventories(this);
         try {

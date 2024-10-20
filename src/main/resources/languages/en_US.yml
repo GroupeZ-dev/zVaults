@@ -19,3 +19,5 @@ not_permission_configure_vault: "<red>You do not have permission to configure th
 already_access_to_vault: "<red>The player %player% have already have access to this vault."
 successfully_added_access_to_vault: "<green>Successfully added access to %player%."
 successfully_removed_access_to_vault: "<green>Successfully removed access to %player%."
+item_cant_be_null: "<red>The item in your and can't be empty."
+vault_icon_change: "<green>Vault icon changed to <yellow>%new_icon%<green>."

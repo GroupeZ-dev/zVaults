@@ -24,7 +24,7 @@ public enum Message {
     NOT_PERMISSION_CONFIGURE_VAULT,
     ALREADY_ACCESS_TO_VAULT,
     SUCCESSFULLY_ADDED_ACCESS_TO_VAULT,
-    SUCCESSFULLY_REMOVED_ACCESS_TO_VAULT;
+    SUCCESSFULLY_REMOVED_ACCESS_TO_VAULT, ITEM_CANT_BE_NULL, VAULT_ICON_CHANGE;
 
     public String translate(Formatter... formatters) {
         return translate(false, formatters);

@@ -15,3 +15,13 @@ items:
     else:
       item:
         material: BARRIER
+  customize:
+    type: ZVAULTS_CUSTOMIZE_ICON
+    permission: "zvaults.customize.icon"
+    slot: 12
+    item:
+      material: NETHER_STAR
+      name: "#92bed8ᴄᴜsᴛᴏᴍɪᴢᴇ ɪᴄᴏɴ"
+      lore:
+        - ""
+        - "#92bed8ᴄʟɪᴄᴋ &7ᴛᴏ ᴄʜᴀɴɢᴇ ɪᴄᴏɴ ᴏғ ᴠᴀᴜʟᴛ"

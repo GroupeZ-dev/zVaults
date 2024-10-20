@@ -28,6 +28,8 @@ public interface Vault {
 
     Material getIcon();
 
+    void setIcon(Material icon);
+
     default boolean isOwner(User user) {
         return this.getOwner().hasAccess(user.getUniqueId());
     }

@@ -6,6 +6,7 @@ import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.serialization.Base64;
+import fr.traqueur.vaults.api.serialization.MaterialLocalization;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -41,7 +42,7 @@ public record VaultItem(ItemStack item, int amount) {
             MenuItemStack item = Configuration.getConfiguration(VaultsConfiguration.class).getIcon("vault_item");
 
             Placeholders placeholders = new Placeholders();
-            placeholders.register("material_name", getTranslateName(this.item.getType()));
+            placeholders.register("material_name", MaterialLocalization.getTranslateName(this.item.getType()));
             placeholders.register("amount", String.valueOf(this.amount));
             placeholders.register("material", this.item.getType().name());
 
@@ -58,24 +59,6 @@ public record VaultItem(ItemStack item, int amount) {
         }
 
         return this.item;
-    }
-
-    private String getTranslateName(Material material){
-        String key;
-        if(material.isBlock()){
-            String id = material.getKey().getKey();
-
-            key =  "block.minecraft."+id;
-        } else if(material.isItem()){
-            String id = material.getKey().getKey();
-
-            key =  "item.minecraft."+id;
-        } else {
-            throw new IllegalArgumentException("Material is not a block or item");
-        }
-
-        return new TranslatableComponent(key).toPlainText();
-
     }
 
 }

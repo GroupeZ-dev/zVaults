@@ -19,6 +19,7 @@ import fr.traqueur.vaults.configurator.access.ZSharedAccess;
 import fr.traqueur.vaults.configurator.access.ZSharedAccessRepository;
 import fr.traqueur.vaults.storage.migrations.SharedAccessMigration;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Material;
 
 import java.util.*;
 

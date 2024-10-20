@@ -19,3 +19,5 @@ not_permission_configure_vault: "<red>Vous n'avez pas la permission de configure
 already_access_to_vault: "<red>Le joueur %player% a déjà accès à ce coffre."
 successfully_added_access_to_vault: "<green>Accès ajouté avec succès à %player%."
 successfully_removed_access_to_vault: "<green>Accès retiré avec succès à %player%."
+item_cant_be_null: "<red>L'item dans votre main ne peut pas être vide."
+vault_icon_change: "<green>Icone du coffre changée pour <yellow>%new_icon%<green>."
