@@ -1,4 +1,4 @@
-package fr.traqueur.vaults.commands;
+package fr.traqueur.vaults.commands.admin;
 
 import fr.traqueur.commands.api.Arguments;
 import fr.traqueur.commands.api.Command;
@@ -26,6 +26,8 @@ public class CreateCommand extends Command<VaultsPlugin> {
 
         this.userManager = plugin.getManager(UserManager.class);
         this.vaultsManager = plugin.getManager(VaultsManager.class);
+
+        this.setPermission("vaults.admin.create");
 
         this.addArgs("receiver:user");
         this.addArgs("size:int", (sender) -> this.vaultsManager.getSizeTabulation());

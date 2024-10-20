@@ -1,4 +1,4 @@
-package fr.traqueur.vaults.commands;
+package fr.traqueur.vaults.commands.admin;
 
 import fr.traqueur.commands.api.Arguments;
 import fr.traqueur.commands.api.Command;
@@ -26,6 +26,8 @@ public class SetSizeCommand extends Command<VaultsPlugin> {
 
         this.userManager = plugin.getManager(UserManager.class);
         this.vaultsManager = plugin.getManager(VaultsManager.class);
+
+        this.setPermission("vaults.admin.setsize");
 
         this.addArgs("receiver:user");
         this.addArgs("vault_num:int", (sender) -> this.vaultsManager.getNumVaultsTabulation());

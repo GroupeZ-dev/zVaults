@@ -38,6 +38,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     private final Map<UUID, Vault> vaults;
     private final Map<UUID, List<UUID>> openedVaults;
     private final Map<UUID, InventoryDefault> linkedVaultToInventory;
+    private final Map<UUID, User> targetUserVaultsChoose;
 
     public ZVaultsManager(VaultsConfiguration configuration) {
         this.configuration = configuration;
@@ -47,6 +48,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         this.vaults = new HashMap<>();
         this.openedVaults = new HashMap<>();
         this.linkedVaultToInventory = new HashMap<>();
+        this.targetUserVaultsChoose = new HashMap<>();
 
         this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this.ownerResolver), VAULT_TABLE_NAME);
         MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
@@ -372,6 +374,22 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
         this.getPlugin().getManager(VaultConfigurationManager.class).delete(vault);
         this.vaultService.delete(vault);
+    }
+
+    @Override
+    public void openVaultChooseMenu(User user, User target) {
+        this.targetUserVaultsChoose.put(user.getUniqueId(), target);
+        this.getPlugin().getInventoryManager().openInventory(user.getPlayer(), "vaults_choose_menu");
+    }
+
+    @Override
+    public User getTargetUser(User user) {
+        return this.targetUserVaultsChoose.get(user.getUniqueId());
+    }
+
+    @Override
+    public void closeVaultChooseMenu(User user) {
+        this.targetUserVaultsChoose.remove(user.getUniqueId());
     }
 
     @Override

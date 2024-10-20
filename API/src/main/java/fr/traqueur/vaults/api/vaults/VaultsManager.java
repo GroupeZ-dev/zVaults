@@ -59,4 +59,10 @@ public interface VaultsManager extends Manager {
     void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault);
 
     void deleteVault(Vault vault);
+
+    void openVaultChooseMenu(User user, User target);
+
+    User getTargetUser(User user);
+
+    void closeVaultChooseMenu(User user);
 }

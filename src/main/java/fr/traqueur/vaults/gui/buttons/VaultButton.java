@@ -26,6 +26,7 @@ public class VaultButton extends ZButton implements PaginateButton {
     private final VaultsManager vaultsManager;
     private final UserManager userManager;
     private final VaultConfigurationManager vaultConfigurationManager;
+    private User target;
 
     public VaultButton(Plugin plugin) {
         this.plugin = (VaultsPlugin) plugin;
@@ -40,6 +41,18 @@ public class VaultButton extends ZButton implements PaginateButton {
     }
 
     @Override
+    public void onInventoryOpen(Player player, InventoryDefault inventory, Placeholders placeholders) {
+        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
+        this.target = this.vaultsManager.getTargetUser(user);
+    }
+
+    @Override
+    public void onInventoryClose(Player player, InventoryDefault inventory) {
+        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
+        this.vaultsManager.closeVaultChooseMenu(user);
+    }
+
+    @Override
     public void onRender(Player player, InventoryDefault inventory) {
         displayItems(player, inventory);
     }
@@ -48,7 +61,7 @@ public class VaultButton extends ZButton implements PaginateButton {
         VaultsConfiguration configuration = Configuration.getConfiguration(VaultsConfiguration.class);
         Pagination<Vault> pagination = new Pagination<>();
         User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        List<Vault> vaults = this.vaultsManager.getVaults(user);
+        List<Vault> vaults = this.vaultsManager.getVaults(this.target);
         List<Vault> buttons = pagination.paginate(vaults, this.slots.size(), inventory.getPage());
 
         for (int i = 0; i != Math.min(buttons.size(), this.slots.size()); i++) {
@@ -62,7 +75,7 @@ public class VaultButton extends ZButton implements PaginateButton {
                 if(event.getClick() == ClickType.LEFT) {
                     this.vaultsManager.openVault(user, vault);
                 } else if(event.getClick() == ClickType.RIGHT) {
-                    if(!vault.isOwner(user) && !user.hasPermission("zvaults.bypass")) {
+                    if(!vault.isOwner(user) && !user.hasPermission("zvaults.admin")) {
                         user.sendMessage(Message.NOT_PERMISSION_CONFIGURE_VAULT);
                         return;
                     }
