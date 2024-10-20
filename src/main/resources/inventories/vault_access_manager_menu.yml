@@ -1,5 +1,5 @@
-name: "&8ᴠᴀᴜʟᴛs [%page%/%maxPage%]"
-size: 27
+name: "&8ᴀᴄᴄᴇss ᴍᴀɴᴀɢᴇʀ [%page%/%maxPage%]"
+size: 54
 items:
   decoration:
     isPermanent: true
@@ -8,8 +8,10 @@ items:
       name: "&e"
     slots:
       - 0-9
-      - 17
-      - 19-25
+      - 17-18
+      - 26-27
+      - 35-36
+      - 44-53
   next:
     type: NEXT
     isPermanent: true
@@ -41,6 +43,6 @@ items:
   items:
     isPermanent: true
     update: true
-    type: ZVAULTS_VAULTS
+    type: ZVAULTS_VAULT_USERS_ACCESS
     slots:
-      - 10-16
+      - 10-43

@@ -6,7 +6,11 @@ items:
     permission: "zvaults.invite"
     item:
       material: EMERALD
-      name: "#92bed8Iɴᴠɪᴛᴇ Pʟᴀʏᴇʀ"
+      name: "#92bed8ᴍᴀɴᴀɢᴇ ᴀᴄᴄᴇss ᴛᴏ ᴠᴀᴜʟᴛ"
+      lore:
+        - "#92bed8ʀɪɢʜᴛ ᴄʟɪᴄᴋ &7ᴛᴏ ɪɴᴠɪᴛᴇ ᴘʟᴀʏᴇʀ"
+        - ""
+        - "#92bed8ʟᴇғᴛ ᴄʟɪᴄᴋ &7ᴛᴏ ᴍᴀɴᴀɢᴇ ᴡʜᴏ ʜᴀᴠᴇ ᴀᴄᴄᴇss"
     slot: 10
     else:
       item:

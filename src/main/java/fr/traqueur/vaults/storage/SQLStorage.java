@@ -105,11 +105,17 @@ public class SQLStorage implements Storage {
                     field.setAccessible(true);
                     Object obj = field.get(dto);
 
+                    String name = recordComponent.getName();
+
+                    if(recordComponent.isAnnotationPresent(Column.class)) {
+                        name = recordComponent.getAnnotation(Column.class).value();
+                    }
+
                     if(obj instanceof UUID uuid) {
-                        table1.where(recordComponent.getName(), uuid.toString());
+                        table1.where(name, uuid.toString());
                         continue;
                     }
-                    table1.where(recordComponent.getName(), obj);
+                    table1.where(name, obj);
                 } catch (IllegalAccessException | NoSuchFieldException e) {
                     throw new RuntimeException(e);
                 }

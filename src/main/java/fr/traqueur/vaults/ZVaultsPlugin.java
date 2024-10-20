@@ -27,8 +27,10 @@ import fr.traqueur.vaults.commands.VaultsCommand;
 import fr.traqueur.vaults.commands.arguments.OwnerTypeArgument;
 import fr.traqueur.vaults.commands.arguments.UserArgument;
 import fr.traqueur.vaults.configurator.ZVaultConfigurationManager;
+import fr.traqueur.vaults.gui.VaultAccessManagerMenu;
 import fr.traqueur.vaults.gui.VaultConfigMenu;
 import fr.traqueur.vaults.gui.VaultsChooseMenu;
+import fr.traqueur.vaults.gui.buttons.UserAccessButton;
 import fr.traqueur.vaults.gui.buttons.VaultButton;
 import fr.traqueur.vaults.gui.buttons.VaultInviteButton;
 import fr.traqueur.vaults.gui.buttons.VaultItemButton;
@@ -42,7 +44,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -53,13 +57,13 @@ public final class ZVaultsPlugin extends VaultsPlugin {
     private InventoryManager inventoryManager;
     private ButtonManager buttonManager;
     private MessageResolver messageResolver;
-    private Set<Saveable> saveables;
+    private List<Saveable> saveables;
 
     @Override
     public void onEnable() {
         long start = System.currentTimeMillis();
         VaultsLogger.info("&e=== ENABLE START ===");
-        this.saveables = new HashSet<>();
+        this.saveables = new ArrayList<>();
         this.scheduler = new FoliaLib(this).getScheduler();
         this.inventoryManager = this.getProvider(InventoryManager.class);
         this.buttonManager = this.getProvider(ButtonManager.class);
@@ -110,12 +114,14 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         buttonManager.register(new NoneLoader(this, VaultButton.class, "zvaults_vaults"));
         buttonManager.register(new NoneLoader(this, VaultItemButton.class, "zvaults_vault_items"));
         buttonManager.register(new NoneLoader(this, VaultInviteButton.class, "zvaults_invite_player"));
+        buttonManager.register(new NoneLoader(this, UserAccessButton.class, "zvaults_vault_users_access"));
 
         inventoryManager.deleteInventories(this);
         try {
             this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vaults_choose_menu.yml", VaultsChooseMenu.class);
             this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_menu.yml");
             this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_config_menu.yml", VaultConfigMenu.class);
+            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_access_manager_menu.yml", VaultAccessManagerMenu.class);
         } catch (InventoryException e) {
             throw new RuntimeException(e);
         }

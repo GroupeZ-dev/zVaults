@@ -20,12 +20,12 @@ import fr.traqueur.vaults.configurator.access.ZSharedAccessRepository;
 import fr.traqueur.vaults.storage.migrations.SharedAccessMigration;
 import net.wesjd.anvilgui.AnvilGUI;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 
 public class ZVaultConfigurationManager implements VaultConfigurationManager, Saveable {
 
     private final Map<UUID, List<UUID>> openedConfigVaults;
+    private final Map<UUID, List<UUID>> openedAccessManagerVaults;
     private final Map<UUID, List<SharedAccess>> sharedAccesses;
 
     private final Service<SharedAccess, SharedAccessDTO> sharedAccessService;
@@ -33,6 +33,7 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
     public ZVaultConfigurationManager() {
         this.openedConfigVaults = new HashMap<>();
         this.sharedAccesses = new HashMap<>();
+        this.openedAccessManagerVaults = new HashMap<>();
 
         this.sharedAccessService = new Service<>(this.getPlugin(), SharedAccessDTO.class, new ZSharedAccessRepository(this.getPlugin()), SHARED_ACCESS_TABLE);
         MigrationManager.registerMigration(new SharedAccessMigration(SHARED_ACCESS_TABLE));
@@ -52,6 +53,7 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
     @Override
     public boolean hasAccess(Vault vault, User user) {
         if(!this.sharedAccesses.containsKey(vault.getUniqueId())) {
+            System.out.println("Shared access is null");
             return false;
         }
         return this.sharedAccesses.get(vault.getUniqueId()).stream().anyMatch(sharedAccess -> sharedAccess.getUser().getUniqueId().equals(user.getUniqueId()));
@@ -86,6 +88,46 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
                 .title(config.title())
                 .plugin(this.getPlugin())
                 .open(user.getPlayer());
+    }
+
+    @Override
+    public void openAccessManagerMenu(User user, Vault vault) {
+        this.closeVaultConfig(user);
+        this.openedAccessManagerVaults.computeIfAbsent(vault.getUniqueId(), uuid -> new ArrayList<>()).add(user.getUniqueId());
+        this.getPlugin().getInventoryManager().openInventory(user.getPlayer(), "vault_access_manager_menu");
+    }
+
+    @Override
+    public void closeAccessManagerMenu(User user) {
+        this.openedAccessManagerVaults.values().forEach(uuids -> uuids.remove(user.getUniqueId()));
+    }
+
+    @Override
+    public Vault getOpenedAccessManager(User user) {
+        UUID vaultId = this.openedAccessManagerVaults.keySet().stream().filter(uuid -> this.openedAccessManagerVaults.get(uuid).contains(user.getUniqueId())).findFirst().orElseThrow();
+        return this.getPlugin().getManager(VaultsManager.class).getVault(vaultId);
+    }
+
+    @Override
+    public List<User> getWhoCanAccess(Vault vault) {
+        if(!this.sharedAccesses.containsKey(vault.getUniqueId())) {
+            return new ArrayList<>();
+        }
+        return this.sharedAccesses.getOrDefault(vault.getUniqueId(), new ArrayList<>()).stream().map(SharedAccess::getUser).toList();
+    }
+
+    @Override
+    public void removeAccess(Vault vault, User user) {
+        if(!this.hasAccess(vault, user)) {
+            return;
+        }
+        this.sharedAccesses.get(vault.getUniqueId()).removeIf(sharedAccess -> {
+            if(!sharedAccess.getUser().getUniqueId().equals(user.getUniqueId())) {
+                return false;
+            }
+            this.sharedAccessService.delete(sharedAccess);
+            return true;
+        });
     }
 
     @Override

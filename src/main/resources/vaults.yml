@@ -44,3 +44,11 @@ vaults_icons:
     name: "&c&lAᴜᴄᴜɴ ᴏʙᴊᴇᴛ"
     lore:
       - "&fSʟᴏᴛ Iɴᴛᴇʀᴅɪᴛ"
+  user_access_vault_item:
+    material: PLAYER_HEAD
+    name: "#92bed8%player_name%"
+    lore:
+      - "&7ᴛʜɪs #92bed8ᴘʟᴀʏᴇʀ &7ʜᴀᴠᴇ ᴀᴄᴄᴇss"
+      - "&7ᴛᴏ ʏᴏᴜʀ #92bed8ᴠᴀᴜʟᴛ"
+      - ""
+      - "#92bed8ʟᴇғᴛ ᴄʟɪᴄᴋ &7ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴀᴄᴄᴇss"

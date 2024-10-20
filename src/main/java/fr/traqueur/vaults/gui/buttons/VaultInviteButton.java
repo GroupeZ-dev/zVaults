@@ -40,7 +40,7 @@ public class VaultInviteButton extends ZButton {
         if (clickType == ClickType.LEFT) {
             this.vaultConfigurationManager.openInvitationMenu(user, vault);
         } else if (clickType == ClickType.RIGHT) {
-            //manage invites
+            this.vaultConfigurationManager.openAccessManagerMenu(user, vault);
         }
     }
 }
