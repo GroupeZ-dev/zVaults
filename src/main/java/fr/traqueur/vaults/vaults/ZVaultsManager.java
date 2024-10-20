@@ -119,10 +119,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public boolean sizeIsAvailable(int size) {
-        if(size % 9 != 0) {
-            return false;
-        }
-
         return switch (configuration.getSizeMode()) {
             case DEFAULT -> size == configuration.getDefaultSize();
             case MIN_SIZE -> size >= configuration.getDefaultSize() && size <= 54;
@@ -139,11 +135,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     public List<String> getSizeTabulation() {
         return switch (configuration.getSizeMode()) {
             case DEFAULT -> Stream.of(configuration.getDefaultSize()).map(String::valueOf).toList();
-            case MIN_SIZE -> IntStream.iterate(configuration.getDefaultSize(), n -> n + 9)
-                    .limit((54 - configuration.getDefaultSize()) / 9 + 1)
+            case MIN_SIZE -> IntStream.iterate(configuration.getDefaultSize(), n -> n + 1)
+                    .limit((54 - configuration.getDefaultSize()) + 1)
                     .filter(n -> n <= 54).mapToObj(String::valueOf).toList();
-            case MAX_SIZE -> IntStream.iterate(9, n -> n + 9)
-                    .limit((configuration.getDefaultSize() - 9) / 9 + 1)
+            case MAX_SIZE -> IntStream.iterate(1, n -> n + 1)
+                    .limit((configuration.getDefaultSize()) + 1)
                     .filter(n -> n <= configuration.getDefaultSize()).mapToObj(String::valueOf).toList();
         };
     }
