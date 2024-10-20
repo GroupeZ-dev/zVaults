@@ -340,11 +340,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public void handleDoubleClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
-
-    }
-
-    @Override
     public void save() {
         this.vaults.values().forEach(this.vaultService::save);
     }
@@ -444,10 +439,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
         VaultItem vaultItem = new VaultItem(item, amount);
         event.getInventory().setItem(correspondingslot, vaultItem.toItem(player, vault.isInfinite()));
-        if (!cursor.getType().isAir()) {
-            int newAmount = cursor.getAmount() - amountItem;
-            event.getView().setCursor(newAmount == 0 ? new ItemStack(Material.AIR) : new ItemStack(cursor.getType(), newAmount));
-        }
         return true;
     }
 

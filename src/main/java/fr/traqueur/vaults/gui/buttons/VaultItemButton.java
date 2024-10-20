@@ -99,8 +99,6 @@ public class VaultItemButton extends ZButton {
                     if(this.vault.isInfinite()) {
                         event.setCancelled(true);
                     }
-                    player.sendMessage(event.getAction()+"");
-                    player.sendMessage("You clicked on the item");
                 };
             } else {
                 item = configuration.getIcon("empty_item").build(player);
@@ -142,7 +140,6 @@ public class VaultItemButton extends ZButton {
                 this.vaultsManager.handleRightClick(event, player, cursor, current, slot, inventorySize, this.vault);
             }
             case SHIFT_LEFT, SHIFT_RIGHT -> {
-                System.out.println("SHIFT");
                 this.vaultsManager.handleShift(event, player, cursor, current, slot, inventorySize, this.vault);
             }
             case DROP, CONTROL_DROP -> {
@@ -150,9 +147,6 @@ public class VaultItemButton extends ZButton {
             }
             case NUMBER_KEY -> {
                     this.vaultsManager.handleNumberKey(event, player, cursor, current, slot, inventorySize, this.vault);
-            }
-            case DOUBLE_CLICK -> {
-                this.vaultsManager.handleDoubleClick(event, player, cursor, current, slot, inventorySize, this.vault);
             }
         }
 
