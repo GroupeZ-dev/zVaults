@@ -3,7 +3,6 @@ package fr.traqueur.vaults.gui;
 import fr.maxlego08.menu.ZInventory;
 import fr.maxlego08.menu.api.button.Button;
 import fr.traqueur.vaults.gui.buttons.UserAccessButton;
-import fr.traqueur.vaults.gui.buttons.VaultButton;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 

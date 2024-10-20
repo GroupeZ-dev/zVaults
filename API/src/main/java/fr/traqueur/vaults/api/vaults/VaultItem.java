@@ -15,9 +15,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public record VaultItem(ItemStack item, int amount) {
 
     public static VaultItem deserialize(String serialized) {

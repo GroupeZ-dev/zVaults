@@ -3,7 +3,6 @@ package fr.traqueur.vaults.gui;
 import fr.maxlego08.menu.ZInventory;
 import fr.maxlego08.menu.api.button.Button;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
-import fr.maxlego08.menu.zcore.utils.inventory.InventoryResult;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;

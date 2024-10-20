@@ -9,7 +9,6 @@ import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
-import fr.traqueur.vaults.api.vaults.SizeMode;
 import fr.traqueur.vaults.api.vaults.VaultOwner;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import org.bukkit.command.CommandSender;
