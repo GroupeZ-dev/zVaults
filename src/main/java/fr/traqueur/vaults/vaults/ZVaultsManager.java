@@ -251,8 +251,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
         if(slot >= inventorySize) {
             if(vault.isInfinite()) {
-                this.addItem(event, current, vault, player, current.getAmount());
-                event.setCurrentItem(new ItemStack(Material.AIR));
+                if (this.addItem(event, current, vault, player, current.getAmount())) {
+                    event.setCurrentItem(new ItemStack(Material.AIR));
+                }
             } else {
                 Inventory inventory = Bukkit.createInventory(null, inventorySize, "");
                 for(int i = 0; i < vault.getSize(); i++) {
@@ -327,8 +328,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 return;
             }
             int amountItem = hotbarItem.getAmount();
-            this.addItem(event, hotbarItem, vault, player, amountItem);
-            player.getInventory().setItem(event.getHotbarButton(), new ItemStack(Material.AIR));
+            if (this.addItem(event, hotbarItem, vault, player, amountItem)) {
+                player.getInventory().setItem(event.getHotbarButton(), new ItemStack(Material.AIR));
+            }
         } else {
             ItemStack hotbarItem = player.getInventory().getItem(event.getHotbarButton());
             ItemStack currentItem = (current == null || current.getType().isAir()) ? new ItemStack(Material.AIR) : new ItemStack(current.getType(), current.getAmount());
@@ -424,13 +426,13 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         event.getView().setCursor(newCursor);
     }
 
-    private void addItem(InventoryClickEvent event, ItemStack cursor, Vault vault, Player player, int amountItem) {
+    private boolean addItem(InventoryClickEvent event, ItemStack cursor, Vault vault, Player player, int amountItem) {
         int correspondingslot = event.getInventory().first(cursor.getType());
         if(correspondingslot == -1) {
             correspondingslot = event.getInventory().firstEmpty();
         }
         if(correspondingslot == -1) {
-            return;
+            return false;
         }
         ItemStack item = event.getInventory().getItem(correspondingslot);
         int amount;
@@ -446,6 +448,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             int newAmount = cursor.getAmount() - amountItem;
             event.getView().setCursor(newAmount == 0 ? new ItemStack(Material.AIR) : new ItemStack(cursor.getType(), newAmount));
         }
+        return true;
     }
 
     private void registerResolvers(OwnerResolver ownerResolver) {
