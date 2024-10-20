@@ -1,0 +1,9 @@
+name: "%vault_name%"
+size: 54
+items:
+  items:
+    isPermanent: true
+    update: true
+    type: ZVAULTS_VAULT_ITEMS
+    slots:
+      - 0-53

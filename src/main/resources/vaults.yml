@@ -15,21 +15,27 @@ default_size: 27
 # - "max_size" : Chaque vault a une taille configurable, mais ne peut pas être plus grande que 'default_size'.
 size_mode: DEFAULT
 
-vault_title: "<gold><bold>Vault"
+vault_title:
+  default: "&8ᴠᴀᴜʟᴛ"
+  9: "&8ᴠᴀᴜʟᴛ 9"
+  27: "&8ᴠᴀᴜʟᴛ 27"
+  54: "&8ᴠᴀᴜʟᴛ 54"
 
 vaults_icons:
   open_vault:
     material: CHEST
     model_data: 1
-    name: "&6&lVault"
+    name: "&8ᴠᴀᴜʟᴛ"
     lore:
-      - "&7Clic droit pour ouvrir"
-      - "&7votre vault personnel"
+      - "#92bed8ᴄʟɪᴄᴋ ᴅʀᴏɪᴛ &7ᴘᴏᴜʀ ᴏᴜᴠʀɪʀ"
+      - "&7ᴠᴏᴛʀᴇ ᴠᴀᴜʟᴛ ᴘᴇʀsᴏɴɴᴇʟ"
   vault_item:
-    name: "&6&lStock de %material_name%"
+    name: "#92bed8Sᴛᴏᴄᴋ ᴅᴇ &7%material_name%"
     material: "%material%"
     lore:
-      - "Stock: %amount%"
-      - ""
-      - "&7Clic droit pour prendre 1"
-      - "&7Shift + clic droit pour prendre 64"
+      - "#92bed8Sᴛᴏᴄᴋ: &f%amount%"
+  empty_item:
+    material: BARRIER
+    name: "&c&lAᴜᴄᴜɴ ᴏʙᴊᴇᴛ"
+    lore:
+      - "&fSʟᴏᴛ Iɴᴛᴇʀᴅɪᴛ"

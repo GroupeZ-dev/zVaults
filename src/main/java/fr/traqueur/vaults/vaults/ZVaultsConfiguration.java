@@ -24,12 +24,14 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private int maxVaultsPerPlayer;
     private boolean infiniteVaults;
     private SizeMode sizeMode;
-    private String vaultTitle;
     @NonLoadable
     private final Map<String, MenuItemStack> vaultsIcons;
+    @NonLoadable
+    private final Map<String, String> vautlsTitle;
 
     public ZVaultsConfiguration() {
         this.vaultsIcons = new HashMap<>();
+        this.vautlsTitle = new HashMap<>();
         this.load = false;
     }
 
@@ -50,6 +52,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
             } catch (InventoryException e) {
                 throw new RuntimeException(e);
             }
+        });
+
+        config.getConfigurationSection("vault_title").getKeys(false).forEach(key -> {
+            this.vautlsTitle.put(key, config.getString("vault_title." + key));
         });
         this.load = true;
     }
@@ -85,7 +91,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     }
 
     @Override
-    public String getVaultTitle() {
-        return vaultTitle;
+    public String getVaultTitle(String key) {
+        return this.vautlsTitle.getOrDefault(key, this.vautlsTitle.get("default"));
     }
 }

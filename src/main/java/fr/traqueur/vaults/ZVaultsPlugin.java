@@ -27,12 +27,14 @@ import fr.traqueur.vaults.commands.arguments.OwnerTypeArgument;
 import fr.traqueur.vaults.commands.arguments.UserArgument;
 import fr.traqueur.vaults.gui.VaultsChooseMenu;
 import fr.traqueur.vaults.gui.buttons.VaultButton;
+import fr.traqueur.vaults.gui.buttons.VaultItemButton;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
 import fr.traqueur.vaults.users.ZUserManager;
 import fr.traqueur.vaults.vaults.ZVaultsConfiguration;
 import fr.traqueur.vaults.vaults.ZVaultsManager;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
 
@@ -101,10 +103,12 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         buttonManager.unregisters(this);
         buttonManager.register(new NoneLoader(this, VaultButton.class, "zvaults_vaults"));
+        buttonManager.register(new NoneLoader(this, VaultItemButton.class, "zvaults_vault_items"));
 
         inventoryManager.deleteInventories(this);
         try {
             this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vaults_choose_menu.yml", VaultsChooseMenu.class);
+            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_menu.yml");
         } catch (InventoryException e) {
             throw new RuntimeException(e);
         }
@@ -131,9 +135,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
     public void onDisable() {
         long start = System.currentTimeMillis();
         VaultsLogger.info("&e=== DISABLE START ===");
-        if(this.storage != null) {
-            this.storage.onDisable();
-        }
+        Bukkit.getOnlinePlayers().forEach(Player::closeInventory);
         if(this.messageResolver != null) {
             this.messageResolver.close();
         }
@@ -142,6 +144,9 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         }
         if(this.saveables != null) {
             this.saveables.forEach(Saveable::save);
+        }
+        if(this.storage != null) {
+            this.storage.onDisable();
         }
         VaultsLogger.success("&e=== DISABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
     }
