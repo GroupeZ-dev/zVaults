@@ -3,10 +3,13 @@ package fr.traqueur.vaults.commands;
 import fr.traqueur.commands.api.Arguments;
 import fr.traqueur.commands.api.Command;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
+import fr.traqueur.vaults.api.vaults.SizeMode;
 import fr.traqueur.vaults.api.vaults.VaultOwner;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import org.bukkit.command.CommandSender;
@@ -19,7 +22,6 @@ public class CreateCommand extends Command<VaultsPlugin> {
     private final UserManager userManager;
     private final VaultsManager vaultsManager;
 
-    // /zvaults create <player> <size> (<type>)
     public CreateCommand(VaultsPlugin plugin) {
         super(plugin, "create");
 
@@ -28,6 +30,9 @@ public class CreateCommand extends Command<VaultsPlugin> {
 
         this.addArgs("receiver:user");
         this.addArgs("size:int", (sender) -> this.vaultsManager.getSizeTabulation());
+        if (Configuration.getConfiguration(VaultsConfiguration.class).isVaultsInfinity()) {
+            this.addArgs("infinite:boolean");
+        }
         this.addOptinalArgs("type:ownerType");
         this.setGameOnly(true);
     }
@@ -39,11 +44,17 @@ public class CreateCommand extends Command<VaultsPlugin> {
         int size = arguments.get("size");
         Optional<String> opt = arguments.getOptional("type");
         String type = opt.orElse("player");
+        boolean infinite = false;
+
+        if (Configuration.getConfiguration(VaultsConfiguration.class).isVaultsInfinity()) {
+            infinite = arguments.get("infinite");
+        }
+
         if (!this.vaultsManager.sizeIsAvailable(size)) {
             user.sendMessage(Message.SIZE_NOT_AVAILABLE, Formatter.format("%size%", size));
             return;
         }
         VaultOwner owner = this.vaultsManager.generateOwner(type, receiver);
-        this.vaultsManager.createVault(user, owner, size);
+        this.vaultsManager.createVault(user, owner, size, infinite);
     }
 }

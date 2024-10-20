@@ -103,13 +103,13 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public void createVault(User creator, VaultOwner owner, int size) {
+    public void createVault(User creator, VaultOwner owner, int size, boolean infinite) {
         var vaults = this.getVaults(owner.getUniqueId());
         if(this.configuration.getMaxVaultsByPlayer() != -1 && vaults.size() >= this.configuration.getMaxVaultsByPlayer()) {
             creator.sendMessage(Message.MAX_VAULTS_REACHED);
             return;
         }
-        Vault vault = new ZVault(owner, size, configuration.isVaultsInfinity());
+        Vault vault = new ZVault(owner, size, infinite);
         vaults.add(vault);
         this.vaultService.save(vault);
         this.vaults.put(vault.getUniqueId(), vault);
