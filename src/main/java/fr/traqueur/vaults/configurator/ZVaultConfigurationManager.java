@@ -1,15 +1,26 @@
 package fr.traqueur.vaults.configurator;
 
 import fr.maxlego08.sarah.MigrationManager;
+import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.InvitePlayerMenuConfiguration;
+import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.configurator.SharedAccess;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.SharedAccessDTO;
+import fr.traqueur.vaults.api.messages.Formatter;
+import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
+import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
+import fr.traqueur.vaults.api.vaults.VaultsManager;
+import fr.traqueur.vaults.configurator.access.ZSharedAccess;
+import fr.traqueur.vaults.configurator.access.ZSharedAccessRepository;
 import fr.traqueur.vaults.storage.migrations.SharedAccessMigration;
+import net.wesjd.anvilgui.AnvilGUI;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 public class ZVaultConfigurationManager implements VaultConfigurationManager, Saveable {
@@ -40,7 +51,41 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
 
     @Override
     public boolean hasAccess(Vault vault, User user) {
+        if(!this.sharedAccesses.containsKey(vault.getUniqueId())) {
+            return false;
+        }
         return this.sharedAccesses.get(vault.getUniqueId()).stream().anyMatch(sharedAccess -> sharedAccess.getUser().getUniqueId().equals(user.getUniqueId()));
+    }
+
+    @Override
+    public Vault getOpenedConfig(User user) {
+        UUID vaultId = this.openedConfigVaults.keySet().stream().filter(uuid -> this.openedConfigVaults.get(uuid).contains(user.getUniqueId())).findFirst().orElseThrow();
+        return this.getPlugin().getManager(VaultsManager.class).getVault(vaultId);
+    }
+
+    @Override
+    public void openInvitationMenu(User user, Vault vault) {
+        this.closeVaultConfig(user);
+        InvitePlayerMenuConfiguration config = Configuration.getConfiguration(VaultsConfiguration.class).getInvitePlayerMenuConfiguration();
+        UserManager userManager = this.getPlugin().getManager(UserManager.class);
+        new AnvilGUI.Builder()
+                .onClick((slot, stateSnapshot) -> {
+                    if(slot != AnvilGUI.Slot.OUTPUT) {
+                        return Collections.emptyList();
+                    }
+                    String name = stateSnapshot.getText();
+                    if(name.equals(user.getName())) {
+                        return List.of(AnvilGUI.ResponseAction.replaceInputText(config.tryAgainMessage()));
+                    }
+                    Optional<User> target = userManager.getUser(name);
+                    return target.map(value -> List.of(AnvilGUI.ResponseAction.run(() -> {
+                        this.addSharedAccess(user, vault, value);
+                    }), AnvilGUI.ResponseAction.close())).orElseGet(() -> List.of(AnvilGUI.ResponseAction.replaceInputText(config.tryAgainMessage())));
+                })
+                .text(config.startMessage())
+                .title(config.title())
+                .plugin(this.getPlugin())
+                .open(user.getPlayer());
     }
 
     @Override
@@ -51,5 +96,15 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
     @Override
     public void save() {
         this.sharedAccesses.values().forEach(sharedAccesses -> sharedAccesses.forEach(this.sharedAccessService::save));
+    }
+
+    private void addSharedAccess(User user, Vault vault, User value) {
+        if(this.hasAccess(vault, value)) {
+            user.sendMessage(Message.ALREADY_ACCESS_TO_VAULT, Formatter.format("%player%", value.getName()));
+            return;
+        }
+        SharedAccess sharedAccess = new ZSharedAccess(UUID.randomUUID(), vault, value);
+        this.sharedAccesses.computeIfAbsent(vault.getUniqueId(), uuid -> new ArrayList<>()).add(sharedAccess);
+        this.sharedAccessService.save(sharedAccess);
     }
 }

@@ -13,4 +13,8 @@ public interface VaultConfigurationManager extends Manager {
     void closeVaultConfig(User user);
 
     boolean hasAccess(Vault vault, User user);
+
+    Vault getOpenedConfig(User user);
+
+    void openInvitationMenu(User user, Vault vault);
 }

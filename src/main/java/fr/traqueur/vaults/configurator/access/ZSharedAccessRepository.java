@@ -1,4 +1,4 @@
-package fr.traqueur.vaults.configurator;
+package fr.traqueur.vaults.configurator.access;
 
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.configurator.SharedAccess;

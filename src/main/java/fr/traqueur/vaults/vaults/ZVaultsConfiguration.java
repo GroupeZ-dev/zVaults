@@ -5,6 +5,7 @@ import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.config.InvitePlayerMenuConfiguration;
 import fr.traqueur.vaults.api.config.NonLoadable;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.vaults.SizeMode;
@@ -24,6 +25,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private int maxVaultsPerPlayer;
     private boolean infiniteVaults;
     private SizeMode sizeMode;
+    private InvitePlayerMenuConfiguration invitePlayerMenu;
     @NonLoadable
     private final Map<String, MenuItemStack> vaultsIcons;
     @NonLoadable
@@ -93,5 +95,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public String getVaultTitle(String key) {
         return this.vautlsTitle.getOrDefault(key, this.vautlsTitle.get("default"));
+    }
+
+    @Override
+    public InvitePlayerMenuConfiguration getInvitePlayerMenuConfiguration() {
+        return this.invitePlayerMenu;
     }
 }

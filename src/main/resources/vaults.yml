@@ -21,6 +21,11 @@ vault_title:
   27: "&8ᴠᴀᴜʟᴛ 27"
   54: "&8ᴠᴀᴜʟᴛ 54"
 
+invite_player_menu:
+  title: "Invitation à votre Vault"
+  start_message: "Entrez le nom du joueur à inviter :"
+  try_again_message: "&cCe joueur n'existe pas ou n'est pas connecté."
+
 vaults_icons:
   open_vault:
     material: CHEST
