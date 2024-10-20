@@ -39,7 +39,7 @@ public interface VaultsManager extends Manager {
 
     VaultOwner generateOwner(String type, User receiver);
 
-    List<String> getNumVaultsTabulation(CommandSender sender);
+    List<String> getNumVaultsTabulation();
 
     Vault getVault(User receiver, int vaultNum) throws IndexOutOfBoundVaultException;
 

@@ -9,13 +9,11 @@ import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
-import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.*;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -147,14 +145,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public List<String> getNumVaultsTabulation(CommandSender sender) {
-        if(!(sender instanceof Player player)) {
-            return List.of();
-        }
-        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
+    public List<String> getNumVaultsTabulation() {
+        int maxVaults = this.configuration.getMaxVaultsByPlayer() == -1 ? 20 : this.configuration.getMaxVaultsByPlayer();
         return IntStream.iterate(0, n -> n + 1)
-                .limit(this.getVaults(user).size() + 1)
-                .filter(n -> n <= this.getVaults(user).size()).mapToObj(String::valueOf).toList();
+                .limit(maxVaults)
+                .filter(n -> n < maxVaults).mapToObj(String::valueOf).toList();
     }
 
     @Override
