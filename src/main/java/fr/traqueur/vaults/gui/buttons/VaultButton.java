@@ -1,6 +1,7 @@
 package fr.traqueur.vaults.gui.buttons;
 
 import fr.maxlego08.menu.api.button.PaginateButton;
+import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.button.ZButton;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.menu.zcore.utils.inventory.Pagination;
@@ -54,7 +55,10 @@ public class VaultButton extends ZButton implements PaginateButton {
             int slot = slots.get(i);
             Vault vault = buttons.get(i);
 
-            inventory.addItem(slot, configuration.getIcon("open_vault").build(player)).setClick(event -> {
+            Placeholders placeholders = new Placeholders();
+            placeholders.register("vault_icon", vault.getIcon().name());
+
+            inventory.addItem(slot, configuration.getIcon("open_vault").build(player, false, placeholders)).setClick(event -> {
                 if(event.getClick() == ClickType.LEFT) {
                     this.vaultsManager.openVault(user, vault);
                 } else if(event.getClick() == ClickType.RIGHT) {

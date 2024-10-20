@@ -9,6 +9,7 @@ import fr.traqueur.vaults.api.config.InvitePlayerMenuConfiguration;
 import fr.traqueur.vaults.api.config.NonLoadable;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.vaults.SizeMode;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -30,6 +31,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private final Map<String, MenuItemStack> vaultsIcons;
     @NonLoadable
     private final Map<String, String> vautlsTitle;
+    private Material openVaultDefaultMaterial;
 
     public ZVaultsConfiguration() {
         this.vaultsIcons = new HashMap<>();
@@ -100,5 +102,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public InvitePlayerMenuConfiguration getInvitePlayerMenuConfiguration() {
         return this.invitePlayerMenu;
+    }
+
+    @Override
+    public Material getVaultIcon() {
+        return this.openVaultDefaultMaterial;
     }
 }

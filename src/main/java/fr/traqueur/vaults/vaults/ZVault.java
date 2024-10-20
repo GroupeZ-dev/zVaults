@@ -3,6 +3,7 @@ package fr.traqueur.vaults.vaults;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultOwner;
+import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,15 +15,17 @@ public class ZVault implements Vault {
     private final VaultOwner owner;
     private final List<VaultItem> content;
     private final boolean infinite;
+    private final Material material;
     private int size;
 
-    public ZVault(VaultOwner owner, int size, boolean infinite) {
-        this(UUID.randomUUID(), owner, new ArrayList<>(), size, infinite);
+    public ZVault(VaultOwner owner, Material material, int size, boolean infinite) {
+        this(UUID.randomUUID(), owner, material, new ArrayList<>(), size, infinite);
     }
 
-    public ZVault(UUID uniqueId, VaultOwner owner, List<VaultItem> content, int size, boolean infinite) {
+    public ZVault(UUID uniqueId, VaultOwner owner, Material material, List<VaultItem> content, int size, boolean infinite) {
         this.uniqueId = uniqueId;
         this.owner = owner;
+        this.material = material;
         this.content = content;
         this.size = size;
         this.infinite = infinite;
@@ -62,5 +65,10 @@ public class ZVault implements Vault {
     @Override
     public boolean isInfinite() {
         return this.infinite;
+    }
+
+    @Override
+    public Material getIcon() {
+        return material;
     }
 }

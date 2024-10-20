@@ -15,6 +15,8 @@ default_size: 27
 # - "max_size" : Chaque vault a une taille configurable, mais ne peut pas être plus grande que 'default_size'.
 size_mode: DEFAULT
 
+open_vault_default_material: CHEST
+
 vault_title:
   default: "&8ᴠᴀᴜʟᴛ"
   9: "&8ᴠᴀᴜʟᴛ 9"
@@ -28,7 +30,7 @@ invite_player_menu:
 
 vaults_icons:
   open_vault:
-    material: CHEST
+    material: "%vault_icon%"
     model_data: 1
     name: "&8ᴠᴀᴜʟᴛ"
     lore:

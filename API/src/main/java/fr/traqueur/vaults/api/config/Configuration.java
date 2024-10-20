@@ -8,6 +8,7 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -83,6 +84,8 @@ public interface Configuration {
                     field.set(this, configuration.getFloat(configKey));
                 } else if (field.getType().equals(BigDecimal.class)) {
                     field.set(this, new BigDecimal(configuration.getString(configKey, "0")));
+                } else if(field.getType().equals(Material.class)) {
+                    field.set(this, Material.valueOf(configuration.getString(configKey, "STONE").toUpperCase()));
                 } else if (field.getType().isEnum()) {
                     Class<? extends Enum> enumType = (Class<? extends Enum>) field.getType();
                     field.set(this, Enum.valueOf(enumType, configuration.getString(configKey, "").toUpperCase()));

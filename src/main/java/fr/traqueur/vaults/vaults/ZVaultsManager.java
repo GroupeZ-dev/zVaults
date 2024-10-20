@@ -109,7 +109,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             creator.sendMessage(Message.MAX_VAULTS_REACHED);
             return;
         }
-        Vault vault = new ZVault(owner, size, infinite);
+        Vault vault = new ZVault(owner, this.configuration.getVaultIcon(), size, infinite);
         vaults.add(vault);
         this.vaultService.save(vault);
         this.vaults.put(vault.getUniqueId(), vault);
