@@ -1,5 +1,6 @@
 package fr.traqueur.vaults.api.vaults;
 
+import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.users.User;
@@ -16,6 +17,8 @@ public interface VaultsManager extends Manager {
     String VAULT_TABLE_NAME = "vaults";
 
     void saveVault(Vault vault);
+
+    void linkVaultToInventory(User user, InventoryDefault inventory);
 
     Vault getOpenedVault(User user);
 

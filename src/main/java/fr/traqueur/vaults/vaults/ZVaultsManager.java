@@ -1,5 +1,6 @@
 package fr.traqueur.vaults.vaults;
 
+import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.sarah.MigrationManager;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.data.Saveable;
@@ -34,6 +35,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     private final Service<Vault, VaultDTO> vaultService;
     private final Map<UUID, Vault> vaults;
     private final Map<UUID, List<UUID>> openedVaults;
+    private final Map<UUID, InventoryDefault> linkedVaultToInventory;
 
     public ZVaultsManager(VaultsConfiguration configuration) {
         this.configuration = configuration;
@@ -42,6 +44,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
         this.vaults = new HashMap<>();
         this.openedVaults = new HashMap<>();
+        this.linkedVaultToInventory = new HashMap<>();
 
         this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this.ownerResolver), VAULT_TABLE_NAME);
         MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
@@ -55,7 +58,17 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public void openVault(User user, Vault vault) {
         this.openedVaults.computeIfAbsent(vault.getUniqueId(), uuid -> new ArrayList<>()).add(user.getUniqueId());
+        if(this.linkedVaultToInventory.containsKey(vault.getUniqueId())) {
+            user.getPlayer().openInventory(this.linkedVaultToInventory.get(vault.getUniqueId()).getSpigotInventory());
+            return;
+        }
         this.getPlugin().getInventoryManager().openInventory(user.getPlayer(), "vault_menu");
+    }
+
+    @Override
+    public void linkVaultToInventory(User user, InventoryDefault inventory) {
+        Vault vault = this.getOpenedVault(user);
+        this.linkedVaultToInventory.put(vault.getUniqueId(), inventory);
     }
 
     @Override
@@ -71,6 +84,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     public void closeVault(User user, Vault vault) {
         this.openedVaults.computeIfAbsent(vault.getUniqueId(), k -> new ArrayList<>()).remove(user.getUniqueId());
         if(this.openedVaults.getOrDefault(vault.getUniqueId(), Collections.emptyList()).isEmpty()) {
+            this.linkedVaultToInventory.remove(vault.getUniqueId());
             this.saveVault(vault);
         }
     }
@@ -175,7 +189,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     public void handleLeftClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
         InventoryAction action = event.getAction();
         if(action == InventoryAction.PLACE_ALL) {
-            if (slot > vault.getSize()) {
+            if (slot >= vault.getSize()) {
                 return;
             }
             event.setCancelled(vault.isInfinite());
@@ -190,7 +204,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         } else if(action == InventoryAction.PLACE_SOME) {
             this.placeSome(event, cursor, current, slot);
         } else if (action == InventoryAction.SWAP_WITH_CURSOR) {
-            if(slot > vault.getSize()) {
+            if(slot >= vault.getSize()) {
                 return;
             }
             if(vault.isInfinite()) {
@@ -207,7 +221,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 }
             }
         } else if (action == InventoryAction.PICKUP_ALL) {
-            if (slot > vault.getSize()) {
+            if (slot >= vault.getSize()) {
                 return;
             }
             if(!vault.isInfinite()) {
@@ -224,7 +238,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     public void handleRightClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
         InventoryAction action = event.getAction();
         if(action == InventoryAction.PICKUP_HALF) {
-            if (slot > vault.getSize()) {
+            if (slot >= vault.getSize()) {
                 return;
             }
             if(!vault.isInfinite()) {
@@ -253,7 +267,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void handleShift(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
-        if(slot > vault.getSize() && slot < inventorySize || current == null || current.getType().isAir()) {
+        if(slot >= vault.getSize() && slot < inventorySize || current == null || current.getType().isAir()) {
             return;
         }
         if(slot >= inventorySize) {
@@ -306,7 +320,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean controlDrop) {
-        if(slot > vault.getSize()) {
+        if(slot >= vault.getSize()) {
             return;
         }
         int amount = controlDrop ? Math.min(current.getMaxStackSize(), this.getAmountFromItem(current)) : 1;
