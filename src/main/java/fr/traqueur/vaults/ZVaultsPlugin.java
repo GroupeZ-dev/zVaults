@@ -34,6 +34,7 @@ import fr.traqueur.vaults.users.ZUserManager;
 import fr.traqueur.vaults.vaults.ZVaultsConfiguration;
 import fr.traqueur.vaults.vaults.ZVaultsManager;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
 
@@ -134,9 +135,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
     public void onDisable() {
         long start = System.currentTimeMillis();
         VaultsLogger.info("&e=== DISABLE START ===");
-        if(this.storage != null) {
-            this.storage.onDisable();
-        }
+        Bukkit.getOnlinePlayers().forEach(Player::closeInventory);
         if(this.messageResolver != null) {
             this.messageResolver.close();
         }
@@ -145,6 +144,9 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         }
         if(this.saveables != null) {
             this.saveables.forEach(Saveable::save);
+        }
+        if(this.storage != null) {
+            this.storage.onDisable();
         }
         VaultsLogger.success("&e=== DISABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
     }
