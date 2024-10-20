@@ -28,7 +28,8 @@ public class VaultsChooseMenu extends ZInventory {
 
             if (elementSize >= 1) {
                 int size = button.getSlots().size();
-                return ((elementSize / (size)) + (elementSize == (size) ? 0 : 1));
+                int toReturn = ((elementSize / (size)) + (elementSize == (size) ? 0 : 1));
+                return toReturn == 0 ? 1 : toReturn;
             }
         }
 
