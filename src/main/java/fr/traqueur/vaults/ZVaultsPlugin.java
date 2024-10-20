@@ -112,6 +112,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         buttonManager.register(new NoneLoader(this, VaultInviteButton.class, "zvaults_invite_player"));
         buttonManager.register(new NoneLoader(this, UserAccessButton.class, "zvaults_vault_users_access"));
         buttonManager.register(new NoneLoader(this, CustomizeIconButton.class, "zvaults_customize_icon"));
+        buttonManager.register(new NoneLoader(this, DeleteVaultButton.class, "zvaults_delete"));
 
         inventoryManager.deleteInventories(this);
         try {

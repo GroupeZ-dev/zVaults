@@ -21,3 +21,4 @@ successfully_added_access_to_vault: "<green>Accès ajouté avec succès à %play
 successfully_removed_access_to_vault: "<green>Accès retiré avec succès à %player%."
 item_cant_be_null: "<red>L'item dans votre main ne peut pas être vide."
 vault_icon_change: "<green>Icone du coffre changée pour <yellow>%new_icon%<green>."
+vault_deleted: "<green>Coffre supprimé."

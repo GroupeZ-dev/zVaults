@@ -3,12 +3,14 @@ package fr.traqueur.vaults.vaults;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.sarah.MigrationManager;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
+import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.VaultDTO;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
+import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.*;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 import org.bukkit.Bukkit;
@@ -354,6 +356,22 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             player.getInventory().setItem(event.getHotbarButton(), currentItem);
             event.getInventory().setItem(slot, hotbarItem);
         }
+    }
+
+    @Override
+    public void deleteVault(Vault vault) {
+        this.vaults.remove(vault.getUniqueId());
+        this.linkedVaultToInventory.remove(vault.getUniqueId());
+        if(this.openedVaults.containsKey(vault.getUniqueId())) {
+            var users = this.openedVaults.remove(vault.getUniqueId());
+            users.forEach(uuid -> {
+                User user = this.getPlugin().getManager(UserManager.class).getUser(uuid).orElseThrow();
+                user.sendMessage(Message.VAULT_DELETED);
+                user.getPlayer().closeInventory();
+            });
+        }
+        this.getPlugin().getManager(VaultConfigurationManager.class).delete(vault);
+        this.vaultService.delete(vault);
     }
 
     @Override

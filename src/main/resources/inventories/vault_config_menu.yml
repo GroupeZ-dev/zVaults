@@ -25,3 +25,13 @@ items:
       lore:
         - ""
         - "#92bed8ᴄʟɪᴄᴋ &7ᴛᴏ ᴄʜᴀɴɢᴇ ɪᴄᴏɴ ᴏғ ᴠᴀᴜʟᴛ"
+  delete:
+    type: ZVAULTS_DELETE
+    permission: "zvaults.delete"
+    slot: 16
+    item:
+      material: REDSTONE_BLOCK
+      name: "#92bed8ᴅᴇʟᴇᴛᴇ ᴠᴀᴜʟᴛ"
+      lore:
+        - ""
+        - "#92bed8ᴄʟɪᴄᴋ &7ᴛᴏ ᴅᴇʟᴇᴛᴇ ᴠᴀᴜʟᴛ"

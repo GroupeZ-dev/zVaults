@@ -132,6 +132,30 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
     }
 
     @Override
+    public void delete(Vault vault) {
+        var sharedAccess = this.sharedAccesses.remove(vault.getUniqueId());
+        if(this.openedAccessManagerVaults.containsKey(vault.getUniqueId())) {
+            var list = this.openedAccessManagerVaults.remove(vault.getUniqueId());
+            list.forEach(uuid -> {
+                User user = this.getPlugin().getManager(UserManager.class).getUser(uuid).orElseThrow();
+                user.sendMessage(Message.VAULT_DELETED);
+                user.getPlayer().closeInventory();
+            });
+        }
+        if(this.openedConfigVaults.containsKey(vault.getUniqueId())) {
+            var list = this.openedConfigVaults.remove(vault.getUniqueId());
+            list.forEach(uuid -> {
+                User user = this.getPlugin().getManager(UserManager.class).getUser(uuid).orElseThrow();
+                user.sendMessage(Message.VAULT_DELETED);
+                user.getPlayer().closeInventory();
+            });
+        }
+        if(sharedAccess != null) {
+            sharedAccess.forEach(this.sharedAccessService::delete);
+        }
+    }
+
+    @Override
     public void load() {
         this.sharedAccessService.findAll().forEach(sharedAccess -> this.sharedAccesses.computeIfAbsent(sharedAccess.getVault().getUniqueId(), uuid -> new ArrayList<>()).add(sharedAccess));
     }

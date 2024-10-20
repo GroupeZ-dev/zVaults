@@ -62,7 +62,7 @@ public class VaultButton extends ZButton implements PaginateButton {
                 if(event.getClick() == ClickType.LEFT) {
                     this.vaultsManager.openVault(user, vault);
                 } else if(event.getClick() == ClickType.RIGHT) {
-                    if(!vault.isOwner(user)) {
+                    if(!vault.isOwner(user) && !user.hasPermission("zvaults.bypass")) {
                         user.sendMessage(Message.NOT_PERMISSION_CONFIGURE_VAULT);
                         return;
                     }

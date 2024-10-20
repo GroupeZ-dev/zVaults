@@ -15,6 +15,10 @@ public interface User {
 
     void sendMessage(Message message, Formatter... formatters);
 
+    default boolean hasPermission(String permission) {
+        return this.getPlayer().hasPermission(permission);
+    }
+
     default Player getPlayer() {
         return Bukkit.getPlayer(this.getUniqueId());
     }
