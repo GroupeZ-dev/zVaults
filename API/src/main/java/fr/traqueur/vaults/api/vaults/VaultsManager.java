@@ -9,12 +9,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface VaultsManager extends Manager {
 
     String VAULT_TABLE_NAME = "vaults";
-
-    void openVaultConfig(User user, Vault vault);
 
     void saveVault(Vault vault);
 
@@ -39,6 +38,8 @@ public interface VaultsManager extends Manager {
     List<String> getNumVaultsTabulation();
 
     Vault getVault(User receiver, int vaultNum) throws IndexOutOfBoundVaultException;
+
+    Vault getVault(UUID vaultId);
 
     List<Vault> getVaults(User user);
 

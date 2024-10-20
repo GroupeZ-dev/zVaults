@@ -7,11 +7,14 @@ import fr.maxlego08.menu.zcore.utils.inventory.Pagination;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
+import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
+import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
@@ -21,11 +24,13 @@ public class VaultButton extends ZButton implements PaginateButton {
     private final VaultsPlugin plugin;
     private final VaultsManager vaultsManager;
     private final UserManager userManager;
+    private final VaultConfigurationManager vaultConfigurationManager;
 
     public VaultButton(Plugin plugin) {
         this.plugin = (VaultsPlugin) plugin;
         this.vaultsManager = this.plugin.getManager(VaultsManager.class);
-        this.userManager =  this.plugin.getManager(UserManager.class);;
+        this.userManager =  this.plugin.getManager(UserManager.class);
+        this.vaultConfigurationManager = this.plugin.getManager(VaultConfigurationManager.class);
     }
 
     @Override
@@ -50,10 +55,14 @@ public class VaultButton extends ZButton implements PaginateButton {
             Vault vault = buttons.get(i);
 
             inventory.addItem(slot, configuration.getIcon("open_vault").build(player)).setClick(event -> {
-                if(event.getClick() == org.bukkit.event.inventory.ClickType.LEFT) {
+                if(event.getClick() == ClickType.LEFT) {
                     this.vaultsManager.openVault(user, vault);
-                } else if(event.getClick() == org.bukkit.event.inventory.ClickType.RIGHT) {
-                    this.vaultsManager.openVaultConfig(user, vault);
+                } else if(event.getClick() == ClickType.RIGHT) {
+                    if(!vault.isOwner(user)) {
+                        user.sendMessage(Message.NOT_PERMISSION_CONFIGURE_VAULT);
+                        return;
+                    }
+                    this.vaultConfigurationManager.openVaultConfig(user, vault);
                 }
             });
         }

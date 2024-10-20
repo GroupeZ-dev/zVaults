@@ -104,6 +104,11 @@ public class ZUserManager implements UserManager, Saveable {
     }
 
     @Override
+    public void load() {
+
+    }
+
+    @Override
     public void save() {
         this.users.values().forEach(this.userService::save);
     }

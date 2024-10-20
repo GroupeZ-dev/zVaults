@@ -45,13 +45,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
         this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this.ownerResolver), VAULT_TABLE_NAME);
         MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
-
-        this.vaultService.findAll().forEach(vault -> this.vaults.put(vault.getUniqueId(), vault));
-    }
-
-    @Override
-    public void openVaultConfig(User user, Vault vault) {
-        this.getPlugin().getInventoryManager().openInventory(user.getPlayer(), "vault_config_menu");
     }
 
     @Override
@@ -156,6 +149,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             throw new IndexOutOfBoundVaultException();
         }
         return list.get(vaultNum);
+    }
+
+    @Override
+    public Vault getVault(UUID vaultId) {
+        return this.vaults.get(vaultId);
     }
 
     @Override
@@ -346,6 +344,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             player.getInventory().setItem(event.getHotbarButton(), currentItem);
             event.getInventory().setItem(slot, hotbarItem);
         }
+    }
+
+    @Override
+    public void load() {
+        this.vaultService.findAll().forEach(vault -> this.vaults.put(vault.getUniqueId(), vault));
     }
 
     @Override

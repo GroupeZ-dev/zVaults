@@ -15,6 +15,7 @@ import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.LangConfiguration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
+import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.messages.MessageResolver;
@@ -25,6 +26,8 @@ import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.commands.VaultsCommand;
 import fr.traqueur.vaults.commands.arguments.OwnerTypeArgument;
 import fr.traqueur.vaults.commands.arguments.UserArgument;
+import fr.traqueur.vaults.configurator.ZVaultConfigurationManager;
+import fr.traqueur.vaults.gui.VaultConfigMenu;
 import fr.traqueur.vaults.gui.VaultsChooseMenu;
 import fr.traqueur.vaults.gui.buttons.VaultButton;
 import fr.traqueur.vaults.gui.buttons.VaultInviteButton;
@@ -101,6 +104,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         UserManager userManager = this.registerManager(new ZUserManager(), UserManager.class);
         VaultsManager vaultsManager = this.registerManager(new ZVaultsManager(vaultConfig), VaultsManager.class);
+        this.registerManager(new ZVaultConfigurationManager(), VaultConfigurationManager.class);
 
         buttonManager.unregisters(this);
         buttonManager.register(new NoneLoader(this, VaultButton.class, "zvaults_vaults"));
@@ -111,7 +115,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         try {
             this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vaults_choose_menu.yml", VaultsChooseMenu.class);
             this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_menu.yml");
-            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_config_menu.yml");
+            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_config_menu.yml", VaultConfigMenu.class);
         } catch (InventoryException e) {
             throw new RuntimeException(e);
         }
@@ -122,6 +126,8 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         commandManager.registerCommand(new VaultsCommand(this));
 
         this.storage.onEnable();
+
+        this.saveables.forEach(Saveable::load);
 
         this.scheduler.runTimerAsync(() -> this.saveables.forEach(Saveable::save), 1, 1, TimeUnit.HOURS);
 
