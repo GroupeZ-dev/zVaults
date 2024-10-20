@@ -1,0 +1,13 @@
+name: "&8ᴄᴏɴғɪɢᴜʀᴀᴛɪᴏɴ"
+size: 27
+items:
+  invite:
+    type: ZVAULTS_INVITE_PLAYER
+    permission: "zvaults.invite"
+    item:
+      material: EMERALD
+      name: "#92bed8Iɴᴠɪᴛᴇ Pʟᴀʏᴇʀ"
+    slot: 10
+    else:
+      item:
+        material: BARRIER

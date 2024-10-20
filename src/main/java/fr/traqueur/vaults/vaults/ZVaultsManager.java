@@ -50,6 +50,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
+    public void openVaultConfig(User user, Vault vault) {
+        this.getPlugin().getInventoryManager().openInventory(user.getPlayer(), "vault_config_menu");
+    }
+
+    @Override
     public void saveVault(Vault vault) {
         this.vaultService.save(vault);
     }

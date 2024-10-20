@@ -50,7 +50,11 @@ public class VaultButton extends ZButton implements PaginateButton {
             Vault vault = buttons.get(i);
 
             inventory.addItem(slot, configuration.getIcon("open_vault").build(player)).setClick(event -> {
-                this.vaultsManager.openVault(user, vault);
+                if(event.getClick() == org.bukkit.event.inventory.ClickType.LEFT) {
+                    this.vaultsManager.openVault(user, vault);
+                } else if(event.getClick() == org.bukkit.event.inventory.ClickType.RIGHT) {
+                    this.vaultsManager.openVaultConfig(user, vault);
+                }
             });
         }
     }

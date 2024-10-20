@@ -14,6 +14,8 @@ public interface VaultsManager extends Manager {
 
     String VAULT_TABLE_NAME = "vaults";
 
+    void openVaultConfig(User user, Vault vault);
+
     void saveVault(Vault vault);
 
     Vault getOpenedVault(User user);
