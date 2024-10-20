@@ -28,7 +28,7 @@ public class SetSizeCommand extends Command<VaultsPlugin> {
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
         this.addArgs("receiver:user");
-        this.addArgs("vault_num:int", (sender) -> this.vaultsManager.getNumVaultsTabulation());
+        this.addArgs("vault_num:int", this.vaultsManager::getNumVaultsTabulation);
         this.addOptinalArgs("size:int", (sender) -> List.of("9", "18", "27"));
         this.setGameOnly(true);
     }
