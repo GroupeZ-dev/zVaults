@@ -180,7 +180,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 return;
             }
 
-            this.addItem(event, cursor, vault, player, cursor.getAmount());
+            if (this.addItem(event, cursor, vault, player, cursor.getAmount())) {
+                event.getView().setCursor(new ItemStack(Material.AIR));
+            }
 
         } else if(action == InventoryAction.PLACE_SOME) {
             this.placeSome(event, cursor, current, slot);
@@ -189,7 +191,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 return;
             }
             if(vault.isInfinite()) {
-                this.addItem(event, cursor, vault, player, cursor.getAmount());
+                if (this.addItem(event, cursor, vault, player, cursor.getAmount())) {
+                    event.getView().setCursor(new ItemStack(Material.AIR));
+                }
             } else {
                 if(this.isSimilar(cursor, current)) {
                     this.placeSome(event, cursor, current, slot);
@@ -394,7 +398,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             event.getView().setCursor(newCursor);
             return;
         }
-        this.addItem(event, cursor, vault, player, 1);
+        if (this.addItem(event, cursor, vault, player, 1)) {
+            int newCursorAmount = cursor.getAmount() - 1;
+            event.getView().setCursor(newCursorAmount == 0 ? new ItemStack(Material.AIR) : new ItemStack(cursor.getType(), newCursorAmount));
+        }
     }
 
     private void changeItemVault(InventoryClickEvent event, Player player, ItemStack current, int slot, Vault vault, int amount) {
