@@ -1,6 +1,5 @@
 package fr.traqueur.vaults.gui.buttons;
 
-import fr.maxlego08.menu.MenuItemStack;
 import fr.maxlego08.menu.api.button.PaginateButton;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.button.ZButton;
@@ -10,7 +9,6 @@ import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
-import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
@@ -18,7 +16,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -69,7 +66,7 @@ public class UserAccessButton extends ZButton implements PaginateButton {
 
             inventory.addItem(slot, this.getItem(user, value)).setClick(event -> {
                 if(event.getClick() == ClickType.LEFT) {
-                    this.vaultConfigurationManager.removeAccess(this.vault, value);
+                    this.vaultConfigurationManager.removeAccess(user, this.vault, value);
                     event.getInventory().setItem(slot, new ItemStack(Material.AIR));
                 }
             });

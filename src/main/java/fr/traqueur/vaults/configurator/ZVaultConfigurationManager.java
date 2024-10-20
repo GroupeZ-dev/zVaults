@@ -53,7 +53,6 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
     @Override
     public boolean hasAccess(Vault vault, User user) {
         if(!this.sharedAccesses.containsKey(vault.getUniqueId())) {
-            System.out.println("Shared access is null");
             return false;
         }
         return this.sharedAccesses.get(vault.getUniqueId()).stream().anyMatch(sharedAccess -> sharedAccess.getUser().getUniqueId().equals(user.getUniqueId()));
@@ -117,15 +116,16 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
     }
 
     @Override
-    public void removeAccess(Vault vault, User user) {
-        if(!this.hasAccess(vault, user)) {
+    public void removeAccess(User user, Vault vault, User value) {
+        if(!this.hasAccess(vault, value)) {
             return;
         }
         this.sharedAccesses.get(vault.getUniqueId()).removeIf(sharedAccess -> {
-            if(!sharedAccess.getUser().getUniqueId().equals(user.getUniqueId())) {
+            if(!sharedAccess.getUser().getUniqueId().equals(value.getUniqueId())) {
                 return false;
             }
             this.sharedAccessService.delete(sharedAccess);
+            user.sendMessage(Message.SUCCESSFULLY_REMOVED_ACCESS_TO_VAULT, Formatter.format("%player%", value.getName()));
             return true;
         });
     }
@@ -148,5 +148,6 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
         SharedAccess sharedAccess = new ZSharedAccess(UUID.randomUUID(), vault, value);
         this.sharedAccesses.computeIfAbsent(vault.getUniqueId(), uuid -> new ArrayList<>()).add(sharedAccess);
         this.sharedAccessService.save(sharedAccess);
+        user.sendMessage(Message.SUCCESSFULLY_ADDED_ACCESS_TO_VAULT, Formatter.format("%player%", value.getName()));
     }
 }

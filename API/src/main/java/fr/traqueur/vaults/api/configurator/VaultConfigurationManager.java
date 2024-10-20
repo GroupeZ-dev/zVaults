@@ -28,5 +28,5 @@ public interface VaultConfigurationManager extends Manager {
 
     List<User> getWhoCanAccess(Vault vault);
 
-    void removeAccess(Vault vault, User user);
+    void removeAccess(User user, Vault vault, User value);
 }
