@@ -214,6 +214,12 @@ public interface Configuration {
             } catch (NumberFormatException exception) {
                 logger.log(Level.SEVERE, String.format("Failed to convert '%s' to Float", value), exception);
             }
+        } else if (type == Material.class) {
+            try {
+                return Material.valueOf(value.toString());
+            } catch (IllegalArgumentException exception) {
+                logger.log(Level.SEVERE, String.format("Failed to convert '%s' to Material", value), exception);
+            }
         }
         return value;
     }

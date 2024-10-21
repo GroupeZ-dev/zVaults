@@ -29,7 +29,7 @@ public interface VaultsManager extends Manager {
 
     int getAmountFromItem(ItemStack item);
 
-    void createVault(User creator, VaultOwner owner, int size, boolean infinite);
+    void createVault(User creator, VaultOwner owner, int size, int maxVaults, boolean infinite);
 
     boolean sizeIsAvailable(int size);
 

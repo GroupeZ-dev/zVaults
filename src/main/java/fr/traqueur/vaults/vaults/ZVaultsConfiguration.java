@@ -23,7 +23,6 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private boolean load;
 
     private int defaultSize;
-    private int maxVaultsPerPlayer;
     private boolean infiniteVaults;
     private SizeMode sizeMode;
     private InvitePlayerMenuConfiguration invitePlayerMenu;
@@ -32,10 +31,12 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @NonLoadable
     private final Map<String, String> vautlsTitle;
     private Material openVaultDefaultMaterial;
+    private final Map<String, Integer> maxVaultsByOwnerType;
 
     public ZVaultsConfiguration() {
         this.vaultsIcons = new HashMap<>();
         this.vautlsTitle = new HashMap<>();
+        this.maxVaultsByOwnerType = new HashMap<>();
         this.load = false;
     }
 
@@ -61,6 +62,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
         config.getConfigurationSection("vault_title").getKeys(false).forEach(key -> {
             this.vautlsTitle.put(key, config.getString("vault_title." + key));
         });
+        config.getConfigurationSection("max_vaults").getKeys(false).forEach(key -> {
+            this.maxVaultsByOwnerType.put(key, config.getInt("max_vaults." + key));
+        });
+
         this.load = true;
     }
 
@@ -77,11 +82,6 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public int getDefaultSize() {
         return defaultSize;
-    }
-
-    @Override
-    public int getMaxVaultsByPlayer() {
-        return maxVaultsPerPlayer;
     }
 
     @Override
@@ -107,5 +107,11 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public Material getVaultIcon() {
         return this.openVaultDefaultMaterial;
+    }
+
+    @Override
+    public int getMaxVaultsByOwnerType(String ownerType) {
+        System.out.println(this.maxVaultsByOwnerType);
+        return this.maxVaultsByOwnerType.getOrDefault(ownerType, -1);
     }
 }

@@ -117,9 +117,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public void createVault(User creator, VaultOwner owner, int size, boolean infinite) {
+    public void createVault(User creator, VaultOwner owner, int size, int playerVaults, boolean infinite) {
         var vaults = this.getVaults(owner.getUniqueId());
-        if(this.configuration.getMaxVaultsByPlayer() != -1 && vaults.size() >= this.configuration.getMaxVaultsByPlayer()) {
+        if(playerVaults != -1 &&  vaults.size() >= playerVaults) {
             creator.sendMessage(Message.MAX_VAULTS_REACHED);
             return;
         }
@@ -160,10 +160,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public List<String> getNumVaultsTabulation() {
-        int maxVaults = this.configuration.getMaxVaultsByPlayer() == -1 ? 20 : this.configuration.getMaxVaultsByPlayer();
         return IntStream.iterate(0, n -> n + 1)
-                .limit(maxVaults)
-                .filter(n -> n < maxVaults).mapToObj(String::valueOf).toList();
+                .limit(100)
+                .filter(n -> n < 100).mapToObj(String::valueOf).toList();
     }
 
     @Override

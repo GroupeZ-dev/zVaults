@@ -56,6 +56,7 @@ public class CreateCommand extends Command<VaultsPlugin> {
             return;
         }
         VaultOwner owner = this.vaultsManager.generateOwner(type, receiver);
-        this.vaultsManager.createVault(user, owner, size, infinite);
+        int maxVaults = Configuration.getConfiguration(VaultsConfiguration.class).getMaxVaultsByOwnerType(type.toLowerCase());
+        this.vaultsManager.createVault(user, owner, size, maxVaults, infinite);
     }
 }

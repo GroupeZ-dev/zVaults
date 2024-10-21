@@ -10,8 +10,6 @@ public interface VaultsConfiguration extends Configuration {
 
     int getDefaultSize();
 
-    int getMaxVaultsByPlayer();
-
     boolean isVaultsInfinity();
 
     MenuItemStack getIcon(String id);
@@ -21,4 +19,6 @@ public interface VaultsConfiguration extends Configuration {
     InvitePlayerMenuConfiguration getInvitePlayerMenuConfiguration();
 
     Material getVaultIcon();
+
+    int getMaxVaultsByOwnerType(String ownerType);
 }

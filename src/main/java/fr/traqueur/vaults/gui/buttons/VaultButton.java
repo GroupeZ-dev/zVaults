@@ -61,6 +61,9 @@ public class VaultButton extends ZButton implements PaginateButton {
         VaultsConfiguration configuration = Configuration.getConfiguration(VaultsConfiguration.class);
         Pagination<Vault> pagination = new Pagination<>();
         User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
+        if(this.target == null) {
+            this.target = user;
+        }
         List<Vault> vaults = this.vaultsManager.getVaults(this.target);
         List<Vault> buttons = pagination.paginate(vaults, this.slots.size(), inventory.getPage());
 
