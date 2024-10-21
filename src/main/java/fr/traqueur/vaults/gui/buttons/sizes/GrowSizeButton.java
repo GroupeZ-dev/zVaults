@@ -8,7 +8,7 @@ import fr.traqueur.vaults.api.users.User;
 
 public class GrowSizeButton extends ManipulationSizeButton {
 
-    protected GrowSizeButton(VaultsPlugin plugin, int size) {
+    public GrowSizeButton(VaultsPlugin plugin, int size) {
         super(plugin, size);
     }
 

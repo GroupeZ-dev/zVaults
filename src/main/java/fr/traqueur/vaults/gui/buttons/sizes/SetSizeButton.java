@@ -8,7 +8,7 @@ import fr.traqueur.vaults.api.users.User;
 
 public class SetSizeButton extends ManipulationSizeButton {
 
-    protected SetSizeButton(VaultsPlugin plugin, int size) {
+    public SetSizeButton(VaultsPlugin plugin, int size) {
         super(plugin, size);
     }
 
