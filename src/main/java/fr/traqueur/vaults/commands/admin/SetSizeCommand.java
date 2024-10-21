@@ -4,7 +4,6 @@ import fr.traqueur.commands.api.Arguments;
 import fr.traqueur.commands.api.Command;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
-import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
@@ -48,12 +47,6 @@ public class SetSizeCommand extends Command<VaultsPlugin> {
             user.sendMessage(Message.VAULT_NOT_FOUND);
             return;
         }
-        if(!this.vaultsManager.sizeIsAvailable(size)) {
-            user.sendMessage(Message.SIZE_NOT_AVAILABLE, Formatter.format("%size%", size));
-            return;
-        }
-        vault.setSize(size);
-        vault.getOwner().sendMessage(Message.VAULT_SET_SIZE, Formatter.format("%size%", vault.getSize()));
-        user.sendMessage(Message.VAULT_SET_SIZE_SUCCESS, Formatter.format("%size%", vault.getSize()));
+        this.vaultsManager.changeSizeOfVault(user, vault, size, Message.VAULT_SET_SIZE_SUCCESS, Message.VAULT_SET_SIZE);
     }
 }

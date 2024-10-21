@@ -5,7 +5,6 @@ import fr.maxlego08.menu.button.ZButton;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
-import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;

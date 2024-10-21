@@ -7,6 +7,7 @@ import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.VaultDTO;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
+import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
@@ -390,6 +391,17 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public void closeVaultChooseMenu(User user) {
         this.targetUserVaultsChoose.remove(user.getUniqueId());
+    }
+
+    @Override
+    public void changeSizeOfVault(User user, Vault vault, int size, Message success, Message transmitted) {
+        if(!this.sizeIsAvailable(size)) {
+            user.sendMessage(Message.SIZE_NOT_AVAILABLE, Formatter.format("%size%", size));
+            return;
+        }
+        vault.setSize(size);
+        vault.getOwner().sendMessage(transmitted, Formatter.format("%size%", size));
+        user.sendMessage(success, Formatter.format("%size%", size));
     }
 
     @Override

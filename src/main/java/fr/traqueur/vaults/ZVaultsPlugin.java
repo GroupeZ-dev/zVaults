@@ -32,6 +32,9 @@ import fr.traqueur.vaults.gui.VaultConfigMenu;
 import fr.traqueur.vaults.gui.VaultMenu;
 import fr.traqueur.vaults.gui.VaultsChooseMenu;
 import fr.traqueur.vaults.gui.buttons.*;
+import fr.traqueur.vaults.gui.buttons.sizes.GrowSizeButton;
+import fr.traqueur.vaults.gui.buttons.sizes.SetSizeButton;
+import fr.traqueur.vaults.gui.loaders.ManipulationSizeButtonLoader;
 import fr.traqueur.vaults.lang.ZLangConfiguration;
 import fr.traqueur.vaults.storage.SQLStorage;
 import fr.traqueur.vaults.users.ZUserManager;
@@ -113,6 +116,8 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         buttonManager.register(new NoneLoader(this, UserAccessButton.class, "zvaults_vault_users_access"));
         buttonManager.register(new NoneLoader(this, CustomizeIconButton.class, "zvaults_customize_icon"));
         buttonManager.register(new NoneLoader(this, DeleteVaultButton.class, "zvaults_delete"));
+        buttonManager.register(new ManipulationSizeButtonLoader(this, SetSizeButton.class, "zvaults_set_size"));
+        buttonManager.register(new ManipulationSizeButtonLoader(this, GrowSizeButton.class, "zvaults_grow_size"));
 
         inventoryManager.deleteInventories(this);
         try {

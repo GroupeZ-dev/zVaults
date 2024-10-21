@@ -11,8 +11,6 @@ import fr.traqueur.vaults.api.serialization.MaterialLocalization;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
-import net.md_5.bungee.api.chat.TranslatableComponent;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;

@@ -4,7 +4,6 @@ import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.users.User;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;

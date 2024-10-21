@@ -3,6 +3,7 @@ package fr.traqueur.vaults.api.vaults;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.managers.Manager;
+import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -65,4 +66,6 @@ public interface VaultsManager extends Manager {
     User getTargetUser(User user);
 
     void closeVaultChooseMenu(User user);
+
+    void changeSizeOfVault(User user, Vault vault, int size, Message success, Message transmitted);
 }
