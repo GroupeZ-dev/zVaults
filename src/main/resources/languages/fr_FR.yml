@@ -6,6 +6,8 @@ missing_args_message: "<red>Un argument est manquant."
 arg_not_recognized_message: "<red>L'argument %arg% que vous avez entré n'est pas reconnu."
 no_requirement_message: "<red>Vous ne remplissez pas les conditions pour faire cela."
 
+reload_plugin_success: "<green>Plugin rechargé avec succès."
+
 max_vaults_reached: "<red>Ce joueur a atteint le nombre maximum de coffres qu'il peut avoir."
 vault_created: "<green>Coffre créé."
 receive_new_vault: "<green>Vous avez reçu un nouveau coffre."

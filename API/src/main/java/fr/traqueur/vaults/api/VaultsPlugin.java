@@ -22,4 +22,5 @@ public abstract class VaultsPlugin extends JavaPlugin {
 
     public abstract MessageResolver getMessageResolver();
 
+    public abstract void loadInventories();
 }

@@ -20,7 +20,7 @@ public class VaultsCommand extends Command<VaultsPlugin> {
         this.userManager = plugin.getManager(UserManager.class);
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
-        this.addSubCommand(new AdminCommand(plugin));
+        this.addSubCommand(new AdminCommand(plugin), new ReloadCommand(plugin));
 
         this.setGameOnly(true);
     }

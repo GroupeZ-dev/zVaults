@@ -119,15 +119,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         buttonManager.register(new ManipulationSizeButtonLoader(this, SetSizeButton.class, "zvaults_set_size"));
         buttonManager.register(new ManipulationSizeButtonLoader(this, GrowSizeButton.class, "zvaults_grow_size"));
 
-        inventoryManager.deleteInventories(this);
-        try {
-            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vaults_choose_menu.yml", VaultsChooseMenu.class);
-            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_menu.yml", VaultMenu.class);
-            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_config_menu.yml", VaultConfigMenu.class);
-            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_access_manager_menu.yml", VaultAccessManagerMenu.class);
-        } catch (InventoryException e) {
-            throw new RuntimeException(e);
-        }
+        this.loadInventories();
 
         commandManager.registerConverter(String.class, "ownerType", new OwnerTypeArgument(vaultsManager.getOwnerResolver()));
         commandManager.registerConverter(User.class, "user", new UserArgument(userManager));
@@ -197,6 +189,19 @@ public final class ZVaultsPlugin extends VaultsPlugin {
     @Override
     public MessageResolver getMessageResolver() {
         return this.messageResolver;
+    }
+
+    @Override
+    public void loadInventories() {
+        inventoryManager.deleteInventories(this);
+        try {
+            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vaults_choose_menu.yml", VaultsChooseMenu.class);
+            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_menu.yml", VaultMenu.class);
+            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_config_menu.yml", VaultConfigMenu.class);
+            this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vault_access_manager_menu.yml", VaultAccessManagerMenu.class);
+        } catch (InventoryException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private <I extends Manager, T extends I> I registerManager(T instance, Class<I> clazz) {

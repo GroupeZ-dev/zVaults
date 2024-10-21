@@ -6,6 +6,8 @@ missing_args_message: "<red>You are missing arguments."
 arg_not_recognized_message: "<red>The argument %arg% you entered is not recognized."
 no_requirement_message: "<red>You do not meet the requirements to do that."
 
+reload_plugin_success: "<green>Plugin reloaded successfully."
+
 max_vaults_reached: "<red>This player have reached the maximum amount of vaults he can have."
 vault_created: "<green>Vault created."
 receive_new_vault: "<green>You have received a new vault."
