@@ -34,8 +34,14 @@ vaults_icons:
     model_data: 1
     name: "&8ᴠᴀᴜʟᴛ"
     lore:
+      - "#92bed8ᴛᴀɪʟʟᴇ: &f%vault_size% &7sʟᴏᴛs"
+      - "#92bed8Sᴛᴏᴄᴋ: &f%vault_content_size% &7oʙᴊᴇᴛs"
+      - ""
       - "#92bed8ᴄʟɪᴄᴋ ᴅʀᴏɪᴛ &7ᴘᴏᴜʀ ᴏᴜᴠʀɪʀ"
       - "&7ᴠᴏᴛʀᴇ ᴠᴀᴜʟᴛ ᴘᴇʀsᴏɴɴᴇʟ"
+      - ""
+      - "#92bed8ᴄʟɪᴄᴋ ɢᴀᴜᴄʜᴇ&7 ᴘᴏᴜʀ"
+      - "&7ᴄᴏɴғɪɢᴜʀᴇʀ ᴠᴏᴛʀᴇ ᴠᴀᴜʟᴛ"
   vault_item:
     name: "#92bed8Sᴛᴏᴄᴋ ᴅᴇ &7%material_name%"
     material: "%material%"

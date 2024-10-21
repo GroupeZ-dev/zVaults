@@ -70,6 +70,9 @@ public class VaultButton extends ZButton implements PaginateButton {
 
             Placeholders placeholders = new Placeholders();
             placeholders.register("vault_icon", vault.getIcon().name());
+            placeholders.register("vault_size", vault.getSize() +"");
+            int contentSize = vault.getContent().stream().filter(vaultItem -> vaultItem.item() != null && !vaultItem.item().getType().isAir()).toList().size();
+            placeholders.register("vault_content_size", contentSize + "");
 
             inventory.addItem(slot, configuration.getIcon("open_vault").build(player, false, placeholders)).setClick(event -> {
                 if(event.getClick() == ClickType.LEFT) {
