@@ -6,6 +6,7 @@ import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
+import fr.traqueur.vaults.api.events.VaultUpdateEvent;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
@@ -112,6 +113,13 @@ public class VaultItemButton extends ZButton {
         if(this.vault.isInfinite()) {
             event.setCancelled(true);
         }
+        event.getNewItems().forEach((slot, item) -> {
+            if(slot < this.vault.getSize()) {
+                VaultItem vaultItem = new VaultItem(item, this.vaultsManager.getAmountFromItem(item));
+                VaultUpdateEvent vaultUpdateEvent = new VaultUpdateEvent(plugin, this.userManager.getUser(player.getUniqueId()).orElseThrow(), this.vault, vaultItem, slot);
+                plugin.getServer().getPluginManager().callEvent(vaultUpdateEvent);
+            }
+        });
     }
 
     @Override

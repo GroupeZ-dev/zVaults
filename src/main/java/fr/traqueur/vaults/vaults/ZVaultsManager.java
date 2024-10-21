@@ -8,6 +8,7 @@ import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.VaultDTO;
 import fr.traqueur.vaults.api.events.VaultCloseEvent;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
+import fr.traqueur.vaults.api.events.VaultUpdateEvent;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
@@ -228,6 +229,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     ItemStack newCursor = new ItemStack(current.getType(), current.getAmount());
                     event.getInventory().setItem(slot, cursor);
                     event.getView().setCursor(newCursor);
+
+                    VaultItem vaultItem = new VaultItem(cursor, cursor.getAmount());
+                    VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+                    Bukkit.getPluginManager().callEvent(updateEvent);
                 }
             }
         } else if (action == InventoryAction.PICKUP_ALL) {
@@ -237,6 +242,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             if(!vault.isInfinite()) {
                 event.getInventory().setItem(slot, new ItemStack(Material.AIR));
                 event.getView().setCursor(new ItemStack(current.getType(), current.getAmount()));
+
+                VaultItem vaultItem = new VaultItem(new ItemStack(Material.AIR), 1);
+                VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+                Bukkit.getPluginManager().callEvent(updateEvent);
                 return;
             }
             int amount = Math.min(current.getMaxStackSize(), this.getAmountFromItem(current) + cursor.getAmount());
@@ -259,6 +268,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 ItemStack newCursor = newCursorAmount == 0 ? new ItemStack(Material.AIR) : new ItemStack(current.getType(), newCursorAmount);
                 event.getInventory().setItem(slot, newCurrent);
                 event.getView().setCursor(newCursor);
+
+                VaultItem vaultItem = new VaultItem(newCurrent, newCurrent.getAmount());
+                VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+                Bukkit.getPluginManager().callEvent(updateEvent);
                 return;
             }
             int amount = Math.min(current.getMaxStackSize()/2, this.getAmountFromItem(current));
@@ -269,8 +282,19 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             if(this.isSimilar(cursor, current)) {
                 this.placeOne(event, player, cursor, current, slot, vault);
             } else {
-                event.getInventory().setItem(slot, cursor);
-                event.getView().setCursor(new ItemStack(current.getType(), current.getAmount()));
+                if(!vault.isInfinite()) {
+                    event.getInventory().setItem(slot, cursor);
+                    event.getView().setCursor(new ItemStack(current.getType(), current.getAmount()));
+
+                    VaultItem vaultItem = new VaultItem(cursor, cursor.getAmount());
+                    VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+                    Bukkit.getPluginManager().callEvent(updateEvent);
+                } else {
+                    if(this.addItem(event, cursor, vault, player, 1)) {
+                        int newCursorAmount = cursor.getAmount() - 1;
+                        event.getView().setCursor(newCursorAmount == 0 ? new ItemStack(Material.AIR) : new ItemStack(cursor.getType(), newCursorAmount));
+                    }
+                }
             }
         }
     }
@@ -299,6 +323,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 var notAdded = inventory.addItem(current);
                 ItemStack newCurrent = notAdded.isEmpty() ? new ItemStack(Material.AIR) : notAdded.values().iterator().next();
                 event.setCurrentItem(newCurrent);
+                VaultItem vaultItem;
+                VaultUpdateEvent updateEvent;
                 for (int i = 0; i < vault.getSize(); i++) {
                     ItemStack ref = event.getInventory().getItem(i);
                     ItemStack item = inventory.getItem(i);
@@ -307,7 +333,15 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                             || ref == null && item != null
                             || ref != null && item == null
                             || ref != null && ref.getAmount() != item.getAmount()) {
+                        if(item == null) {
+                            item = new ItemStack(Material.AIR);
+                        }
+
                         event.getInventory().setItem(i, item);
+
+                        vaultItem = new VaultItem(item, item.getAmount());
+                        updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, i);
+                        Bukkit.getPluginManager().callEvent(updateEvent);
                     }
                 }
             }
@@ -324,6 +358,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                var notAdded = player.getInventory().addItem(current);
                ItemStack newCurrent = notAdded.isEmpty() ? new ItemStack(Material.AIR) : notAdded.values().iterator().next();
                event.setCurrentItem(newCurrent);
+
+               VaultItem vaultItem = new VaultItem(newCurrent, newCurrent.getAmount());
+               VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+               Bukkit.getPluginManager().callEvent(updateEvent);
             }
         }
     }
@@ -348,6 +386,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 newCurrent = new ItemStack(current.getType(), current.getAmount() - amount);
             }
             event.getInventory().setItem(slot, newCurrent);
+
+            VaultItem vaultItem = new VaultItem(newCurrent, newCurrent.getAmount());
+            VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+            Bukkit.getPluginManager().callEvent(updateEvent);
         }
     }
 
@@ -367,6 +409,14 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             ItemStack currentItem = (current == null || current.getType().isAir()) ? new ItemStack(Material.AIR) : new ItemStack(current.getType(), current.getAmount());
             player.getInventory().setItem(event.getHotbarButton(), currentItem);
             event.getInventory().setItem(slot, hotbarItem);
+
+            if(hotbarItem == null) {
+                hotbarItem = new ItemStack(Material.AIR);
+            }
+
+            VaultItem vaultItem = new VaultItem(hotbarItem, hotbarItem.getAmount());
+            VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+            Bukkit.getPluginManager().callEvent(updateEvent);
         }
     }
 
@@ -453,12 +503,16 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     private void changeCurrent(InventoryClickEvent event, Player player, ItemStack current, int slot, Vault vault, int amount) {
         int newAmount = this.getAmountFromItem(current) - amount;
+        VaultItem vaultItem;
         if(newAmount == 0) {
-            event.getInventory().setItem(slot, new ItemStack(Material.AIR));
+            vaultItem = new VaultItem(new ItemStack(Material.AIR), 1);
         } else {
-            VaultItem vaultItem = new VaultItem(current, newAmount);
-            event.getInventory().setItem(slot, vaultItem.toItem(player, vault.isInfinite()));
+            vaultItem = new VaultItem(current, newAmount);
         }
+        event.getInventory().setItem(slot, vaultItem.toItem(player, vault.isInfinite()));
+
+        VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+        Bukkit.getPluginManager().callEvent(updateEvent);
     }
 
     private void placeOne(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, Vault vault) {
@@ -471,6 +525,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             ItemStack newCurrent = new ItemStack((current == null || current.getType() == Material.AIR) ? cursor.getType() : current.getType(), (current == null || current.getType() == Material.AIR) ? 1 : current.getAmount() + 1);
             event.getInventory().setItem(slot, newCurrent);
             event.getView().setCursor(newCursor);
+
+            VaultItem vaultItem = new VaultItem(newCurrent, newCurrent.getAmount());
+            VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+            Bukkit.getPluginManager().callEvent(updateEvent);
             return;
         }
         if (this.addItem(event, cursor, vault, player, 1)) {
@@ -484,10 +542,13 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         VaultItem vaultItem;
         if(rest > 0) {
             vaultItem = new VaultItem(current, rest);
-            event.getInventory().setItem(slot, vaultItem.toItem(player, vault.isInfinite()));
         } else {
-            event.getInventory().setItem(slot, new ItemStack(Material.AIR));
+            vaultItem = new VaultItem(new ItemStack(Material.AIR),1);
         }
+        event.getInventory().setItem(slot, vaultItem.toItem(player, vault.isInfinite()));
+        VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+        Bukkit.getPluginManager().callEvent(updateEvent);
+
         event.getView().setCursor(new ItemStack(current.getType(), amount));
     }
 
@@ -501,9 +562,14 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         ItemStack newCurrent = new ItemStack(current.getType(), newAmount);
         event.getInventory().setItem(slot, newCurrent);
         event.getView().setCursor(newCursor);
+
+        VaultItem vaultItem = new VaultItem(newCurrent, newCurrent.getAmount());
+        VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(event.getWhoClicked().getUniqueId()).orElseThrow(), this.getOpenedVault(this.getPlugin().getManager(UserManager.class).getUser(event.getWhoClicked().getUniqueId()).orElseThrow()), vaultItem, slot);
+        Bukkit.getPluginManager().callEvent(updateEvent);
     }
 
     private boolean addItem(InventoryClickEvent event, ItemStack cursor, Vault vault, Player player, int amountItem) {
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
         int correspondingslot = event.getInventory().first(cursor.getType());
         if(correspondingslot == -1) {
             correspondingslot = event.getInventory().firstEmpty();
@@ -521,6 +587,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
         VaultItem vaultItem = new VaultItem(item, amount);
         event.getInventory().setItem(correspondingslot, vaultItem.toItem(player, vault.isInfinite()));
+
+        VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), user, vault, vaultItem, correspondingslot);
+        Bukkit.getPluginManager().callEvent(updateEvent);
         return true;
     }
 
