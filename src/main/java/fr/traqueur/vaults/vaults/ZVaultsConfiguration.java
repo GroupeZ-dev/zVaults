@@ -111,7 +111,6 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
 
     @Override
     public int getMaxVaultsByOwnerType(String ownerType) {
-        System.out.println(this.maxVaultsByOwnerType);
         return this.maxVaultsByOwnerType.getOrDefault(ownerType, -1);
     }
 }

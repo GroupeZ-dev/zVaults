@@ -16,6 +16,7 @@ import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.*;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
+import fr.traqueur.zvaults.hooks.ZSuperiorOwner;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -414,7 +415,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void load() {
-        this.vaultService.findAll().forEach(vault -> this.vaults.put(vault.getUniqueId(), vault));
+        this.vaultService.findAll().stream().filter(vault -> vault.getOwner().isEnable()).forEach(vault -> this.vaults.put(vault.getUniqueId(), vault));
     }
 
     @Override
@@ -525,5 +526,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     private void registerResolvers(OwnerResolver ownerResolver) {
         ownerResolver.registerOwnerType("player", ZPlayerOwner.class);
+        if(Bukkit.getServer().getPluginManager().getPlugin("SuperiorSkyblock2") != null) {
+            ownerResolver.registerOwnerType("superiorskyblock", ZSuperiorOwner.class);
+        }
     }
 }

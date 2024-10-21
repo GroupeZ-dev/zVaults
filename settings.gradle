@@ -1,3 +1,6 @@
 rootProject.name = 'zVaults'
 include 'API'
+include 'Hooks'
+include 'Hooks:SuperiorSkyblock'
+findProject(':Hooks:SuperiorSkyblock')?.name = 'SuperiorSkyblock'
 

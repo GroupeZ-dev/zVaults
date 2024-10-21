@@ -1,0 +1,7 @@
+group 'Hooks'
+
+allprojects {
+    dependencies {
+        implementation project(":API")
+    }
+}

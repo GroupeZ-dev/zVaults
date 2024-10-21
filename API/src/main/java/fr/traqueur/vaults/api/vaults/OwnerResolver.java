@@ -19,7 +19,7 @@ public class OwnerResolver {
         this.ownerTypes.put(name, ownerType);
     }
 
-    public VaultOwner resolveOwner(String name, UUID uniqueId) {
+    public VaultOwner resolveOwner(String name, UUID uniqueId){
         Class<? extends VaultOwner> ownerType = this.ownerTypes.get(name);
         if (ownerType == null) {
             throw new IllegalArgumentException("Unknown owner type: " + name);

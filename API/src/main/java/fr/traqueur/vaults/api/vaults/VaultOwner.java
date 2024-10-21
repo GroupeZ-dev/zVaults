@@ -24,6 +24,8 @@ public abstract class VaultOwner {
 
     public abstract UUID fromUser(User user);
 
+    public abstract boolean isEnable();
+
     public abstract boolean hasAccess(UUID player);
 
     public abstract void sendMessage(Message message, Formatter... formatters);
