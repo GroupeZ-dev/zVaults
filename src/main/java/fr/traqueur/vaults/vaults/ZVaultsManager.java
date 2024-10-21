@@ -6,6 +6,8 @@ import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.VaultDTO;
+import fr.traqueur.vaults.api.events.VaultCloseEvent;
+import fr.traqueur.vaults.api.events.VaultOpenEvent;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
@@ -62,6 +64,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void openVault(User user, Vault vault) {
+        VaultOpenEvent event = new VaultOpenEvent(this.getPlugin(), user, vault);
+        Bukkit.getPluginManager().callEvent(event);
+        if(event.isCancelled()) {
+            return;
+        }
         this.openedVaults.computeIfAbsent(vault.getUniqueId(), uuid -> new ArrayList<>()).add(user.getUniqueId());
         if(this.linkedVaultToInventory.containsKey(vault.getUniqueId())) {
             user.getPlayer().openInventory(this.linkedVaultToInventory.get(vault.getUniqueId()).getSpigotInventory());
@@ -89,6 +96,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     public void closeVault(User user, Vault vault) {
         this.openedVaults.computeIfAbsent(vault.getUniqueId(), k -> new ArrayList<>()).remove(user.getUniqueId());
         if(this.openedVaults.getOrDefault(vault.getUniqueId(), Collections.emptyList()).isEmpty()) {
+            VaultCloseEvent event = new VaultCloseEvent(this.getPlugin(), user, vault);
+            Bukkit.getPluginManager().callEvent(event);
             this.linkedVaultToInventory.remove(vault.getUniqueId());
             this.saveVault(vault);
         }
