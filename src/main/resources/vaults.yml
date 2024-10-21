@@ -3,6 +3,7 @@ config-version: "${vaults_config_version}"
 # Nombre maximum de vaults par joueur (mettre -1 pour illimité)
 max_vaults:
   player: 5
+  superiorskyblock: 1
 # Si true, les joueurs peuvent avoir un stock illimité par items dans leurs vaults
 infinite_vaults: false
 
