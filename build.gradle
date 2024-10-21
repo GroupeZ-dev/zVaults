@@ -75,6 +75,7 @@ dependencies {
     rootProject.subprojects.findAll { it.path.startsWith(':Hooks:') }.each { subproject ->
         implementation project(subproject.path)
     }
+    implementation(project(':Distributed'))
 }
 
 shadowJar {

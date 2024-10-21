@@ -11,7 +11,11 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class VaultEvent extends PlayerEvent {
 
-    private final HandlerList HANDLERS = new HandlerList();
+    private static final HandlerList HANDLERS = new HandlerList();
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
 
     private final VaultsPlugin plugin;
     private final Vault vault;

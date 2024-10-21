@@ -17,7 +17,7 @@ import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.*;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
-import fr.traqueur.zvaults.hooks.ZSuperiorOwner;
+import fr.traqueur.vaults.hooks.ZSuperiorOwner;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;

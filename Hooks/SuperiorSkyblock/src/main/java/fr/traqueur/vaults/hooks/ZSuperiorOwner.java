@@ -1,4 +1,4 @@
-package fr.traqueur.zvaults.hooks;
+package fr.traqueur.vaults.hooks;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;

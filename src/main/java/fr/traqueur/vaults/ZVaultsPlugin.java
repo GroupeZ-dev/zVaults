@@ -17,6 +17,7 @@ import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.data.Saveable;
+import fr.traqueur.vaults.api.distributed.DistributedManager;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.messages.MessageResolver;
 import fr.traqueur.vaults.api.storage.Storage;
@@ -27,6 +28,7 @@ import fr.traqueur.vaults.commands.VaultsCommand;
 import fr.traqueur.vaults.commands.arguments.OwnerTypeArgument;
 import fr.traqueur.vaults.commands.arguments.UserArgument;
 import fr.traqueur.vaults.configurator.ZVaultConfigurationManager;
+import fr.traqueur.vaults.distributed.ZDistributedManager;
 import fr.traqueur.vaults.gui.VaultAccessManagerMenu;
 import fr.traqueur.vaults.gui.VaultConfigMenu;
 import fr.traqueur.vaults.gui.VaultMenu;
@@ -108,6 +110,9 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         UserManager userManager = this.registerManager(new ZUserManager(), UserManager.class);
         VaultsManager vaultsManager = this.registerManager(new ZVaultsManager(vaultConfig), VaultsManager.class);
         this.registerManager(new ZVaultConfigurationManager(), VaultConfigurationManager.class);
+        if(config.isMultiServerSyncSupport()) {
+            this.registerManager(new ZDistributedManager(this), DistributedManager.class);
+        }
 
         buttonManager.unregisters(this);
         buttonManager.register(new NoneLoader(this, VaultButton.class, "zvaults_vaults"));
@@ -155,6 +160,10 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         if(this.saveables != null) {
             this.saveables.forEach(Saveable::save);
         }
+        if(this.getManager(DistributedManager.class) != null) {
+            this.getManager(DistributedManager.class).disable();
+        }
+
         if(this.storage != null) {
             this.storage.onDisable();
         }

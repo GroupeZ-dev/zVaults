@@ -1,0 +1,6 @@
+group "Distributed"
+
+dependencies {
+    implementation project(":API")
+    implementation 'redis.clients:jedis:5.2.0'
+}

@@ -6,6 +6,7 @@ import fr.maxlego08.sarah.database.DatabaseType;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.config.NonLoadable;
+import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;
 
 public class ZMainConfiguration implements MainConfiguration {
 
@@ -17,6 +18,8 @@ public class ZMainConfiguration implements MainConfiguration {
     @NonLoadable
     private DatabaseConfiguration databaseConfiguration;
     private boolean debug;
+    private boolean multiServerSyncSupport;
+    private RedisConnectionConfig redisConfig;
 
     public ZMainConfiguration(VaultsPlugin plugin) {
         this.plugin = plugin;
@@ -57,7 +60,17 @@ public class ZMainConfiguration implements MainConfiguration {
     }
 
     @Override
+    public RedisConnectionConfig getRedisConnectionConfig() {
+        return this.redisConfig;
+    }
+
+    @Override
     public boolean isDebug() {
         return this.debug;
+    }
+
+    @Override
+    public boolean isMultiServerSyncSupport() {
+        return multiServerSyncSupport;
     }
 }
