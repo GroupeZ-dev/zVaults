@@ -3,6 +3,7 @@ package fr.traqueur.vaults.api.storage;
 import fr.traqueur.vaults.api.VaultsPlugin;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Service<T, DTO> {
@@ -46,6 +47,7 @@ public class Service<T, DTO> {
         return plugin.getStorage().findAll(table, this.dtoClass)
                 .stream()
                 .map(this.repository::toEntity)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 }

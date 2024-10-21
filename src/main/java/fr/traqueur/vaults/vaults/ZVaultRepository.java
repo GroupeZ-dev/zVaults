@@ -25,7 +25,12 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
 
     @Override
     public Vault toEntity(VaultDTO vaultDTO) {
-        VaultOwner owner = ownerResolver.resolveOwner(vaultDTO.ownerType(), vaultDTO.owner());
+        VaultOwner owner;
+        try {
+            owner = ownerResolver.resolveOwner(vaultDTO.ownerType(), vaultDTO.owner());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
         List<VaultItem> content;
         if(vaultDTO.content().isEmpty()) {
             content = new ArrayList<>();

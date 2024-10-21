@@ -25,11 +25,6 @@ public class ZPlayerOwner extends VaultOwner {
     }
 
     @Override
-    public boolean isEnable() {
-        return true;
-    }
-
-    @Override
     public boolean hasAccess(UUID player) {
         return player.equals(this.getUniqueId());
     }

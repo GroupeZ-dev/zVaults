@@ -415,7 +415,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void load() {
-        this.vaultService.findAll().stream().filter(vault -> vault.getOwner().isEnable()).forEach(vault -> this.vaults.put(vault.getUniqueId(), vault));
+        this.vaultService.findAll().forEach(vault -> this.vaults.put(vault.getUniqueId(), vault));
     }
 
     @Override

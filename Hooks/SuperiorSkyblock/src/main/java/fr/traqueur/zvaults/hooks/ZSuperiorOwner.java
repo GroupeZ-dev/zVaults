@@ -28,11 +28,6 @@ public class ZSuperiorOwner extends VaultOwner {
     }
 
     @Override
-    public boolean isEnable() {
-        return Bukkit.getServer().getPluginManager().getPlugin("SuperiorSkyblock2") != null;
-    }
-
-    @Override
     public boolean hasAccess(UUID player) {
         return SuperiorSkyblockAPI.getIslandByUUID(this.getUniqueId())
                 .getAllPlayersInside()
