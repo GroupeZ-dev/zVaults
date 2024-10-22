@@ -2,6 +2,7 @@ package fr.traqueur.vaults.distributed;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import fr.traqueur.vaults.api.VaultsLogger;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
@@ -71,6 +72,9 @@ public class ZDistributedManager implements DistributedManager {
 
     private void handleVaultUpdate(VaultUpdate vaultUpdate) {
         this.vaultsManager.getLinkedInventory(vaultUpdate.vault()).ifPresent(inventory -> {
+            if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+                VaultsLogger.info("Received vault update for vault " + vaultUpdate.vault().getUniqueId() + " on slot " + vaultUpdate.slot());
+            }
             inventory.getSpigotInventory().setItem(vaultUpdate.slot(), vaultUpdate.itemStack());
         });
     }

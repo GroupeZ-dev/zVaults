@@ -8,7 +8,7 @@ public record VaultDTO(@Column(value = "unique_id", primary = true) UUID uniqueI
                        UUID owner,
                        String ownerType,
                        String icon,
-                       String content,
+                       @Column(value = "content", type = "LONGTEXT") String content,
                        int size,
                        boolean infinite) {
 }

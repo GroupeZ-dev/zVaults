@@ -2,6 +2,9 @@ package fr.traqueur.vaults.vaults;
 
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.sarah.MigrationManager;
+import fr.traqueur.vaults.api.VaultsLogger;
+import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.data.Saveable;
@@ -87,6 +90,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public void linkVaultToInventory(User user, InventoryDefault inventory) {
         Vault vault = this.getOpenedVault(user);
+        if(Configuration.getConfiguration(MainConfiguration.class).isDebug()){
+            VaultsLogger.info("Vault " + vault.getUniqueId() + " linked to spigot inventory !");
+        }
         this.linkedVaultToInventory.put(vault.getUniqueId(), inventory);
     }
 
