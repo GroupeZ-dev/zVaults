@@ -44,6 +44,11 @@ vaults_icons:
       - ""
       - "#92bed8ᴄʟɪᴄᴋ ɢᴀᴜᴄʜᴇ&7 ᴘᴏᴜʀ"
       - "&7ᴄᴏɴғɪɢᴜʀᴇʀ ᴠᴏᴛʀᴇ ᴠᴀᴜʟᴛ"
+  loading_open:
+    material: ENDER_CHEST
+    name: "&8ᴠᴀᴜʟᴛ"
+    lore:
+      - "&7Cʜᴀʀɢᴇᴍᴇɴᴛ..."
   vault_item:
     name: "#92bed8Sᴛᴏᴄᴋ ᴅᴇ &7%material_name%"
     material: "%material%"

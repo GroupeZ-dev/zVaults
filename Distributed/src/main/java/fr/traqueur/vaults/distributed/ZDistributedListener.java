@@ -1,7 +1,6 @@
 package fr.traqueur.vaults.distributed;
 
 import fr.traqueur.vaults.api.distributed.DistributedManager;
-import fr.traqueur.vaults.api.distributed.VaultUpdate;
 import fr.traqueur.vaults.api.events.VaultCloseEvent;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
 import fr.traqueur.vaults.api.events.VaultUpdateEvent;
@@ -18,7 +17,7 @@ public class ZDistributedListener implements Listener {
 
     @EventHandler
     public void onVaultOpen(VaultOpenEvent event) {
-        this.distributedManager.publishOpenRequest(event.getVault());
+        this.distributedManager.publishOpenRequest(event);
     }
 
     @EventHandler

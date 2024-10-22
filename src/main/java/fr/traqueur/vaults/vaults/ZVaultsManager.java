@@ -79,6 +79,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         if(event.isCancelled()) {
             return;
         }
+        vault.setContent(event.getContent());
         this.openedVaults.computeIfAbsent(vault.getUniqueId(), uuid -> new ArrayList<>()).add(user.getUniqueId());
         if(this.linkedVaultToInventory.containsKey(vault.getUniqueId())) {
             user.getPlayer().openInventory(this.linkedVaultToInventory.get(vault.getUniqueId()).getSpigotInventory());

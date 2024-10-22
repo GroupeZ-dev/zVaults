@@ -79,6 +79,7 @@ public class VaultButton extends ZButton implements PaginateButton {
 
             inventory.addItem(slot, configuration.getIcon("open_vault").build(player, false, placeholders)).setClick(event -> {
                 if(event.getClick() == ClickType.LEFT) {
+                    event.getInventory().setItem(event.getRawSlot(), configuration.getIcon("loading_open").build(player, false, placeholders));
                     this.vaultsManager.openVault(user, vault);
                 } else if(event.getClick() == ClickType.RIGHT) {
                     if(!vault.isOwner(user) && !user.hasPermission("zvaults.admin")) {
