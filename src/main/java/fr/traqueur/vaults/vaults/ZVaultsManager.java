@@ -216,6 +216,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             }
             event.setCancelled(vault.isInfinite());
             if(!vault.isInfinite()) {
+                VaultItem vaultItem = new VaultItem(cursor, cursor.getAmount());
+                VaultUpdateEvent updateEvent = new VaultUpdateEvent(this.getPlugin(), this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow(), vault, vaultItem, slot);
+                Bukkit.getPluginManager().callEvent(updateEvent);
                 return;
             }
 
