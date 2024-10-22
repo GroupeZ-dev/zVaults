@@ -15,6 +15,8 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.text.DecimalFormat;
+
 public record VaultItem(ItemStack item, int amount) {
 
     public static VaultItem deserialize(String serialized) {
@@ -42,7 +44,7 @@ public record VaultItem(ItemStack item, int amount) {
 
             Placeholders placeholders = new Placeholders();
             placeholders.register("material_name", MaterialLocalization.getTranslateName(this.item.getType()));
-            placeholders.register("amount", String.valueOf(this.amount));
+            placeholders.register("amount", this.formatNumber(this.amount));
             placeholders.register("material", this.item.getType().name());
 
             ItemStack itemStack = item.build(player, true, placeholders);
@@ -58,6 +60,19 @@ public record VaultItem(ItemStack item, int amount) {
         }
 
         return this.item;
+    }
+
+    private String formatNumber(double value) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        if (value >= 1_000_000_000) {
+            return decimalFormat.format(value / 1_000_000_000) + "B";
+        } else if (value >= 1_000_000) {
+            return decimalFormat.format(value / 1_000_000) + "M";
+        } else if (value >= 1_000) {
+            return decimalFormat.format(value / 1_000) + "k";
+        } else {
+            return String.valueOf((int) value); // For numbers less than 1000
+        }
     }
 
 }
