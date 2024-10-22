@@ -15,13 +15,13 @@ import fr.traqueur.vaults.api.events.VaultOpenEvent;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
+import fr.traqueur.vaults.distributed.adapter.VaultOpenAckRequestAdapter;
 import fr.traqueur.vaults.distributed.adapter.VaultUpdateAdapter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
-import javax.print.attribute.standard.PresentationDirection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,8 +29,6 @@ import java.util.concurrent.*;
 
 public class ZDistributedManager implements DistributedManager {
 
-    private final Jedis publisher;
-    private final Jedis subscriber;
     private final ExecutorService executorService;
     private final Gson gson;
     private final UUID serverUUID;
@@ -39,18 +37,14 @@ public class ZDistributedManager implements DistributedManager {
 
     public ZDistributedManager(VaultsPlugin plugin) {
         this.serverUUID = UUID.randomUUID();
-        MainConfiguration configuration = Configuration.getConfiguration(MainConfiguration.class);
-        RedisConnectionConfig redisConfig = configuration.getRedisConnectionConfig();
 
         this.executorService = Executors.newSingleThreadExecutor();
-
-        this.publisher = this.createJedisInstance(redisConfig);
-        this.subscriber = this.createJedisInstance(redisConfig);
 
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(VaultUpdateRequest.class, new VaultUpdateAdapter(plugin.getManager(VaultsManager.class)))
+                .registerTypeAdapter(VaultOpenAckRequest.class, new VaultOpenAckRequestAdapter())
                 .create();
 
         this.executorService.submit(this::subscribe);
@@ -60,14 +54,14 @@ public class ZDistributedManager implements DistributedManager {
     @Override
     public void disable() {
         this.executorService.shutdownNow();
-        this.publisher.close();
-        this.subscriber.close();
     }
 
     @Override
     public void publishVaultUpdate(Vault vault, ItemStack item, int slot) {
         VaultUpdateRequest vaultUpdate = new VaultUpdateRequest(serverUUID, vault, item, slot);
-        publisher.publish(UPDATE_CHANNEL_NAME, gson.toJson(vaultUpdate, VaultUpdateRequest.class));
+        try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            publisher.publish(UPDATE_CHANNEL_NAME, gson.toJson(vaultUpdate, VaultUpdateRequest.class));
+        }
     }
 
     @Override
@@ -75,33 +69,37 @@ public class ZDistributedManager implements DistributedManager {
         if(Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
             VaultsLogger.info("Sending open request for vault " + event.getVault().getUniqueId());
         }
-        VaultOpenRequest openRequest = new VaultOpenRequest(serverUUID, event.getVault().getUniqueId());
-        publisher.publish(OPEN_CHANNEL_NAME, gson.toJson(openRequest, VaultOpenRequest.class));
-        this.waitForVaultSaveConfirmation(event);
-    }
 
-    public void waitForVaultSaveConfirmation(VaultOpenEvent event) {
+        Jedis openAckSubscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig());
+        CompletableFuture<Void> future = new CompletableFuture<>();
 
-        try (Jedis openAckSubscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
-            Future<?> future = executorService.submit(() -> {
-                openAckSubscriber.subscribe(new JedisPubSub() {
-                    @Override
-                    public void onMessage(String channel, String message) {
-                        VaultOpenAckRequest request = gson.fromJson(message, VaultOpenAckRequest.class);
-                        if (request.server().equals(serverUUID) && event.getVault().getUniqueId().equals(request.vault())) {
-                            if(Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
-                                VaultsLogger.info("Received open ack for vault " + request.vault());
-                            }
-                            event.setContent(request.items());
-                            openAckSubscriber.close();
+        var execAck = Executors.newSingleThreadExecutor();
+
+        execAck.submit(() -> openAckSubscriber.subscribe(new JedisPubSub() {
+            @Override
+            public void onMessage(String channel, String message) {
+                if(channel.equals(OPEN_ACK_CHANNEL_NAME)) {
+                    VaultOpenAckRequest request = gson.fromJson(message, VaultOpenAckRequest.class);
+                    if (request.server().equals(serverUUID) && event.getVault().getUniqueId().equals(request.vault())) {
+                        if(Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+                            VaultsLogger.info("Received open ack for vault " + request.vault());
                         }
+                        event.setContent(request.items());
                     }
-                }, OPEN_ACK_CHANNEL_NAME);
-            });
+                }
+            }
+        }, OPEN_ACK_CHANNEL_NAME));
 
-            try {
-                future.get(10, TimeUnit.SECONDS);
-            } catch (Exception ignored) {}
+        VaultOpenRequest openRequest = new VaultOpenRequest(serverUUID, event.getVault().getUniqueId());
+        try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            publisher.publish(OPEN_CHANNEL_NAME, gson.toJson(openRequest, VaultOpenRequest.class));
+        }
+
+        try {
+            future.get(1, TimeUnit.SECONDS);
+        } catch (Exception ignored) {} finally {
+            openAckSubscriber.close();
+            execAck.shutdownNow();
         }
     }
 
@@ -137,28 +135,32 @@ public class ZDistributedManager implements DistributedManager {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
                 VaultsLogger.info("Sending open ack for vault " + openRequest.vaultId());
             }
-            publisher.publish(OPEN_ACK_CHANNEL_NAME, gson.toJson(request, VaultOpenAckRequest.class));
+            try (Jedis ackPublisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+                ackPublisher.publish(OPEN_ACK_CHANNEL_NAME, gson.toJson(request, VaultOpenAckRequest.class));
+            }
         });
     }
 
 
     private void subscribe() {
-        subscriber.subscribe(new JedisPubSub() {
-            @Override
-            public void onMessage(String channel, String message) {
-                if (channel.equals(UPDATE_CHANNEL_NAME)) {
-                    VaultUpdateRequest vaultUpdate = gson.fromJson(message, VaultUpdateRequest.class);
-                    if(!vaultUpdate.server().equals(serverUUID)) {
-                        handleVaultUpdate(vaultUpdate);
-                    }
-                } else if (channel.equals(OPEN_CHANNEL_NAME)) {
-                    VaultOpenRequest openRequest = gson.fromJson(message, VaultOpenRequest.class);
-                    if(!openRequest.server().equals(serverUUID)) {
-                        handleVaultOpen(openRequest);
+        try (Jedis subscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            subscriber.subscribe(new JedisPubSub() {
+                @Override
+                public void onMessage(String channel, String message) {
+                    if (channel.equals(UPDATE_CHANNEL_NAME)) {
+                        VaultUpdateRequest vaultUpdate = gson.fromJson(message, VaultUpdateRequest.class);
+                        if(!vaultUpdate.server().equals(serverUUID)) {
+                            handleVaultUpdate(vaultUpdate);
+                        }
+                    } else if (channel.equals(OPEN_CHANNEL_NAME)) {
+                        VaultOpenRequest openRequest = gson.fromJson(message, VaultOpenRequest.class);
+                        if(!openRequest.server().equals(serverUUID)) {
+                            handleVaultOpen(openRequest);
+                        }
                     }
                 }
-            }
-        }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME);
+            }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME);
+        }
     }
 
     private Jedis createJedisInstance(RedisConnectionConfig config) {
