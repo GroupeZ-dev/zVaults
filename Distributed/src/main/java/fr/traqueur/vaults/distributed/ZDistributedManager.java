@@ -2,7 +2,6 @@ package fr.traqueur.vaults.distributed;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.tcoded.folialib.wrapper.task.WrappedTask;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
@@ -10,14 +9,13 @@ import fr.traqueur.vaults.api.distributed.DistributedManager;
 import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;
 import fr.traqueur.vaults.api.distributed.VaultUpdate;
 import fr.traqueur.vaults.api.vaults.Vault;
-import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.distributed.adapter.VaultUpdateAdapter;
+import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
 import java.util.UUID;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,6 +26,8 @@ public class ZDistributedManager implements DistributedManager {
     private final ExecutorService executorService;
     private final Gson gson;
     private final UUID serverUUID;
+    private final VaultsManager vaultsManager;
+
 
     public ZDistributedManager(VaultsPlugin plugin) {
         this.serverUUID = UUID.randomUUID();
@@ -46,6 +46,8 @@ public class ZDistributedManager implements DistributedManager {
             this.subscriber.auth(redisConfig.user(), redisConfig.password());
         }
 
+        this.vaultsManager = plugin.getManager(VaultsManager.class);
+
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(VaultUpdate.class, new VaultUpdateAdapter(plugin.getManager(VaultsManager.class)))
                 .create();
@@ -62,13 +64,15 @@ public class ZDistributedManager implements DistributedManager {
     }
 
     @Override
-    public void publishVaultUpdate(Vault vault, VaultItem item, int slot) {
+    public void publishVaultUpdate(Vault vault, ItemStack item, int slot) {
         VaultUpdate vaultUpdate = new VaultUpdate(serverUUID, vault, item, slot);
         publisher.publish(CHANNEL_NAME, gson.toJson(vaultUpdate, VaultUpdate.class));
     }
 
     private void handleVaultUpdate(VaultUpdate vaultUpdate) {
-        System.out.println("Received vault update");
+        this.vaultsManager.getLinkedInventory(vaultUpdate.vault()).ifPresent(inventory -> {
+            inventory.getSpigotInventory().setItem(vaultUpdate.slot(), vaultUpdate.itemStack());
+        });
     }
 
     private void subscribe() {

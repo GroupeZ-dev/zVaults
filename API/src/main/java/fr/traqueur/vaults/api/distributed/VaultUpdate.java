@@ -1,9 +1,9 @@
 package fr.traqueur.vaults.api.distributed;
 
 import fr.traqueur.vaults.api.vaults.Vault;
-import fr.traqueur.vaults.api.vaults.VaultItem;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public record VaultUpdate(UUID server, Vault vault, VaultItem vaultItem, int slot) {
+public record VaultUpdate(UUID server, Vault vault, ItemStack itemStack, int slot) {
 }

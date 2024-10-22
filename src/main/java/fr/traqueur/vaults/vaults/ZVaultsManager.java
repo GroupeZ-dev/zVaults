@@ -60,6 +60,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
+    public Optional<InventoryDefault> getLinkedInventory(Vault vault) {
+        return Optional.ofNullable(this.linkedVaultToInventory.get(vault.getUniqueId()));
+    }
+
+    @Override
     public void saveVault(Vault vault) {
         this.vaultService.save(vault);
     }

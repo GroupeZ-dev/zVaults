@@ -2,7 +2,7 @@ package fr.traqueur.vaults.api.distributed;
 
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.vaults.Vault;
-import fr.traqueur.vaults.api.vaults.VaultItem;
+import org.bukkit.inventory.ItemStack;
 
 public interface DistributedManager extends Manager {
 
@@ -10,6 +10,6 @@ public interface DistributedManager extends Manager {
 
     void disable();
 
-    void publishVaultUpdate(Vault vault, VaultItem item, int slot);
+    void publishVaultUpdate(Vault vault, ItemStack item, int slot);
 
 }

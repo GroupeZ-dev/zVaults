@@ -28,7 +28,10 @@ public class ZDistributedListener implements Listener {
 
     @EventHandler
     public void onVaultUpdate(VaultUpdateEvent event) {
-        this.distributedManager.publishVaultUpdate(event.getVault(), event.getItem(), event.getSlot());
+        this.distributedManager.
+                publishVaultUpdate(event.getVault(),
+                        event.getItem().toItem(event.getUser().getPlayer(),
+                                event.getVault().isInfinite()), event.getSlot());
     }
 
 }

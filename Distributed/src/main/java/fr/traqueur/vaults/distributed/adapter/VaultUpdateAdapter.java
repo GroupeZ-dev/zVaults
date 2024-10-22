@@ -4,8 +4,8 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import fr.traqueur.vaults.api.distributed.VaultUpdate;
+import fr.traqueur.vaults.api.serialization.Base64;
 import fr.traqueur.vaults.api.vaults.Vault;
-import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class VaultUpdateAdapter extends TypeAdapter<VaultUpdate> {
         jsonWriter.name("server").value(vaultUpdate.server().toString());
         jsonWriter.name("vault").value(vaultUpdate.vault().getUniqueId().toString());
         jsonWriter.name("slot").value(vaultUpdate.slot());
-        jsonWriter.name("vaultItem").value(vaultUpdate.vaultItem().serialize());
+        jsonWriter.name("vaultItem").value(Base64.encodeItem(vaultUpdate.itemStack()));
         jsonWriter.endObject();
     }
 
@@ -61,6 +61,6 @@ public class VaultUpdateAdapter extends TypeAdapter<VaultUpdate> {
         }
 
         Vault vault = this.vaultsManager.getVault(vaultUUID);
-        return new VaultUpdate(server, vault, VaultItem.deserialize(vaultItem), slot);
+        return new VaultUpdate(server, vault, Base64.decodeItem(vaultItem), slot);
     }
 }

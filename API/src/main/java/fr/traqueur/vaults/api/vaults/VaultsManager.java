@@ -11,11 +11,14 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface VaultsManager extends Manager {
 
     String VAULT_TABLE_NAME = "vaults";
+
+    Optional<InventoryDefault> getLinkedInventory(Vault vault);
 
     void saveVault(Vault vault);
 
