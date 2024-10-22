@@ -71,7 +71,6 @@ public class ZDistributedManager implements DistributedManager {
         }
 
         Jedis openAckSubscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig());
-        CompletableFuture<Void> future = new CompletableFuture<>();
 
         var execAck = Executors.newSingleThreadExecutor();
 
@@ -95,12 +94,8 @@ public class ZDistributedManager implements DistributedManager {
             publisher.publish(OPEN_CHANNEL_NAME, gson.toJson(openRequest, VaultOpenRequest.class));
         }
 
-        try {
-            future.get(1, TimeUnit.SECONDS);
-        } catch (Exception ignored) {} finally {
-            openAckSubscriber.close();
-            execAck.shutdownNow();
-        }
+        openAckSubscriber.close();
+        execAck.shutdownNow();
     }
 
     private void handleVaultUpdate(VaultUpdateRequest vaultUpdate) {
@@ -125,9 +120,9 @@ public class ZDistributedManager implements DistributedManager {
                 ItemStack item = inventory.getSpigotInventory().getItem(i);
                 VaultItem vaultItem;
                 if (item != null) {
-                    vaultItem = new VaultItem(item, this.vaultsManager.getAmountFromItem(item));
+                    vaultItem = new VaultItem(item, this.vaultsManager.getAmountFromItem(item), i);
                 } else {
-                    vaultItem = new VaultItem(new ItemStack(Material.AIR), 1);
+                    vaultItem = new VaultItem(new ItemStack(Material.AIR), 1, i);
                 }
                 items.add(vaultItem);
             }

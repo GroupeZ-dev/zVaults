@@ -17,15 +17,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.DecimalFormat;
 
-public record VaultItem(ItemStack item, int amount) {
+public record VaultItem(ItemStack item, int amount, int slot) {
 
     public static VaultItem deserialize(String serialized) {
         String[] parts = serialized.split(":");
-        return new VaultItem(Base64.decodeItem(parts[0]), Integer.parseInt(parts[1]));
+        return new VaultItem(Base64.decodeItem(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+    }
+
+    public boolean isEmpty() {
+        return this.item == null || this.item.getType().isAir();
     }
 
     public String serialize() {
-        return Base64.encodeItem(this.item) + ":" + this.amount;
+        return Base64.encodeItem(this.item) + ":" + this.amount + ":" + this.slot;
     }
 
     public ItemStack toItem(Player player, boolean infinite) {

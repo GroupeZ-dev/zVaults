@@ -7,6 +7,7 @@ import fr.traqueur.vaults.api.vaults.VaultItem;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VaultOpenEvent extends VaultEvent implements Cancellable {
@@ -18,7 +19,7 @@ public class VaultOpenEvent extends VaultEvent implements Cancellable {
     public VaultOpenEvent(VaultsPlugin plugin, @NotNull User who, Vault vault) {
         super(plugin, who, vault);
         this.cancelled = false;
-        this.content = vault.getContent();
+        this.content = new ArrayList<>(vault.getContent());
     }
 
     @Override

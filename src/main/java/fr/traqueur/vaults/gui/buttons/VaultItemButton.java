@@ -69,9 +69,9 @@ public class VaultItemButton extends ZButton {
         for (int i = 0; i < vault.getSize(); i++) {
             ItemStack item = inv.getItem(i);
             if (item == null || item.getType() == Material.AIR) {
-                content.add(new VaultItem(new ItemStack(Material.AIR), 1));
+                content.add(new VaultItem(new ItemStack(Material.AIR), 1, i));
             } else {
-                content.add(new VaultItem(item, this.vaultsManager.getAmountFromItem(item)));
+                content.add(vault.getInSlot(i));
             }
 
         }
@@ -87,7 +87,7 @@ public class VaultItemButton extends ZButton {
             Consumer<InventoryClickEvent> click;
             if (slot < vaultSize) {
                 if (this.vault.getContent().size() <= slot || this.vault.getContent().isEmpty()) {
-                    item = new VaultItem(new ItemStack(Material.AIR), 1).toItem(player, this.vault.isInfinite());
+                    item = new VaultItem(new ItemStack(Material.AIR), 1, slot).toItem(player, this.vault.isInfinite());
                 } else {
                     var vaultItem = this.vault.getContent().get(slot);
                     if(vaultItem.item() == null || vaultItem.item().getType().isAir()) {
@@ -115,7 +115,7 @@ public class VaultItemButton extends ZButton {
         }
         event.getNewItems().forEach((slot, item) -> {
             if(slot < this.vault.getSize()) {
-                VaultItem vaultItem = new VaultItem(item, this.vaultsManager.getAmountFromItem(item));
+                VaultItem vaultItem = vault.getInSlot(slot);
                 VaultUpdateEvent vaultUpdateEvent = new VaultUpdateEvent(plugin, this.userManager.getUser(player.getUniqueId()).orElseThrow(), this.vault, vaultItem, slot);
                 plugin.getServer().getPluginManager().callEvent(vaultUpdateEvent);
             }
@@ -131,30 +131,22 @@ public class VaultItemButton extends ZButton {
         int slot = event.getRawSlot();
         int inventorySize = inventoryDefault.getSpigotInventory().getSize();
 
-        if(slot >= inventorySize && !clickType.isShiftClick() && clickType != ClickType.DOUBLE_CLICK || slot < 0) {
+        if(slot >= inventorySize && slot >= vault.getSize() && !clickType.isShiftClick() && clickType != ClickType.DOUBLE_CLICK || slot < 0) {
             return;
         }
 
-        if(this.vault.isInfinite() && clickType.isShiftClick()) {
-            event.setCancelled(true);
+        event.setCancelled(this.vault.isInfinite());
+
+        if(!vault.isInfinite()) {
+            return;
         }
 
         switch (clickType) {
-            case LEFT -> {
-                this.vaultsManager.handleLeftClick(event, player, cursor, current, slot, inventorySize, this.vault);
-            }
-            case RIGHT -> {
-                this.vaultsManager.handleRightClick(event, player, cursor, current, slot, inventorySize, this.vault);
-            }
-            case SHIFT_LEFT, SHIFT_RIGHT -> {
-                this.vaultsManager.handleShift(event, player, cursor, current, slot, inventorySize, this.vault);
-            }
-            case DROP, CONTROL_DROP -> {
-                this.vaultsManager.handleDrop(event, player, cursor, current, slot, inventorySize, this.vault, clickType == ClickType.CONTROL_DROP);
-            }
-            case NUMBER_KEY -> {
-                    this.vaultsManager.handleNumberKey(event, player, cursor, current, slot, inventorySize, this.vault);
-            }
+            case LEFT -> this.vaultsManager.handleLeftClick(event, player, cursor, current, slot, inventorySize, this.vault);
+            case RIGHT -> this.vaultsManager.handleRightClick(event, player, cursor, current, slot, inventorySize, this.vault);
+            case SHIFT_LEFT, SHIFT_RIGHT -> this.vaultsManager.handleShift(event, player, cursor, current, slot, inventorySize, this.vault);
+            case DROP, CONTROL_DROP -> this.vaultsManager.handleDrop(event, player, cursor, current, slot, inventorySize, this.vault, clickType == ClickType.CONTROL_DROP);
+            case NUMBER_KEY -> this.vaultsManager.handleNumberKey(event, player, cursor, current, slot, inventorySize, this.vault);
         }
 
     }

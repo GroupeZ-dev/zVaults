@@ -4,6 +4,7 @@ import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultOwner;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,5 +76,10 @@ public class ZVault implements Vault {
     @Override
     public void setIcon(Material icon) {
         this.material = icon;
+    }
+
+    @Override
+    public VaultItem getInSlot(int slot) {
+        return this.content.stream().filter(item -> item.slot() == slot).findFirst().orElse(new VaultItem(new ItemStack(Material.AIR), 1, slot));
     }
 }

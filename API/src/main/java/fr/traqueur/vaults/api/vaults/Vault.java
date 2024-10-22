@@ -29,6 +29,8 @@ public interface Vault {
 
     void setIcon(Material icon);
 
+    VaultItem getInSlot(int slot);
+
     default boolean isOwner(User user) {
         return this.getOwner().hasAccess(user.getUniqueId());
     }
