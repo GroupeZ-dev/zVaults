@@ -5,5 +5,5 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public record VaultUpdate(UUID server, Vault vault, ItemStack itemStack, int slot) {
+public record VaultUpdateRequest(UUID server, Vault vault, ItemStack itemStack, int slot) {
 }

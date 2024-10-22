@@ -18,7 +18,7 @@ public interface VaultsManager extends Manager {
 
     String VAULT_TABLE_NAME = "vaults";
 
-    Optional<InventoryDefault> getLinkedInventory(Vault vault);
+    Optional<InventoryDefault> getLinkedInventory(UUID uuid);
 
     void saveVault(Vault vault);
 

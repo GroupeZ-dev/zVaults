@@ -6,10 +6,13 @@ import org.bukkit.inventory.ItemStack;
 
 public interface DistributedManager extends Manager {
 
-    String CHANNEL_NAME = "vaults";
+    String UPDATE_CHANNEL_NAME = "vaults";
+    String OPEN_CHANNEL_NAME = "vaults-open";
+    String OPEN_ACK_CHANNEL_NAME = "vaults-open-ack";
 
     void disable();
 
     void publishVaultUpdate(Vault vault, ItemStack item, int slot);
 
+    void publishOpenRequest(Vault vault);
 }

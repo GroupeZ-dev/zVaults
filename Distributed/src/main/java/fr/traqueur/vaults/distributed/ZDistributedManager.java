@@ -8,17 +8,21 @@ import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.distributed.DistributedManager;
 import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;
-import fr.traqueur.vaults.api.distributed.VaultUpdate;
+import fr.traqueur.vaults.api.distributed.VaultUpdateRequest;
+import fr.traqueur.vaults.api.distributed.requests.VaultOpenRequest;
 import fr.traqueur.vaults.api.vaults.Vault;
+import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.distributed.adapter.VaultUpdateAdapter;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class ZDistributedManager implements DistributedManager {
 
@@ -37,20 +41,13 @@ public class ZDistributedManager implements DistributedManager {
 
         this.executorService = Executors.newSingleThreadExecutor();
 
-        this.publisher = new Jedis(redisConfig.host(), redisConfig.port());
-        this.subscriber = new Jedis(redisConfig.host(), redisConfig.port());
-        if(redisConfig.password() != null && !redisConfig.password().isEmpty() && (redisConfig.user() == null || redisConfig.user().isEmpty())) {
-            this.publisher.auth(redisConfig.password());
-            this.subscriber.auth(redisConfig.password());
-        } else if(redisConfig.user() != null && !redisConfig.user().isEmpty() && redisConfig.password() != null && !redisConfig.password().isEmpty()) {
-            this.publisher.auth(redisConfig.user(), redisConfig.password());
-            this.subscriber.auth(redisConfig.user(), redisConfig.password());
-        }
+        this.publisher = this.createJedisInstance(redisConfig);
+        this.subscriber = this.createJedisInstance(redisConfig);
 
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(VaultUpdate.class, new VaultUpdateAdapter(plugin.getManager(VaultsManager.class)))
+                .registerTypeAdapter(VaultUpdateRequest.class, new VaultUpdateAdapter(plugin.getManager(VaultsManager.class)))
                 .create();
 
         this.executorService.submit(this::subscribe);
@@ -66,12 +63,39 @@ public class ZDistributedManager implements DistributedManager {
 
     @Override
     public void publishVaultUpdate(Vault vault, ItemStack item, int slot) {
-        VaultUpdate vaultUpdate = new VaultUpdate(serverUUID, vault, item, slot);
-        publisher.publish(CHANNEL_NAME, gson.toJson(vaultUpdate, VaultUpdate.class));
+        VaultUpdateRequest vaultUpdate = new VaultUpdateRequest(serverUUID, vault, item, slot);
+        publisher.publish(UPDATE_CHANNEL_NAME, gson.toJson(vaultUpdate, VaultUpdateRequest.class));
     }
 
-    private void handleVaultUpdate(VaultUpdate vaultUpdate) {
-        this.vaultsManager.getLinkedInventory(vaultUpdate.vault()).ifPresent(inventory -> {
+    @Override
+    public void publishOpenRequest(Vault vault) {
+        VaultOpenRequest openRequest = new VaultOpenRequest(serverUUID, vault.getUniqueId());
+        publisher.publish(OPEN_CHANNEL_NAME, gson.toJson(openRequest, VaultOpenRequest.class));
+        this.waitForVaultSaveConfirmation(vault.getUniqueId());
+    }
+
+    public void waitForVaultSaveConfirmation(UUID vaultId) {
+
+        try (Jedis openAckSubscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            Future<?> future = executorService.submit(() -> {
+                openAckSubscriber.subscribe(new JedisPubSub() {
+                    @Override
+                    public void onMessage(String channel, String message) {
+                        if (message.equals(vaultId.toString())) {
+                            openAckSubscriber.close();
+                        }
+                    }
+                }, OPEN_ACK_CHANNEL_NAME);
+            });
+
+            try {
+                future.get(1, TimeUnit.SECONDS);
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private void handleVaultUpdate(VaultUpdateRequest vaultUpdate) {
+        this.vaultsManager.getLinkedInventory(vaultUpdate.vault().getUniqueId()).ifPresent(inventory -> {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
                 VaultsLogger.info("Received vault update for vault " + vaultUpdate.vault().getUniqueId() + " on slot " + vaultUpdate.slot());
             }
@@ -79,18 +103,56 @@ public class ZDistributedManager implements DistributedManager {
         });
     }
 
+    private void handleVaultOpen(VaultOpenRequest openRequest) {
+        this.vaultsManager.getLinkedInventory(openRequest.vaultId()).ifPresent(inventory -> {
+            Vault vault = this.vaultsManager.getVault(openRequest.vaultId());
+
+            List<VaultItem> items = new ArrayList<>();
+
+            for (int i = 0; i < vault.getSize(); i++) {
+                ItemStack item = inventory.getSpigotInventory().getItem(i);
+                VaultItem vaultItem;
+                if (item != null) {
+                    vaultItem = new VaultItem(item, this.vaultsManager.getAmountFromItem(item));
+                } else {
+                    vaultItem = new VaultItem(new ItemStack(Material.AIR), 1);
+                }
+                items.add(vaultItem);
+            }
+            vault.setContent(items);
+            this.vaultsManager.saveVault(vault);
+            publisher.publish(OPEN_ACK_CHANNEL_NAME, openRequest.vaultId().toString());
+        });
+    }
+
+
     private void subscribe() {
         subscriber.subscribe(new JedisPubSub() {
             @Override
             public void onMessage(String channel, String message) {
-                if (channel.equals(CHANNEL_NAME)) {
-                    VaultUpdate vaultUpdate = gson.fromJson(message, VaultUpdate.class);
+                if (channel.equals(UPDATE_CHANNEL_NAME)) {
+                    VaultUpdateRequest vaultUpdate = gson.fromJson(message, VaultUpdateRequest.class);
                     if(!vaultUpdate.server().equals(serverUUID)) {
                         handleVaultUpdate(vaultUpdate);
                     }
+                } else if (channel.equals(OPEN_CHANNEL_NAME)) {
+                    VaultOpenRequest openRequest = gson.fromJson(message, VaultOpenRequest.class);
+                    if(!openRequest.server().equals(serverUUID)) {
+                        handleVaultOpen(openRequest);
+                    }
                 }
             }
-        }, CHANNEL_NAME);
+        }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME);
+    }
+
+    private Jedis createJedisInstance(RedisConnectionConfig config) {
+        Jedis jedis = new Jedis(config.host(), config.port());
+        if(config.password() != null && !config.password().isEmpty() && (config.user() == null || config.user().isEmpty())) {
+            jedis.auth(config.password());
+        } else if(config.user() != null && !config.user().isEmpty() && config.password() != null && !config.password().isEmpty()) {
+            jedis.auth(config.user(), config.password());
+        }
+        return jedis;
     }
 
 }

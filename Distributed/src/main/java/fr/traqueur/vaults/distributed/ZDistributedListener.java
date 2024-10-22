@@ -18,7 +18,7 @@ public class ZDistributedListener implements Listener {
 
     @EventHandler
     public void onVaultOpen(VaultOpenEvent event) {
-
+        this.distributedManager.publishOpenRequest(event.getVault());
     }
 
     @EventHandler

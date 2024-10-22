@@ -3,7 +3,7 @@ package fr.traqueur.vaults.distributed.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import fr.traqueur.vaults.api.distributed.VaultUpdate;
+import fr.traqueur.vaults.api.distributed.VaultUpdateRequest;
 import fr.traqueur.vaults.api.serialization.Base64;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
@@ -11,7 +11,7 @@ import fr.traqueur.vaults.api.vaults.VaultsManager;
 import java.io.IOException;
 import java.util.UUID;
 
-public class VaultUpdateAdapter extends TypeAdapter<VaultUpdate> {
+public class VaultUpdateAdapter extends TypeAdapter<VaultUpdateRequest> {
 
     private final VaultsManager vaultsManager;
 
@@ -20,7 +20,7 @@ public class VaultUpdateAdapter extends TypeAdapter<VaultUpdate> {
     }
 
     @Override
-    public void write(JsonWriter jsonWriter, VaultUpdate vaultUpdate) throws IOException {
+    public void write(JsonWriter jsonWriter, VaultUpdateRequest vaultUpdate) throws IOException {
         jsonWriter.beginObject();
         jsonWriter.name("server").value(vaultUpdate.server().toString());
         jsonWriter.name("vault").value(vaultUpdate.vault().getUniqueId().toString());
@@ -30,7 +30,7 @@ public class VaultUpdateAdapter extends TypeAdapter<VaultUpdate> {
     }
 
     @Override
-    public VaultUpdate read(JsonReader jsonReader) throws IOException {
+    public VaultUpdateRequest read(JsonReader jsonReader) throws IOException {
         jsonReader.beginObject();
         UUID server = null;
         UUID vaultUUID = null;
@@ -61,6 +61,6 @@ public class VaultUpdateAdapter extends TypeAdapter<VaultUpdate> {
         }
 
         Vault vault = this.vaultsManager.getVault(vaultUUID);
-        return new VaultUpdate(server, vault, Base64.decodeItem(vaultItem), slot);
+        return new VaultUpdateRequest(server, vault, Base64.decodeItem(vaultItem), slot);
     }
 }
