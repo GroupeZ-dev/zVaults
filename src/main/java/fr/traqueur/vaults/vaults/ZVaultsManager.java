@@ -280,7 +280,22 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean controlDrop) {
+        VaultItem vaultItem = vault.getInSlot(slot);
+        if(vaultItem.isEmpty()) {
+            return;
+        }
+        int amountToDrop;
+        if(controlDrop) {
+            amountToDrop = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
+        } else {
+            amountToDrop = 1;
+        }
 
+        VaultItem newVaultItem = this.removeFromVaultItem(vault, vaultItem, amountToDrop);
+        event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+        ItemStack item = vaultItem.item().clone();
+        item.setAmount(amountToDrop);
+        player.getWorld().dropItemNaturally(player.getLocation(), item);
     }
 
     @Override
