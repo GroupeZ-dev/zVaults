@@ -2,7 +2,6 @@ package fr.traqueur.vaults.api.vaults;
 
 import fr.maxlego08.menu.MenuItemStack;
 import fr.maxlego08.menu.api.utils.Placeholders;
-import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.serialization.Base64;
@@ -11,9 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.DecimalFormat;
 
@@ -42,8 +38,6 @@ public record VaultItem(ItemStack item, int amount, int slot) {
                 return item;
             }
 
-
-            VaultsManager manager = JavaPlugin.getPlugin(VaultsPlugin.class).getManager(VaultsManager.class);
             MenuItemStack item = Configuration.getConfiguration(VaultsConfiguration.class).getIcon("vault_item");
 
             Placeholders placeholders = new Placeholders();
@@ -51,14 +45,17 @@ public record VaultItem(ItemStack item, int amount, int slot) {
             placeholders.register("amount", this.formatNumber(this.amount));
             placeholders.register("material", this.item.getType().name());
 
-            ItemStack itemStack = item.build(player, true, placeholders);
-            ItemMeta meta = itemStack.getItemMeta();
-            PersistentDataContainer container = meta.getPersistentDataContainer();
-            container.set(manager.getAmountKey(), PersistentDataType.INTEGER, this.amount);
-            itemStack.setItemMeta(meta);
+            ItemStack templateItem = item.build(player, true, placeholders);
+            ItemStack menuItem = this.item.clone();
+            ItemMeta meta = menuItem.getItemMeta();
+            ItemMeta templateMeta = templateItem.getItemMeta();
+
+            meta.setDisplayName(templateMeta.getDisplayName());
+            meta.setLore(templateMeta.getLore());
+            menuItem.setItemMeta(meta);
 
 
-            return itemStack;
+            return menuItem;
         } else {
             this.item.setAmount(this.amount);
         }

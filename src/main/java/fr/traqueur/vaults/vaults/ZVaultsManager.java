@@ -11,7 +11,6 @@ import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.VaultDTO;
 import fr.traqueur.vaults.api.events.VaultCloseEvent;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
-import fr.traqueur.vaults.api.events.VaultUpdateEvent;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
@@ -19,20 +18,15 @@ import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.*;
-import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 import fr.traqueur.vaults.hooks.ZSuperiorOwner;
+import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -119,19 +113,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public int getAmountFromItem(ItemStack item) {
-        if(item == null || item.getType().isAir()) {
-            return 1;
-        }
-        ItemMeta meta = item.getItemMeta();
-        if(meta == null) {
-            return item.getAmount();
-        }
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        return container.getOrDefault(this.getAmountKey(), PersistentDataType.INTEGER, item.getAmount());
-    }
-
-    @Override
     public void createVault(User creator, VaultOwner owner, int size, int playerVaults, boolean infinite) {
         var vaults = this.getVaults(owner.getUniqueId());
         if(playerVaults != -1 &&  vaults.size() >= playerVaults) {
@@ -202,11 +183,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public VaultOwner generateOwner(String type, User receiver) {
         return this.ownerResolver.resolveOwnerFromUser(type, receiver);
-    }
-
-    @Override
-    public NamespacedKey getAmountKey() {
-        return new NamespacedKey(this.getPlugin(), "zvaults_amount");
     }
 
     @Override
@@ -318,15 +294,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     }
 
-    private void addFromHotbar(InventoryClickEvent event, Player player, Vault vault, ItemStack hotbarItem) {
-        VaultItem vaultItem;
-        int slotToAdd = this.findCorrespondingSlot(event.getInventory(), hotbarItem, vault);
-        vaultItem = vault.getInSlot(slotToAdd);
-        var newVaultItem = this.addToVaultItem(vault, vaultItem, hotbarItem, hotbarItem.getAmount());
-        event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
-        player.getInventory().setItem(event.getHotbarButton(), new ItemStack(Material.AIR));
-    }
-
     @Override
     public void deleteVault(Vault vault) {
         this.vaults.remove(vault.getUniqueId());
@@ -378,6 +345,15 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public void save() {
         this.vaults.values().forEach(this.vaultService::save);
+    }
+
+    private void addFromHotbar(InventoryClickEvent event, Player player, Vault vault, ItemStack hotbarItem) {
+        VaultItem vaultItem;
+        int slotToAdd = this.findCorrespondingSlot(event.getInventory(), hotbarItem, vault);
+        vaultItem = vault.getInSlot(slotToAdd);
+        var newVaultItem = this.addToVaultItem(vault, vaultItem, hotbarItem, hotbarItem.getAmount());
+        event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
+        player.getInventory().setItem(event.getHotbarButton(), new ItemStack(Material.AIR));
     }
 
     private List<Vault> getVaults(UUID owner) {

@@ -5,7 +5,6 @@ import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -30,8 +29,6 @@ public interface VaultsManager extends Manager {
 
     void openVault(User user, Vault vault);
 
-    int getAmountFromItem(ItemStack item);
-
     void createVault(User creator, VaultOwner owner, int size, int maxVaults, boolean infinite);
 
     boolean sizeIsAvailable(int size);
@@ -49,8 +46,6 @@ public interface VaultsManager extends Manager {
     Vault getVault(UUID vaultId);
 
     List<Vault> getVaults(User user);
-
-    NamespacedKey getAmountKey();
 
     void handleLeftClick(InventoryClickEvent event, Player player, ItemStack cursor, int slot, Vault vault);
 
