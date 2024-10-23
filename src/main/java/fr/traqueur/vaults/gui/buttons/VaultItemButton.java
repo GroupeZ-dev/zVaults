@@ -142,7 +142,7 @@ public class VaultItemButton extends ZButton {
         }
 
         switch (clickType) {
-            case LEFT -> this.vaultsManager.handleLeftClick(event, player, cursor, current, slot, inventorySize, this.vault);
+            case LEFT -> this.vaultsManager.handleLeftClick(event, player, cursor, slot, this.vault);
             case RIGHT -> this.vaultsManager.handleRightClick(event, player, cursor, current, slot, inventorySize, this.vault);
             case SHIFT_LEFT, SHIFT_RIGHT -> this.vaultsManager.handleShift(event, player, cursor, current, slot, inventorySize, this.vault);
             case DROP, CONTROL_DROP -> this.vaultsManager.handleDrop(event, player, cursor, current, slot, inventorySize, this.vault, clickType == ClickType.CONTROL_DROP);

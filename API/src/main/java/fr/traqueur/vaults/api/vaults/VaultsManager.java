@@ -52,7 +52,7 @@ public interface VaultsManager extends Manager {
 
     NamespacedKey getAmountKey();
 
-    void handleLeftClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault);
+    void handleLeftClick(InventoryClickEvent event, Player player, ItemStack cursor, int slot, Vault vault);
 
     void handleRightClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault);
 

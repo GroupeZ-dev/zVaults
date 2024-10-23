@@ -29,6 +29,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -209,7 +210,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public void handleLeftClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack c, int slot, int inventorySize, Vault vault) {
+    public void handleLeftClick(InventoryClickEvent event, Player player, ItemStack cursor, int slot, Vault vault) {
         VaultItem vaultItem = vault.getInSlot(slot);
         ItemStack current = vaultItem.item();
         if(cursor == null || cursor.getType().isAir() && !vaultItem.isEmpty()) {
@@ -221,9 +222,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 return;
             }
             vaultItem = vault.getInSlot(slotToAdd);
-            var newVaultItem = this.addToVaultItem(vault, vaultItem, cursor, cursor.getAmount());
-            event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
-            event.getView().setCursor(new ItemStack(Material.AIR));
+            this.addItem(event, player, slotToAdd, vault, vaultItem, cursor, cursor.getAmount());
         }
     }
 
@@ -242,29 +241,45 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 return;
             }
             vaultItem = vault.getInSlot(slotToAdd);
-            var newVaultItem = this.addToVaultItem(vault, vaultItem, cursor, 1);
-            event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
-            int newAmount = cursor.getAmount() - 1;
-            if(newAmount == 0) {
-                event.getView().setCursor(new ItemStack(Material.AIR));
-                return;
-            }
-            cursor.setAmount(newAmount);
-            event.getView().setCursor(cursor);
+            this.addItem(event, player, slotToAdd, vault, vaultItem, cursor, 1);
         }
-    }
-
-    private void removeItem(InventoryClickEvent event, Player player, int slot, Vault vault, VaultItem vaultItem, int amountToRemove) {
-        var newVaultItem = this.removeFromVaultItem(vault, vaultItem, amountToRemove);
-        event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
-        ItemStack newCursor = newVaultItem.isEmpty() ? vaultItem.item().clone() : newVaultItem.item().clone();
-        newCursor.setAmount(amountToRemove);
-        event.getView().setCursor(newCursor);
     }
 
     @Override
     public void handleShift(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+        if (slot < vault.getSize()) {
+            if(cursor == null || cursor.getType().isAir() && current == null || current.getType().isAir()) {
+                return;
+            }
+            int slotToAdd = this.findCorrespondingSlot(player.getInventory(), current, vault);
+            if(slotToAdd == -1) {
+                return;
+            }
 
+            VaultItem vaultItem = vault.getInSlot(slot);
+            int removeAmount = Math.min(vaultItem.amount(), current.getMaxStackSize());
+            ItemStack toAdd = vaultItem.item().clone();
+            toAdd.setAmount(removeAmount);
+            var rest = player.getInventory().addItem(toAdd);
+            if(!rest.isEmpty()) {
+                removeAmount -= rest.values().stream().mapToInt(ItemStack::getAmount).sum();
+            }
+            var newVaultItem = this.removeFromVaultItem(vault, vaultItem, removeAmount);
+            event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+
+        } else if (slot >= inventorySize) {
+            if(cursor == null || cursor.getType().isAir() && current == null || current.getType().isAir()) {
+                return;
+            }
+            int slotToAdd = this.findCorrespondingSlot(event.getInventory(), current, vault);
+            if(slotToAdd == -1) {
+                return;
+            }
+            VaultItem vaultItem = vault.getInSlot(slotToAdd);
+            var newVaultItem = this.addToVaultItem(vault, vaultItem, current, current.getAmount());
+            event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
+            event.setCurrentItem(new ItemStack(Material.AIR));
+        }
     }
 
     @Override
@@ -334,9 +349,29 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         return this.vaults.values().stream().filter(vault -> vault.getOwner().getUniqueId().equals(owner)).collect(Collectors.toList());
     }
 
-    private int findCorrespondingSlot(Inventory inventory, ItemStack cursor, Vault vault) {
+    private void addItem(InventoryClickEvent event, Player player, int slot, Vault vault, VaultItem vaultItem, ItemStack cursor, int amountToAdd) {
+        var newVaultItem = this.addToVaultItem(vault, vaultItem, cursor, amountToAdd);
+        event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+        int newAmount = cursor.getAmount() - amountToAdd;
+        if(newAmount == 0) {
+            event.getView().setCursor(new ItemStack(Material.AIR));
+            return;
+        }
+        cursor.setAmount(newAmount);
+        event.getView().setCursor(cursor);
+    }
+
+    private void removeItem(InventoryClickEvent event, Player player, int slot, Vault vault, VaultItem vaultItem, int amountToRemove) {
+        var newVaultItem = this.removeFromVaultItem(vault, vaultItem, amountToRemove);
+        event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+        ItemStack newCursor = newVaultItem.isEmpty() ? vaultItem.item().clone() : newVaultItem.item().clone();
+        newCursor.setAmount(amountToRemove);
+        event.getView().setCursor(newCursor);
+    }
+
+    private int findCorrespondingSlot(Inventory inventory, ItemStack correspond, Vault vault) {
         for (VaultItem vaultItem : vault.getContent()) {
-            if(cursor.isSimilar(vaultItem.item())) {
+            if(correspond.isSimilar(vaultItem.item())) {
                 return vaultItem.slot();
             }
         }
