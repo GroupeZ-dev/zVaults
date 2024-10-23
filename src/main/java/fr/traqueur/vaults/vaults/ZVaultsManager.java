@@ -300,7 +300,31 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+        ItemStack hotbarItem = player.getInventory().getItem(event.getHotbarButton());
+        VaultItem vaultItem = vault.getInSlot(slot);
 
+        if(vaultItem.isEmpty() && hotbarItem != null && !hotbarItem.getType().isAir()) {
+            this.addFromHotbar(event, player, vault, hotbarItem);
+        } else if(!vaultItem.isEmpty() && (hotbarItem == null || hotbarItem.getType().isAir())) {
+            int amount = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
+            ItemStack toAdd = vaultItem.item().clone();
+            toAdd.setAmount(amount);
+            player.getInventory().setItem(event.getHotbarButton(), toAdd);
+            var newVaultItem = this.removeFromVaultItem(vault, vaultItem, amount);
+            event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+        } else if (hotbarItem != null && vaultItem.item().isSimilar(hotbarItem)) {
+            this.addFromHotbar(event, player, vault, hotbarItem);
+        }
+
+    }
+
+    private void addFromHotbar(InventoryClickEvent event, Player player, Vault vault, ItemStack hotbarItem) {
+        VaultItem vaultItem;
+        int slotToAdd = this.findCorrespondingSlot(event.getInventory(), hotbarItem, vault);
+        vaultItem = vault.getInSlot(slotToAdd);
+        var newVaultItem = this.addToVaultItem(vault, vaultItem, hotbarItem, hotbarItem.getAmount());
+        event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
+        player.getInventory().setItem(event.getHotbarButton(), new ItemStack(Material.AIR));
     }
 
     @Override
