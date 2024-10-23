@@ -233,12 +233,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     event.getView().setCursor(newCursor);
                 }
 
-                case SWAP_WITH_CURSOR ->  {
-                    var newVaultItem = this.addToVaultItem(user, vault, new VaultItem(new ItemStack(Material.AIR), 1, slot), cursor, cursor.getAmount());
-                    event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
-                    ItemStack toAdd = this.cloneItemStack(vaultItem.item());
-                    toAdd.setAmount(vaultItem.amount());
-                    event.getView().setCursor(toAdd);
+                case SWAP_WITH_CURSOR -> {
+                    this.switchWithCursor(event, player, cursor, slot, vault, user, vaultItem);
                 }
 
                 case PICKUP_ALL -> {
@@ -254,8 +250,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void handleRightClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
+        VaultItem vaultItem = vault.getInSlot(slot);
         if (vault.isInfinite()) {
-            VaultItem vaultItem = vault.getInSlot(slot);
             if(cursor == null || cursor.getType().isAir() && !vaultItem.isEmpty()) {
                 int amountToRemove = Math.min(vaultItem.amount() / 2, vaultItem.item().getMaxStackSize() / 2);
                 if(amountToRemove == 0) {
@@ -271,8 +268,44 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 this.addItem(event, player, slotToAdd, vault, vaultItem, cursor, 1);
             }
         } else {
+            InventoryAction action = event.getAction();
+            switch (action) {
+                case SWAP_WITH_CURSOR -> {
+                    this.switchWithCursor(event, player, cursor, slot, vault, user, vaultItem);
+                }
 
+                case PICKUP_HALF -> {
+                    int halfAmount = vaultItem.amount() / 2;
+                    if(halfAmount == 0) {
+                        halfAmount = 1;
+                    }
+                    var newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, halfAmount);
+                    event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+                    ItemStack toAdd = this.cloneItemStack(vaultItem.item());
+                    toAdd.setAmount(halfAmount);
+                    event.getView().setCursor(toAdd);
+                }
+                case PLACE_ONE -> {
+                    var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), 1);
+                    event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+                    ItemStack newCursor = this.cloneItemStack(cursor);
+                    if(cursor.getAmount() - 1 == 0) {
+                        newCursor = new ItemStack(Material.AIR);
+                    } else {
+                        newCursor.setAmount(cursor.getAmount() - 1);
+                    }
+                    event.getView().setCursor(newCursor);
+                }
+            }
         }
+    }
+
+    private void switchWithCursor(InventoryClickEvent event, Player player, ItemStack cursor, int slot, Vault vault, User user, VaultItem vaultItem) {
+        var newVaultItem = this.addToVaultItem(user, vault, new VaultItem(new ItemStack(Material.AIR), 1, slot), cursor, cursor.getAmount());
+        event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+        ItemStack toAdd = this.cloneItemStack(vaultItem.item());
+        toAdd.setAmount(vaultItem.amount());
+        event.getView().setCursor(toAdd);
     }
 
     @Override
