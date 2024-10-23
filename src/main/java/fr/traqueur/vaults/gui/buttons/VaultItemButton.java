@@ -55,27 +55,26 @@ public class VaultItemButton extends ZButton {
             player.closeInventory();
         }
 
-        int size = this.vault.getSize();
-        int rows = (int) Math.ceil(size / 9.0);
-        int slots = rows * 9;
-        placeholders.register("vault_name", configuration.getVaultTitle(slots + ""));
+        placeholders.register("vault_name", configuration.getVaultTitle(this.vault.getSize() + ""));
     }
 
     @Override
     public void onInventoryClose(Player player, InventoryDefault inventory) {
         User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
         var inv = inventory.getSpigotInventory();
-        List<VaultItem> content = new ArrayList<>();
-        for (int i = 0; i < vault.getSize(); i++) {
-            ItemStack item = inv.getItem(i);
-            if (item == null || item.getType() == Material.AIR) {
-                content.add(new VaultItem(new ItemStack(Material.AIR), 1, i));
-            } else {
-                content.add(vault.getInSlot(i));
-            }
+        if(!vault.isInfinite()) {
+            List<VaultItem> content = new ArrayList<>();
+            for (int i = 0; i < vault.getSize(); i++) {
+                ItemStack item = inv.getItem(i);
+                if (item == null || item.getType() == Material.AIR) {
+                    content.add(new VaultItem(new ItemStack(Material.AIR), 1, i));
+                } else {
+                    content.add(new VaultItem(item, item.getAmount(), i));
+                }
 
+            }
+            this.vault.setContent(content);
         }
-        this.vault.setContent(content);
         this.vaultsManager.closeVault(user, vault);
     }
 
@@ -84,7 +83,6 @@ public class VaultItemButton extends ZButton {
         int vaultSize = this.vault.getSize();
         for (int slot : this.slots) {
             ItemStack item;
-            Consumer<InventoryClickEvent> click;
             if (slot < vaultSize) {
                 if (this.vault.getContent().size() <= slot || this.vault.getContent().isEmpty()) {
                     item = new VaultItem(new ItemStack(Material.AIR), 1, slot).toItem(player, this.vault.isInfinite());
@@ -95,16 +93,10 @@ public class VaultItemButton extends ZButton {
                     }
                     item = vaultItem.toItem(player, this.vault.isInfinite());
                 }
-                click = event -> {
-                    if(this.vault.isInfinite()) {
-                        event.setCancelled(true);
-                    }
-                };
             } else {
                 item = configuration.getIcon("empty_item").build(player);
-                click = event -> event.setCancelled(true);
             }
-            inventory.addItem(slot, item).setClick(click);
+            inventory.addItem(slot, item).setClick(event -> event.setCancelled(true));
         }
     }
 
@@ -135,11 +127,7 @@ public class VaultItemButton extends ZButton {
             return;
         }
 
-        event.setCancelled(this.vault.isInfinite());
-
-        if(!vault.isInfinite()) {
-            return;
-        }
+        event.setCancelled(true);
 
         switch (clickType) {
             case LEFT -> this.vaultsManager.handleLeftClick(event, player, cursor, slot, this.vault);

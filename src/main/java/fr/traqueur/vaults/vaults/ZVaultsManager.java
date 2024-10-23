@@ -1,5 +1,6 @@
 package fr.traqueur.vaults.vaults;
 
+import fr.maxlego08.menu.api.dupe.DupeManager;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.sarah.MigrationManager;
 import fr.traqueur.vaults.api.VaultsLogger;
@@ -11,6 +12,7 @@ import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.VaultDTO;
 import fr.traqueur.vaults.api.events.VaultCloseEvent;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
+import fr.traqueur.vaults.api.events.VaultUpdateEvent;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
@@ -22,11 +24,16 @@ import fr.traqueur.vaults.hooks.ZSuperiorOwner;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -187,109 +194,169 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void handleLeftClick(InventoryClickEvent event, Player player, ItemStack cursor, int slot, Vault vault) {
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
         VaultItem vaultItem = vault.getInSlot(slot);
-        ItemStack current = vaultItem.item();
-        if(cursor == null || cursor.getType().isAir() && !vaultItem.isEmpty()) {
-            int amountToRemove = Math.min(vaultItem.amount(), current.getMaxStackSize());
-            this.removeItem(event, player, slot, vault, vaultItem, amountToRemove);
-        } else if(!cursor.getType().isAir()) {
-            int slotToAdd = this.findCorrespondingSlot(event.getInventory(), cursor, vault);
-            if(slotToAdd == -1) {
-                return;
+        if(vault.isInfinite()) {
+            ItemStack current = vaultItem.item();
+            if(cursor == null || cursor.getType().isAir() && !vaultItem.isEmpty()) {
+                int amountToRemove = Math.min(vaultItem.amount(), current.getMaxStackSize());
+                this.removeItem(event, player, slot, vault, vaultItem, amountToRemove);
+            } else if(!cursor.getType().isAir()) {
+                int slotToAdd = this.findCorrespondingSlot(event.getInventory(), cursor, vault);
+                if(slotToAdd == -1) {
+                    return;
+                }
+                vaultItem = vault.getInSlot(slotToAdd);
+                this.addItem(event, player, slotToAdd, vault, vaultItem, cursor, cursor.getAmount());
             }
-            vaultItem = vault.getInSlot(slotToAdd);
-            this.addItem(event, player, slotToAdd, vault, vaultItem, cursor, cursor.getAmount());
+        } else {
+            InventoryAction action = event.getAction();
+            switch (action) {
+                case PLACE_ALL -> {
+                    var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), cursor.getAmount());
+                    event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+                    event.getView().setCursor(new ItemStack(Material.AIR));
+                }
+
+                case PLACE_SOME -> {
+                    int amountToAdd = cursor.getAmount();
+                    int newAmount = Math.min(vaultItem.item().getMaxStackSize(), vaultItem.amount() + amountToAdd);
+                    int restInCursor = amountToAdd - (newAmount - vaultItem.amount());
+                    var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), newAmount - vaultItem.amount());
+                    event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+                    ItemStack newCursor = this.cloneItemStack(cursor);
+                    if(restInCursor == 0) {
+                        newCursor = new ItemStack(Material.AIR);
+                    } else {
+                        newCursor.setAmount(restInCursor);
+                    }
+                    event.getView().setCursor(newCursor);
+                }
+
+                case SWAP_WITH_CURSOR ->  {
+                    var newVaultItem = this.addToVaultItem(user, vault, new VaultItem(new ItemStack(Material.AIR), 1, slot), cursor, cursor.getAmount());
+                    event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+                    ItemStack toAdd = this.cloneItemStack(vaultItem.item());
+                    toAdd.setAmount(vaultItem.amount());
+                    event.getView().setCursor(toAdd);
+                }
+
+                case PICKUP_ALL -> {
+                    var newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, vaultItem.amount());
+                    event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+                    ItemStack toAdd = this.cloneItemStack(vaultItem.item());
+                    toAdd.setAmount(vaultItem.amount());
+                    event.getView().setCursor(toAdd);
+                }
+            }
         }
     }
 
     @Override
     public void handleRightClick(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
-        VaultItem vaultItem = vault.getInSlot(slot);
-        if(cursor == null || cursor.getType().isAir() && !vaultItem.isEmpty()) {
-            int amountToRemove = Math.min(vaultItem.amount() / 2, vaultItem.item().getMaxStackSize() / 2);
-            if(amountToRemove == 0) {
-                amountToRemove = 1;
+        if (vault.isInfinite()) {
+            VaultItem vaultItem = vault.getInSlot(slot);
+            if(cursor == null || cursor.getType().isAir() && !vaultItem.isEmpty()) {
+                int amountToRemove = Math.min(vaultItem.amount() / 2, vaultItem.item().getMaxStackSize() / 2);
+                if(amountToRemove == 0) {
+                    amountToRemove = 1;
+                }
+                this.removeItem(event, player, slot, vault, vaultItem, amountToRemove);
+            } else if(!cursor.getType().isAir()) {
+                int slotToAdd = this.findCorrespondingSlot(event.getInventory(), cursor, vault);
+                if(slotToAdd == -1) {
+                    return;
+                }
+                vaultItem = vault.getInSlot(slotToAdd);
+                this.addItem(event, player, slotToAdd, vault, vaultItem, cursor, 1);
             }
-            this.removeItem(event, player, slot, vault, vaultItem, amountToRemove);
-        } else if(!cursor.getType().isAir()) {
-            int slotToAdd = this.findCorrespondingSlot(event.getInventory(), cursor, vault);
-            if(slotToAdd == -1) {
-                return;
-            }
-            vaultItem = vault.getInSlot(slotToAdd);
-            this.addItem(event, player, slotToAdd, vault, vaultItem, cursor, 1);
+        } else {
+
         }
     }
 
     @Override
     public void handleShift(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
-        if (slot < vault.getSize()) {
-            if(cursor == null || cursor.getType().isAir() && current == null || current.getType().isAir()) {
-                return;
-            }
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
+        if(vault.isInfinite()) {
+            if (slot < vault.getSize()) {
+                if(cursor == null || cursor.getType().isAir() && current == null || current.getType().isAir()) {
+                    return;
+                }
 
-            VaultItem vaultItem = vault.getInSlot(slot);
-            int removeAmount = Math.min(vaultItem.amount(), current.getMaxStackSize());
-            ItemStack toAdd = vaultItem.item().clone();
-            toAdd.setAmount(removeAmount);
-            var rest = player.getInventory().addItem(toAdd);
-            if(!rest.isEmpty()) {
-                removeAmount -= rest.values().stream().mapToInt(ItemStack::getAmount).sum();
-            }
-            var newVaultItem = this.removeFromVaultItem(vault, vaultItem, removeAmount);
-            event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+                VaultItem vaultItem = vault.getInSlot(slot);
+                int removeAmount = Math.min(vaultItem.amount(), current.getMaxStackSize());
+                ItemStack toAdd = vaultItem.item().clone();
+                toAdd.setAmount(removeAmount);
+                var rest = player.getInventory().addItem(toAdd);
+                if(!rest.isEmpty()) {
+                    removeAmount -= rest.values().stream().mapToInt(ItemStack::getAmount).sum();
+                }
+                var newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, removeAmount);
+                event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
 
-        } else if (slot >= inventorySize) {
-            if(cursor == null || cursor.getType().isAir() && current == null || current.getType().isAir()) {
-                return;
+            } else if (slot >= inventorySize) {
+                if(cursor == null || cursor.getType().isAir() && current == null || current.getType().isAir()) {
+                    return;
+                }
+                int slotToAdd = this.findCorrespondingSlot(event.getInventory(), current, vault);
+                if(slotToAdd == -1) {
+                    return;
+                }
+                VaultItem vaultItem = vault.getInSlot(slotToAdd);
+                var newVaultItem = this.addToVaultItem(user, vault, vaultItem, current, current.getAmount());
+                event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
+                event.setCurrentItem(new ItemStack(Material.AIR));
             }
-            int slotToAdd = this.findCorrespondingSlot(event.getInventory(), current, vault);
-            if(slotToAdd == -1) {
-                return;
-            }
-            VaultItem vaultItem = vault.getInSlot(slotToAdd);
-            var newVaultItem = this.addToVaultItem(vault, vaultItem, current, current.getAmount());
-            event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
-            event.setCurrentItem(new ItemStack(Material.AIR));
+        } else {
+
         }
     }
 
     @Override
     public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean controlDrop) {
-        VaultItem vaultItem = vault.getInSlot(slot);
-        if(vaultItem.isEmpty()) {
-            return;
-        }
-        int amountToDrop;
-        if(controlDrop) {
-            amountToDrop = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
-        } else {
-            amountToDrop = 1;
-        }
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
+        if(vault.isInfinite()) {
+            VaultItem vaultItem = vault.getInSlot(slot);
+            if(vaultItem.isEmpty()) {
+                return;
+            }
+            int amountToDrop;
+            if(controlDrop) {
+                amountToDrop = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
+            } else {
+                amountToDrop = 1;
+            }
 
-        VaultItem newVaultItem = this.removeFromVaultItem(vault, vaultItem, amountToDrop);
-        event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
-        ItemStack item = vaultItem.item().clone();
-        item.setAmount(amountToDrop);
-        player.getWorld().dropItemNaturally(player.getLocation(), item);
+            VaultItem newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, amountToDrop);
+            event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+            ItemStack item = vaultItem.item().clone();
+            item.setAmount(amountToDrop);
+            player.getWorld().dropItemNaturally(player.getLocation(), item);
+        } else {
+
+        }
     }
 
     @Override
     public void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
-        ItemStack hotbarItem = player.getInventory().getItem(event.getHotbarButton());
-        VaultItem vaultItem = vault.getInSlot(slot);
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
+        if (vault.isInfinite()) {
+            ItemStack hotbarItem = player.getInventory().getItem(event.getHotbarButton());
+            VaultItem vaultItem = vault.getInSlot(slot);
 
-        if(vaultItem.isEmpty() && hotbarItem != null && !hotbarItem.getType().isAir()) {
-            this.addFromHotbar(event, player, vault, hotbarItem);
-        } else if(!vaultItem.isEmpty() && (hotbarItem == null || hotbarItem.getType().isAir())) {
-            int amount = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
-            ItemStack toAdd = vaultItem.item().clone();
-            toAdd.setAmount(amount);
-            player.getInventory().setItem(event.getHotbarButton(), toAdd);
-            var newVaultItem = this.removeFromVaultItem(vault, vaultItem, amount);
-            event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
-        } else if (hotbarItem != null && vaultItem.item().isSimilar(hotbarItem)) {
-            this.addFromHotbar(event, player, vault, hotbarItem);
+            if(vaultItem.isEmpty() && hotbarItem != null && !hotbarItem.getType().isAir()) {
+                this.addFromHotbar(event, player, vault, hotbarItem);
+            } else if(!vaultItem.isEmpty() && (hotbarItem == null || hotbarItem.getType().isAir())) {
+                int amount = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
+                ItemStack toAdd = vaultItem.item().clone();
+                toAdd.setAmount(amount);
+                player.getInventory().setItem(event.getHotbarButton(), toAdd);
+                var newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, amount);
+                event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+            } else if (hotbarItem != null && vaultItem.item().isSimilar(hotbarItem)) {
+                this.addFromHotbar(event, player, vault, hotbarItem);
+            }
         }
 
     }
@@ -348,10 +415,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     private void addFromHotbar(InventoryClickEvent event, Player player, Vault vault, ItemStack hotbarItem) {
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
         VaultItem vaultItem;
         int slotToAdd = this.findCorrespondingSlot(event.getInventory(), hotbarItem, vault);
         vaultItem = vault.getInSlot(slotToAdd);
-        var newVaultItem = this.addToVaultItem(vault, vaultItem, hotbarItem, hotbarItem.getAmount());
+        var newVaultItem = this.addToVaultItem(user, vault, vaultItem, hotbarItem, hotbarItem.getAmount());
         event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
         player.getInventory().setItem(event.getHotbarButton(), new ItemStack(Material.AIR));
     }
@@ -361,7 +429,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     private void addItem(InventoryClickEvent event, Player player, int slot, Vault vault, VaultItem vaultItem, ItemStack cursor, int amountToAdd) {
-        var newVaultItem = this.addToVaultItem(vault, vaultItem, cursor, amountToAdd);
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
+        var newVaultItem = this.addToVaultItem(user, vault, vaultItem, cursor, amountToAdd);
         event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
         int newAmount = cursor.getAmount() - amountToAdd;
         if(newAmount == 0) {
@@ -373,7 +442,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     private void removeItem(InventoryClickEvent event, Player player, int slot, Vault vault, VaultItem vaultItem, int amountToRemove) {
-        var newVaultItem = this.removeFromVaultItem(vault, vaultItem, amountToRemove);
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
+        var newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, amountToRemove);
         event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
         ItemStack newCursor = newVaultItem.isEmpty() ? vaultItem.item().clone() : newVaultItem.item().clone();
         newCursor.setAmount(amountToRemove);
@@ -389,7 +459,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         return inventory.firstEmpty();
     }
 
-    private VaultItem removeFromVaultItem(Vault vault, VaultItem vaultItem, int amount) {
+    private VaultItem removeFromVaultItem(User user, Vault vault, VaultItem vaultItem, int amount) {
         int currentAmount = vaultItem.amount();
         VaultItem newVaultItem;
         if(currentAmount - amount == 0) {
@@ -397,39 +467,37 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         } else {
             newVaultItem = new VaultItem(vaultItem.item(), currentAmount - amount, vaultItem.slot());
         }
-        vault.setContent(vault.getContent().stream().map(item -> item.slot() == vaultItem.slot() ? newVaultItem : item).collect(Collectors.toList()));
+        vault.setContent(vault.getContent().stream().map(item -> item.slot() == newVaultItem.slot() ? newVaultItem : item).collect(Collectors.toList()));
+        this.sendUpdate(user, vault, newVaultItem);
         return newVaultItem;
     }
 
-    private VaultItem addToVaultItem(Vault vault, VaultItem vaultItem, ItemStack cursor, int amount) {
+    private VaultItem addToVaultItem(User user, Vault vault, VaultItem vaultItem, ItemStack cursor, int amount) {
         int currentAmount = vaultItem.isEmpty() ? 0 : vaultItem.amount();
         VaultItem newVaultItem = new VaultItem(vaultItem.isEmpty() ? cursor : vaultItem.item(), currentAmount + amount, vaultItem.slot());
-        vault.setContent(vault.getContent().stream().map(item -> item.slot() == vaultItem.slot() ? newVaultItem : item).collect(Collectors.toList()));
+        vault.setContent(vault.getContent().stream().map(item -> item.slot() == newVaultItem.slot() ? newVaultItem : item).collect(Collectors.toList()));
+        this.sendUpdate(user, vault, newVaultItem);
         return newVaultItem;
     }
 
-    private boolean isSimilar(ItemStack item1, ItemStack item2) {
-        if(item1 == null && item2 != null || item1 != null && item2 == null) {
-            return false;
-        }
-        if(item2 == null && item1 == null) {
-            return true;
-        }
+    private void sendUpdate(User user, Vault vault, VaultItem newVaultItem) {
+        VaultUpdateEvent vaultUpdateEvent = new VaultUpdateEvent(this.getPlugin(), user, vault, newVaultItem, newVaultItem.slot());
+        Bukkit.getPluginManager().callEvent(vaultUpdateEvent);
+    }
 
-        if(item1.getType() != item2.getType()) {
-            return false;
+    private ItemStack cloneItemStack(ItemStack itemStack) {
+        ItemStack clone = itemStack.clone();
+        ItemMeta cloneMeta = clone.getItemMeta();
+        if(cloneMeta == null) {
+            return clone;
         }
-        ItemMeta meta1 = item1.getItemMeta();
-        ItemMeta meta2 = item2.getItemMeta();
-        if(meta1 == null && meta2 != null || meta1 != null && meta2 == null) {
-            return false;
+        PersistentDataContainer container = cloneMeta.getPersistentDataContainer();
+        NamespacedKey key = new NamespacedKey(Bukkit.getServer().getPluginManager().getPlugin("zMenu"), DupeManager.KEY);
+        if(container.has(key)) {
+            container.remove(key);
         }
-        if(meta1 == null && meta2 == null) {
-            return true;
-        }
-        int customModelData1 = meta1.hasCustomModelData() ? meta1.getCustomModelData() : -1;
-        int customModelData2 = meta2.hasCustomModelData() ? meta2.getCustomModelData() : -1;
-        return customModelData1 == customModelData2;
+        clone.setItemMeta(cloneMeta);
+        return clone;
     }
 
     private void registerResolvers(OwnerResolver ownerResolver) {

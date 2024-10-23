@@ -118,14 +118,7 @@ public class ZDistributedManager implements DistributedManager {
             List<VaultItem> items = new ArrayList<>();
 
             for (int i = 0; i < vault.getSize(); i++) {
-                ItemStack item = inventory.getSpigotInventory().getItem(i);
-                VaultItem vaultItem;
-                if (item != null) {
-                    vaultItem = new VaultItem(item, this.vaultsManager.getAmountFromItem(item), i);
-                } else {
-                    vaultItem = new VaultItem(new ItemStack(Material.AIR), 1, i);
-                }
-                items.add(vaultItem);
+                items.add(vault.getInSlot(i));
             }
             var request = new VaultOpenAckRequest(openRequest.server(), openRequest.vaultId(), items);
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {

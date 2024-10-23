@@ -53,7 +53,7 @@ public record VaultItem(ItemStack item, int amount, int slot) {
             meta.setDisplayName(templateMeta.getDisplayName());
             meta.setLore(templateMeta.getLore());
             menuItem.setItemMeta(meta);
-
+            menuItem.setAmount(1);
 
             return menuItem;
         } else {
