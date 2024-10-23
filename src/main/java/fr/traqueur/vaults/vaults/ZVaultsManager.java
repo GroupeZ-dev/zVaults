@@ -349,6 +349,50 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
     }
 
+    @Override
+    public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean controlDrop) {
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
+        VaultItem vaultItem = vault.getInSlot(slot);
+        if(vaultItem.isEmpty()) {
+            return;
+        }
+        int amountToDrop;
+        if(controlDrop) {
+            amountToDrop = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
+        } else {
+            amountToDrop = 1;
+        }
+
+        VaultItem newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, amountToDrop);
+        event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+        ItemStack item = vaultItem.item().clone();
+        item.setAmount(amountToDrop);
+        player.getWorld().dropItemNaturally(player.getLocation(), item);
+    }
+
+    @Override
+    public void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
+        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
+        if (vault.isInfinite()) {
+            ItemStack hotbarItem = player.getInventory().getItem(event.getHotbarButton());
+            VaultItem vaultItem = vault.getInSlot(slot);
+
+            if(vaultItem.isEmpty() && hotbarItem != null && !hotbarItem.getType().isAir()) {
+                this.addFromHotbar(event, player, vault, hotbarItem);
+            } else if(!vaultItem.isEmpty() && (hotbarItem == null || hotbarItem.getType().isAir())) {
+                int amount = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
+                ItemStack toAdd = vaultItem.item().clone();
+                toAdd.setAmount(amount);
+                player.getInventory().setItem(event.getHotbarButton(), toAdd);
+                var newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, amount);
+                event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
+            } else if (hotbarItem != null && vaultItem.item().isSimilar(hotbarItem)) {
+                this.addFromHotbar(event, player, vault, hotbarItem);
+            }
+        }
+
+    }
+
     private boolean isDifferent(ItemStack item1, ItemStack item2) {
         if (item1 == null && item2 == null) {
             return false;
@@ -397,54 +441,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
         var newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, removeAmount);
         event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
-    }
-
-    @Override
-    public void handleDrop(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault, boolean controlDrop) {
-        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
-        if(vault.isInfinite()) {
-            VaultItem vaultItem = vault.getInSlot(slot);
-            if(vaultItem.isEmpty()) {
-                return;
-            }
-            int amountToDrop;
-            if(controlDrop) {
-                amountToDrop = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
-            } else {
-                amountToDrop = 1;
-            }
-
-            VaultItem newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, amountToDrop);
-            event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
-            ItemStack item = vaultItem.item().clone();
-            item.setAmount(amountToDrop);
-            player.getWorld().dropItemNaturally(player.getLocation(), item);
-        } else {
-
-        }
-    }
-
-    @Override
-    public void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault) {
-        User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
-        if (vault.isInfinite()) {
-            ItemStack hotbarItem = player.getInventory().getItem(event.getHotbarButton());
-            VaultItem vaultItem = vault.getInSlot(slot);
-
-            if(vaultItem.isEmpty() && hotbarItem != null && !hotbarItem.getType().isAir()) {
-                this.addFromHotbar(event, player, vault, hotbarItem);
-            } else if(!vaultItem.isEmpty() && (hotbarItem == null || hotbarItem.getType().isAir())) {
-                int amount = Math.min(vaultItem.amount(), vaultItem.item().getMaxStackSize());
-                ItemStack toAdd = vaultItem.item().clone();
-                toAdd.setAmount(amount);
-                player.getInventory().setItem(event.getHotbarButton(), toAdd);
-                var newVaultItem = this.removeFromVaultItem(user, vault, vaultItem, amount);
-                event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
-            } else if (hotbarItem != null && vaultItem.item().isSimilar(hotbarItem)) {
-                this.addFromHotbar(event, player, vault, hotbarItem);
-            }
-        }
-
     }
 
     @Override
