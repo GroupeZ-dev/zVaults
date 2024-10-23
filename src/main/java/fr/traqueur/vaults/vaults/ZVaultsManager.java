@@ -251,10 +251,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             if(cursor == null || cursor.getType().isAir() && current == null || current.getType().isAir()) {
                 return;
             }
-            int slotToAdd = this.findCorrespondingSlot(player.getInventory(), current, vault);
-            if(slotToAdd == -1) {
-                return;
-            }
 
             VaultItem vaultItem = vault.getInSlot(slot);
             int removeAmount = Math.min(vaultItem.amount(), current.getMaxStackSize());
