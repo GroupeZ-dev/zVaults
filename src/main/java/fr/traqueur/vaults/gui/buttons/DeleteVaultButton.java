@@ -36,7 +36,7 @@ public class DeleteVaultButton extends ZButton {
 
     @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryDefault inventory, int slot, Placeholders placeholders) {
-        this.vaultsManager.deleteVault(vault);
+        this.vaultsManager.deleteVault(vault, true);
         player.closeInventory();
     }
 

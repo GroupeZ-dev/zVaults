@@ -55,6 +55,7 @@ public class ZDistributedManager implements DistributedManager {
                 .registerTypeAdapter(VaultShareRequest.class, new VaultShareRequestAdapter())
                 .registerTypeAdapter(VaultChangeSizeRequest.class, new VaultChangeSizeRequestAdapter())
                 .registerTypeAdapter(VaultIconChangeRequest.class, new VaultChangeIconRequestAdapter())
+                .registerTypeAdapter(VaultDeleteRequest.class, new VaultDeleteRequestAdapter())
                 .create();
 
         this.executorService.submit(this::subscribe);
@@ -176,6 +177,17 @@ public class ZDistributedManager implements DistributedManager {
         }
     }
 
+    @Override
+    public void publishVaultDeleteRequest(Vault vault) {
+        try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+                VaultsLogger.info("Sending delete request for vault " + vault.getUniqueId());
+            }
+            VaultDeleteRequest deleteRequest = new VaultDeleteRequest(serverUUID, vault.getUniqueId());
+            publisher.publish(DELETE_CHANNEL_NAME, gson.toJson(deleteRequest, VaultDeleteRequest.class));
+        }
+    }
+
     private void handleVaultUpdate(VaultUpdateRequest vaultUpdate) {
         this.vaultsManager.getLinkedInventory(vaultUpdate.vault().getUniqueId()).ifPresent(inventory -> {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
@@ -262,6 +274,14 @@ public class ZDistributedManager implements DistributedManager {
         this.vaultsManager.getVault(iconRequest.vault()).setIcon(iconRequest.icon());
     }
 
+    private void handleDeleteRequest(VaultDeleteRequest deleteRequest) {
+        if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+            VaultsLogger.info("Received delete request for vault " + deleteRequest.vaultId());
+        }
+        Vault vault = this.vaultsManager.getVault(deleteRequest.vaultId());
+        this.vaultsManager.deleteVault(vault, false);
+    }
+
     private void subscribe() {
         try (Jedis subscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
             subscriber.subscribe(new JedisPubSub() {
@@ -316,10 +336,17 @@ public class ZDistributedManager implements DistributedManager {
                                 handleVaultIconChange(iconRequest);
                             }
                         }
+                        case DELETE_CHANNEL_NAME -> {
+                            VaultDeleteRequest deleteRequest = gson.fromJson(message, VaultDeleteRequest.class);
+                            if (!deleteRequest.server().equals(serverUUID)) {
+                                handleDeleteRequest(deleteRequest);
+                            }
+                        }
                     }
                 }
             }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME,
-                    CLOSE_CHANNEL_NAME, CREATE_CHANNEL_NAME, SHARE_CHANNEL_NAME, SIZE_CHANNEL_NAME, ICON_CHANNEL_NAME);
+                    CLOSE_CHANNEL_NAME, CREATE_CHANNEL_NAME, SHARE_CHANNEL_NAME,
+                    SIZE_CHANNEL_NAME, ICON_CHANNEL_NAME, DELETE_CHANNEL_NAME);
         }
     }
 

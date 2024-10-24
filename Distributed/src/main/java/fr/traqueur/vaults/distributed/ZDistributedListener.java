@@ -1,6 +1,7 @@
 package fr.traqueur.vaults.distributed;
 
 import fr.traqueur.vaults.api.distributed.DistributedManager;
+import fr.traqueur.vaults.api.distributed.requests.VaultDeleteRequest;
 import fr.traqueur.vaults.api.distributed.requests.VaultShareRequest;
 import fr.traqueur.vaults.api.distributed.requests.VaultStateRequest;
 import fr.traqueur.vaults.api.events.*;
@@ -72,6 +73,11 @@ public class ZDistributedListener implements Listener {
     @EventHandler
     public void onChangeIcon(VaultChangeIconEvent event) {
         this.distributedManager.publishIconChangeRequest(event.getVault(), event.getMaterial());
+    }
+
+    @EventHandler
+    public void onVaultDelete(VaultDeleteEvent event) {
+        this.distributedManager.publishVaultDeleteRequest(event.getVault());
     }
 
 

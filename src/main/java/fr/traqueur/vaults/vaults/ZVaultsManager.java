@@ -424,7 +424,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public void deleteVault(Vault vault) {
+    public void deleteVault(Vault vault, boolean eventLaunch) {
         this.vaults.remove(vault.getUniqueId());
         this.linkedVaultToInventory.remove(vault.getUniqueId());
         if(this.openedVaults.containsKey(vault.getUniqueId())) {
@@ -437,6 +437,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
         this.getPlugin().getManager(VaultConfigurationManager.class).delete(vault);
         this.vaultService.delete(vault);
+        if(eventLaunch) {
+            VaultDeleteEvent event = new VaultDeleteEvent(this.getPlugin(), vault);
+            Bukkit.getPluginManager().callEvent(event);
+        }
     }
 
     @Override

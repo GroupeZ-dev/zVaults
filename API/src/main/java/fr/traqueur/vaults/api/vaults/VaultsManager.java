@@ -33,7 +33,6 @@ public interface VaultsManager extends Manager {
 
     void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite);
 
-
     boolean sizeIsAvailable(int size);
 
     OwnerResolver getOwnerResolver();
@@ -60,7 +59,7 @@ public interface VaultsManager extends Manager {
 
     void handleNumberKey(InventoryClickEvent event, Player player, ItemStack cursor, ItemStack current, int slot, int inventorySize, Vault vault);
 
-    void deleteVault(Vault vault);
+    void deleteVault(Vault vault, boolean eventLaunch);
 
     void openVaultChooseMenu(User user, User target);
 

@@ -22,6 +22,7 @@ public interface DistributedManager extends Manager {
     String SHARE_CHANNEL_NAME = "vaults-share";
     String SIZE_CHANNEL_NAME = "vaults-size";
     String ICON_CHANNEL_NAME = "vaults-icon";
+    String DELETE_CHANNEL_NAME = "vaults-delete";
 
 
     void disable();
@@ -43,4 +44,6 @@ public interface DistributedManager extends Manager {
     void publishSizeChangeRequest(Vault vault);
 
     void publishIconChangeRequest(Vault vault, Material material);
+
+    void publishVaultDeleteRequest(Vault vault);
 }
