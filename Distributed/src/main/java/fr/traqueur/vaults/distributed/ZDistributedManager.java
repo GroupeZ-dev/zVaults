@@ -8,6 +8,7 @@ import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.distributed.DistributedManager;
 import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;
+import fr.traqueur.vaults.api.distributed.requests.VaultStateRequest;
 import fr.traqueur.vaults.api.distributed.requests.VaultUpdateRequest;
 import fr.traqueur.vaults.api.distributed.requests.VaultOpenAckRequest;
 import fr.traqueur.vaults.api.distributed.requests.VaultOpenRequest;
@@ -16,10 +17,13 @@ import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.distributed.adapter.VaultOpenAckRequestAdapter;
+import fr.traqueur.vaults.distributed.adapter.VaultStateRequestAdapter;
 import fr.traqueur.vaults.distributed.adapter.VaultUpdateAdapter;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -32,10 +36,13 @@ public class ZDistributedManager implements DistributedManager {
     private final Gson gson;
     private final UUID serverUUID;
     private final VaultsManager vaultsManager;
+    private final Map<UUID, Integer> vaultStates;
 
 
     public ZDistributedManager(VaultsPlugin plugin) {
         this.serverUUID = UUID.randomUUID();
+
+        this.vaultStates = new HashMap<>();
 
         this.executorService = Executors.newCachedThreadPool();
 
@@ -44,6 +51,7 @@ public class ZDistributedManager implements DistributedManager {
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(VaultUpdateRequest.class, new VaultUpdateAdapter(plugin.getManager(VaultsManager.class)))
                 .registerTypeAdapter(VaultOpenAckRequest.class, new VaultOpenAckRequestAdapter())
+                .registerTypeAdapter(VaultStateRequest.class, new VaultStateRequestAdapter())
                 .create();
 
         this.executorService.submit(this::subscribe);
@@ -61,6 +69,11 @@ public class ZDistributedManager implements DistributedManager {
         try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
             publisher.publish(UPDATE_CHANNEL_NAME, gson.toJson(vaultUpdate, VaultUpdateRequest.class));
         }
+    }
+
+    @Override
+    public boolean isOpenGlobal(Vault vault) {
+        return this.vaultStates.getOrDefault(vault.getUniqueId(), 0) > 0;
     }
 
     @Override
@@ -97,6 +110,14 @@ public class ZDistributedManager implements DistributedManager {
         return completableFuture;
     }
 
+    @Override
+    public void publishStateRequest(Vault vault, VaultStateRequest.State state) {
+        VaultStateRequest request = new VaultStateRequest(serverUUID, vault.getUniqueId(), state);
+        try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            publisher.publish(STATE_CHANNEL_NAME, gson.toJson(request, VaultStateRequest.class));
+        }
+    }
+
     private void handleVaultUpdate(VaultUpdateRequest vaultUpdate) {
         this.vaultsManager.getLinkedInventory(vaultUpdate.vault().getUniqueId()).ifPresent(inventory -> {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
@@ -124,24 +145,46 @@ public class ZDistributedManager implements DistributedManager {
     }
 
 
+    private void handleVaultStateChange(VaultStateRequest stateRequest) {
+        int state = this.vaultStates.getOrDefault(stateRequest.vault(), 0);
+        switch (stateRequest.state()) {
+            case OPEN -> {
+                this.vaultStates.put(stateRequest.vault(), state + 1);
+            }
+            case CLOSE -> {
+                this.vaultStates.put(stateRequest.vault(), state - 1);
+            }
+        }
+    }
+
+
     private void subscribe() {
         try (Jedis subscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
             subscriber.subscribe(new JedisPubSub() {
                 @Override
                 public void onMessage(String channel, String message) {
-                    if (channel.equals(UPDATE_CHANNEL_NAME)) {
-                        VaultUpdateRequest vaultUpdate = gson.fromJson(message, VaultUpdateRequest.class);
-                        if(!vaultUpdate.server().equals(serverUUID)) {
-                            handleVaultUpdate(vaultUpdate);
+                    switch (channel) {
+                        case UPDATE_CHANNEL_NAME -> {
+                            VaultUpdateRequest vaultUpdate = gson.fromJson(message, VaultUpdateRequest.class);
+                            if (!vaultUpdate.server().equals(serverUUID)) {
+                                handleVaultUpdate(vaultUpdate);
+                            }
                         }
-                    } else if (channel.equals(OPEN_CHANNEL_NAME)) {
-                        VaultOpenRequest openRequest = gson.fromJson(message, VaultOpenRequest.class);
-                        if(!openRequest.server().equals(serverUUID)) {
-                            handleVaultOpen(openRequest);
+                        case OPEN_CHANNEL_NAME -> {
+                            VaultOpenRequest openRequest = gson.fromJson(message, VaultOpenRequest.class);
+                            if (!openRequest.server().equals(serverUUID)) {
+                                handleVaultOpen(openRequest);
+                            }
+                        }
+                        case STATE_CHANNEL_NAME -> {
+                            VaultStateRequest stateRequest = gson.fromJson(message, VaultStateRequest.class);
+                            if(!stateRequest.server().equals(serverUUID)) {
+                                handleVaultStateChange(stateRequest);
+                            }
                         }
                     }
                 }
-            }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME);
+            }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME);
         }
     }
 

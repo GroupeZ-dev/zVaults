@@ -1,6 +1,7 @@
 package fr.traqueur.vaults.distributed;
 
 import fr.traqueur.vaults.api.distributed.DistributedManager;
+import fr.traqueur.vaults.api.distributed.requests.VaultStateRequest;
 import fr.traqueur.vaults.api.events.VaultCloseEvent;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
 import fr.traqueur.vaults.api.events.VaultUpdateEvent;
@@ -22,20 +23,24 @@ public class ZDistributedListener implements Listener {
 
     @EventHandler
     public void onVaultOpen(VaultOpenEvent event) {
+        this.distributedManager.publishStateRequest(event.getVault(), VaultStateRequest.State.OPEN);
+        if(!this.distributedManager.isOpenGlobal(event.getVault())) {
+            return;
+        }
+
         try {
             this.distributedManager.publishOpenRequest(event).handle((pubSub, throwable) -> {
                 pubSub.unsubscribe();
                 return null;
-            }).get(1, TimeUnit.SECONDS);
+            }).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
-        } catch (TimeoutException ignored) {
         }
     }
 
     @EventHandler
     public void onVaultClose(VaultCloseEvent event) {
-
+        this.distributedManager.publishStateRequest(event.getVault(), VaultStateRequest.State.CLOSE);
     }
 
     @EventHandler
