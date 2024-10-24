@@ -22,6 +22,7 @@ public class ReloadCommand extends Command<VaultsPlugin> {
     public void execute(CommandSender commandSender, Arguments arguments) {
         this.getPlugin().loadInventories();
         Configuration.REGISTRY.values().forEach(Configuration::load);
+        this.getPlugin().loadCommands();
         this.getPlugin().getMessageResolver().sendMessage(commandSender, Message.RELOAD_PLUGIN_SUCCESS.translate());
     }
 }

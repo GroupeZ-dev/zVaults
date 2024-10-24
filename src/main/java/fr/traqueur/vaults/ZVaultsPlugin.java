@@ -53,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class ZVaultsPlugin extends VaultsPlugin {
 
+    private CommandManager commandManager;
     private PlatformScheduler scheduler;
     private Storage storage;
     private InventoryManager inventoryManager;
@@ -84,7 +85,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         this.storage = new SQLStorage(this, config.getDatabaseConfiguration());
 
-        CommandManager commandManager = new CommandManager(this);
+        this.commandManager = new CommandManager(this);
         commandManager.setDebug(config.isDebug());
         commandManager.setMessageHandler(new CommandsHandler());
         commandManager.setLogger(new Logger() {
@@ -129,7 +130,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         commandManager.registerConverter(String.class, "ownerType", new OwnerTypeArgument(vaultsManager.getOwnerResolver()));
         commandManager.registerConverter(User.class, "user", new UserArgument(userManager));
 
-        commandManager.registerCommand(new VaultsCommand(this));
+        this.loadCommands();
 
         this.storage.onEnable();
 
@@ -211,6 +212,13 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         } catch (InventoryException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void loadCommands() {
+        var command = new VaultsCommand(this);
+        commandManager.unregisterCommand(command);
+        commandManager.registerCommand(command);
     }
 
     private <I extends Manager, T extends I> I registerManager(T instance, Class<I> clazz) {
