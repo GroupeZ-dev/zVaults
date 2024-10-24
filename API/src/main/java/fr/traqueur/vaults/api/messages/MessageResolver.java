@@ -1,7 +1,6 @@
 package fr.traqueur.vaults.api.messages;
 
 import fr.traqueur.vaults.api.VaultsPlugin;
-import fr.traqueur.vaults.api.placeholders.Placeholder;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -20,9 +19,6 @@ public class MessageResolver {
     }
 
     public void sendMessage(CommandSender sender, String message) {
-        if(sender instanceof Player player) {
-            message = Placeholder.parse(player, message);
-        }
         this.audiences.sender(sender).sendMessage(miniMessage.deserialize(message));
     }
 

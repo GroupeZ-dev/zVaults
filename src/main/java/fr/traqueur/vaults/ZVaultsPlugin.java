@@ -138,10 +138,6 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         this.scheduler.runTimerAsync(() -> this.saveables.forEach(Saveable::save), 1, 1, TimeUnit.HOURS);
 
-        if(this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new ZPlaceholder(this).register();
-        }
-
         Bukkit.getOnlinePlayers().forEach(userManager::handleJoin);
 
         VaultsLogger.success("&e=== ENABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
