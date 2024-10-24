@@ -1,1 +1,5 @@
 group 'API'
+
+dependencies {
+    implementation 'redis.clients:jedis:5.2.0'
+}

@@ -7,6 +7,11 @@ import fr.traqueur.vaults.api.events.VaultUpdateEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 public class ZDistributedListener implements Listener {
 
     private final DistributedManager distributedManager;
@@ -17,7 +22,15 @@ public class ZDistributedListener implements Listener {
 
     @EventHandler
     public void onVaultOpen(VaultOpenEvent event) {
-        this.distributedManager.publishOpenRequest(event);
+        try {
+            this.distributedManager.publishOpenRequest(event).handle((pubSub, throwable) -> {
+                pubSub.unsubscribe();
+                return null;
+            }).get(1, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (TimeoutException ignored) {
+        }
     }
 
     @EventHandler
