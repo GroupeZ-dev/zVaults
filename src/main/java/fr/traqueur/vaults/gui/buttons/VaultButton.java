@@ -22,28 +22,19 @@ import java.util.List;
 
 public class VaultButton extends ZButton implements PaginateButton {
 
-    private final VaultsPlugin plugin;
     private final VaultsManager vaultsManager;
     private final UserManager userManager;
     private final VaultConfigurationManager vaultConfigurationManager;
-    private User target;
 
     public VaultButton(Plugin plugin) {
-        this.plugin = (VaultsPlugin) plugin;
-        this.vaultsManager = this.plugin.getManager(VaultsManager.class);
-        this.userManager =  this.plugin.getManager(UserManager.class);
-        this.vaultConfigurationManager = this.plugin.getManager(VaultConfigurationManager.class);
+        this.vaultsManager = ((VaultsPlugin) plugin).getManager(VaultsManager.class);
+        this.userManager =  ((VaultsPlugin) plugin).getManager(UserManager.class);
+        this.vaultConfigurationManager = ((VaultsPlugin) plugin).getManager(VaultConfigurationManager.class);
     }
 
     @Override
     public boolean hasSpecialRender() {
         return true;
-    }
-
-    @Override
-    public void onInventoryOpen(Player player, InventoryDefault inventory, Placeholders placeholders) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        this.target = this.vaultsManager.getTargetUser(user);
     }
 
     @Override
@@ -59,37 +50,39 @@ public class VaultButton extends ZButton implements PaginateButton {
 
     private void displayItems(Player player, InventoryDefault inventory) {
         VaultsConfiguration configuration = Configuration.getConfiguration(VaultsConfiguration.class);
-        Pagination<Vault> pagination = new Pagination<>();
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        if(this.target == null) {
-            this.target = user;
-        }
-        List<Vault> vaults = this.vaultsManager.getVaults(this.target);
-        List<Vault> buttons = pagination.paginate(vaults, this.slots.size(), inventory.getPage());
+        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
+            Pagination<Vault> pagination = new Pagination<>();
+            User target = this.vaultsManager.getTargetUser(user);
+            if(target == null) {
+                target = user;
+            }
+            List<Vault> vaults = this.vaultsManager.getVaults(target);
+            List<Vault> buttons = pagination.paginate(vaults, this.slots.size(), inventory.getPage());
 
-        for (int i = 0; i != Math.min(buttons.size(), this.slots.size()); i++) {
-            int slot = slots.get(i);
-            Vault vault = buttons.get(i);
+            for (int i = 0; i != Math.min(buttons.size(), this.slots.size()); i++) {
+                int slot = slots.get(i);
+                Vault vault = buttons.get(i);
 
-            Placeholders placeholders = new Placeholders();
-            placeholders.register("vault_icon", vault.getIcon().name());
-            placeholders.register("vault_size", vault.getSize() +"");
-            int contentSize = vault.getContent().stream().filter(vaultItem -> vaultItem.item() != null && !vaultItem.item().getType().isAir()).toList().size();
-            placeholders.register("vault_content_size", contentSize + "");
+                Placeholders placeholders = new Placeholders();
+                placeholders.register("vault_icon", vault.getIcon().name());
+                placeholders.register("vault_size", vault.getSize() +"");
+                int contentSize = vault.getContent().stream().filter(vaultItem -> vaultItem.item() != null && !vaultItem.item().getType().isAir()).toList().size();
+                placeholders.register("vault_content_size", contentSize + "");
 
-            inventory.addItem(slot, configuration.getIcon("open_vault").build(player, false, placeholders)).setClick(event -> {
-                if(event.getClick() == ClickType.LEFT) {
-                    event.getInventory().setItem(event.getRawSlot(), configuration.getIcon("loading_open").build(player, false, placeholders));
-                    this.vaultsManager.openVault(user, vault);
-                } else if(event.getClick() == ClickType.RIGHT) {
-                    if(!vault.isOwner(user) && !user.hasPermission("zvaults.admin")) {
-                        user.sendMessage(Message.NOT_PERMISSION_CONFIGURE_VAULT);
-                        return;
+                inventory.addItem(slot, configuration.getIcon("open_vault").build(player, false, placeholders)).setClick(event -> {
+                    if(event.getClick() == ClickType.LEFT) {
+                        event.getInventory().setItem(event.getRawSlot(), configuration.getIcon("loading_open").build(player, false, placeholders));
+                        this.vaultsManager.openVault(user, vault);
+                    } else if(event.getClick() == ClickType.RIGHT) {
+                        if(!vault.isOwner(user) && !user.hasPermission("zvaults.admin")) {
+                            user.sendMessage(Message.NOT_PERMISSION_CONFIGURE_VAULT);
+                            return;
+                        }
+                        this.vaultConfigurationManager.openVaultConfig(user, vault);
                     }
-                    this.vaultConfigurationManager.openVaultConfig(user, vault);
-                }
-            });
-        }
+                });
+            }
+        });
     }
 
     @Override

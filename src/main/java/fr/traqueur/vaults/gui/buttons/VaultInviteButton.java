@@ -15,31 +15,24 @@ import org.bukkit.plugin.Plugin;
 
 public class VaultInviteButton extends ZButton {
 
-    private final VaultsPlugin plugin;
     private final UserManager userManager;
     private final VaultConfigurationManager vaultConfigurationManager;
-    private Vault vault;
 
     public VaultInviteButton(Plugin plugin) {
-        this.plugin = (VaultsPlugin) plugin;
-        this.userManager =  this.plugin.getManager(UserManager.class);
-        this.vaultConfigurationManager = this.plugin.getManager(VaultConfigurationManager.class);
-    }
-
-    @Override
-    public void onInventoryOpen(Player player, InventoryDefault inventory, Placeholders placeholders) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        vault = this.vaultConfigurationManager.getOpenedConfig(user);
+        this.userManager =  ((VaultsPlugin) plugin).getManager(UserManager.class);
+        this.vaultConfigurationManager = ((VaultsPlugin) plugin).getManager(VaultConfigurationManager.class);
     }
 
     @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryDefault inventory, int slot, Placeholders placeholders) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        ClickType clickType = event.getClick();
-        if (clickType == ClickType.LEFT) {
-            this.vaultConfigurationManager.openInvitationMenu(user, vault);
-        } else if (clickType == ClickType.RIGHT) {
-            this.vaultConfigurationManager.openAccessManagerMenu(user, vault);
-        }
+        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
+            Vault vault = this.vaultConfigurationManager.getOpenedConfig(user);
+            ClickType clickType = event.getClick();
+            if (clickType == ClickType.LEFT) {
+                this.vaultConfigurationManager.openInvitationMenu(user, vault);
+            } else if (clickType == ClickType.RIGHT) {
+                this.vaultConfigurationManager.openAccessManagerMenu(user, vault);
+            }
+        });
     }
 }

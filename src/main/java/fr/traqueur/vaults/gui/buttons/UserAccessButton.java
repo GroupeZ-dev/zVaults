@@ -25,27 +25,18 @@ import java.util.List;
 
 public class UserAccessButton extends ZButton implements PaginateButton {
 
-    private final VaultsPlugin plugin;
     private final UserManager userManager;
     private final VaultConfigurationManager vaultConfigurationManager;
-    private Vault vault;
 
     public UserAccessButton(Plugin plugin) {
-        this.plugin = (VaultsPlugin) plugin;
-        this.userManager =  this.plugin.getManager(UserManager.class);
-        this.vaultConfigurationManager = this.plugin.getManager(VaultConfigurationManager.class);
-    }
-
-    @Override
-    public void onInventoryOpen(Player player, InventoryDefault inventory) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        this.vault = this.vaultConfigurationManager.getOpenedAccessManager(user);
+        this.userManager =  ((VaultsPlugin) plugin).getManager(UserManager.class);
+        this.vaultConfigurationManager = ((VaultsPlugin) plugin).getManager(VaultConfigurationManager.class);
     }
 
     @Override
     public void onInventoryClose(Player player, InventoryDefault inventory) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        this.vaultConfigurationManager.closeAccessManagerMenu(user);
+        this.userManager.getUser(player.getUniqueId())
+                .ifPresent(this.vaultConfigurationManager::closeAccessManagerMenu);
     }
 
     @Override
@@ -55,22 +46,24 @@ public class UserAccessButton extends ZButton implements PaginateButton {
 
     @Override
     public void onRender(Player player, InventoryDefault inventory) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        List<User> users = this.vaultConfigurationManager.getWhoCanAccess(this.vault);
-        Pagination<User> pagination = new Pagination<>();
-        List<User> buttons = pagination.paginate(users, this.slots.size(), inventory.getPage());
+        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
+            Vault vault = this.vaultConfigurationManager.getOpenedAccessManager(user);
+            List<User> users = this.vaultConfigurationManager.getWhoCanAccess(vault);
+            Pagination<User> pagination = new Pagination<>();
+            List<User> buttons = pagination.paginate(users, this.slots.size(), inventory.getPage());
 
-        for (int i = 0; i != Math.min(buttons.size(), this.slots.size()); i++) {
-            int slot = slots.get(i);
-            User value = buttons.get(i);
+            for (int i = 0; i != Math.min(buttons.size(), this.slots.size()); i++) {
+                int slot = slots.get(i);
+                User value = buttons.get(i);
 
-            inventory.addItem(slot, this.getItem(user, value)).setClick(event -> {
-                if(event.getClick() == ClickType.LEFT) {
-                    this.vaultConfigurationManager.removeAccess(user, this.vault, value);
-                    event.getInventory().setItem(slot, new ItemStack(Material.AIR));
-                }
-            });
-        }
+                inventory.addItem(slot, this.getItem(user, value)).setClick(event -> {
+                    if(event.getClick() == ClickType.LEFT) {
+                        this.vaultConfigurationManager.removeAccess(user, vault, value);
+                        event.getInventory().setItem(slot, new ItemStack(Material.AIR));
+                    }
+                });
+            }
+        });
     }
 
     private ItemStack getItem(User user, User value) {

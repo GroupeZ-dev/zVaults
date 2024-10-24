@@ -18,7 +18,6 @@ public abstract class ManipulationSizeButton extends ZButton {
     protected final VaultConfigurationManager vaultConfigurationManager;
     protected final VaultsManager vaultsManager;
     protected final int size;
-    protected Vault vault;
 
     protected ManipulationSizeButton(VaultsPlugin plugin, int size) {
         this.size = size;
@@ -28,16 +27,12 @@ public abstract class ManipulationSizeButton extends ZButton {
     }
 
     @Override
-    public void onInventoryOpen(Player player, InventoryDefault inventory) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        vault = this.vaultConfigurationManager.getOpenedConfig(user);
-    }
-
-    @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryDefault inventory, int slot, Placeholders placeholders) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        this.execute(user, inventory, slot, placeholders);
+        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
+            this.execute(user, inventory, slot, placeholders, this.vaultConfigurationManager.getOpenedConfig(user));
+        });
+
     }
 
-    public abstract void execute(User user, InventoryDefault inventory, int slot, Placeholders placeholders);
+    public abstract void execute(User user, InventoryDefault inventory, int slot, Placeholders placeholders, Vault vault);
 }

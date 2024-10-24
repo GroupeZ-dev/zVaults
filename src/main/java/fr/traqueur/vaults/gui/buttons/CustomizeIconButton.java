@@ -22,7 +22,6 @@ public class CustomizeIconButton extends ZButton {
     private final VaultsPlugin plugin;
     private final UserManager userManager;
     private final VaultConfigurationManager vaultConfigurationManager;
-    private Vault vault;
 
     public CustomizeIconButton(Plugin plugin) {
         this.plugin = (VaultsPlugin) plugin;
@@ -31,22 +30,20 @@ public class CustomizeIconButton extends ZButton {
     }
 
     @Override
-    public void onInventoryOpen(Player player, InventoryDefault inventory, Placeholders placeholders) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        vault = this.vaultConfigurationManager.getOpenedConfig(user);
-    }
-
-    @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryDefault inventory, int slot, Placeholders placeholders) {
-        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
-        if (itemInHand == null || itemInHand.getType().isAir()) {
-            user.sendMessage(Message.ITEM_CANT_BE_NULL);
-            return;
-        }
-        vault.setIcon(itemInHand.getType());
-        user.sendMessage(Message.VAULT_ICON_CHANGE, Formatter.format("%new_icon%", MaterialLocalization.getTranslateName(itemInHand.getType())));
-        VaultChangeIconEvent vaultChangeIconEvent = new VaultChangeIconEvent(this.plugin, vault, itemInHand.getType());
-        this.plugin.getServer().getPluginManager().callEvent(vaultChangeIconEvent);
+        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
+            Vault vault = this.vaultConfigurationManager.getOpenedConfig(user);
+
+            ItemStack itemInHand = player.getInventory().getItemInMainHand();
+            if (itemInHand == null || itemInHand.getType().isAir()) {
+                user.sendMessage(Message.ITEM_CANT_BE_NULL);
+                return;
+            }
+            vault.setIcon(itemInHand.getType());
+            user.sendMessage(Message.VAULT_ICON_CHANGE, Formatter.format("%new_icon%", MaterialLocalization.getTranslateName(itemInHand.getType())));
+            VaultChangeIconEvent vaultChangeIconEvent = new VaultChangeIconEvent(this.plugin, vault, itemInHand.getType());
+            this.plugin.getServer().getPluginManager().callEvent(vaultChangeIconEvent);
+
+        });
     }
 }
