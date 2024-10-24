@@ -3,6 +3,7 @@ package fr.traqueur.vaults.vaults;
 import fr.maxlego08.menu.api.dupe.DupeManager;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.sarah.MigrationManager;
+import fr.traqueur.vaults.api.CompatibilityUtil;
 import fr.traqueur.vaults.api.VaultsLogger;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
@@ -227,7 +228,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 case PLACE_ALL -> {
                     var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), cursor.getAmount());
                     event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
-                    event.getView().setCursor(new ItemStack(Material.AIR));
+                    CompatibilityUtil.setCursor(event, new ItemStack(Material.AIR));
                 }
 
                 case PLACE_SOME -> {
@@ -242,7 +243,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     } else {
                         newCursor.setAmount(restInCursor);
                     }
-                    event.getView().setCursor(newCursor);
+                   CompatibilityUtil.setCursor(event,newCursor);
                 }
 
                 case SWAP_WITH_CURSOR -> {
@@ -254,7 +255,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
                     ItemStack toAdd = this.cloneItemStack(vaultItem.item());
                     toAdd.setAmount(vaultItem.amount());
-                    event.getView().setCursor(toAdd);
+                   CompatibilityUtil.setCursor(event,toAdd);
                 }
             }
         }
@@ -295,7 +296,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
                     ItemStack toAdd = this.cloneItemStack(vaultItem.item());
                     toAdd.setAmount(halfAmount);
-                    event.getView().setCursor(toAdd);
+                   CompatibilityUtil.setCursor(event,toAdd);
                 }
                 case PLACE_ONE -> {
                     var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), 1);
@@ -306,7 +307,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     } else {
                         newCursor.setAmount(cursor.getAmount() - 1);
                     }
-                    event.getView().setCursor(newCursor);
+                   CompatibilityUtil.setCursor(event,newCursor);
                 }
             }
         }
@@ -545,7 +546,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
         ItemStack toAdd = this.cloneItemStack(vaultItem.item());
         toAdd.setAmount(vaultItem.amount());
-        event.getView().setCursor(toAdd);
+       CompatibilityUtil.setCursor(event,toAdd);
     }
 
     private void addFromHotbar(InventoryClickEvent event, Player player, Vault vault, ItemStack hotbarItem) {
@@ -568,11 +569,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
         int newAmount = cursor.getAmount() - amountToAdd;
         if(newAmount == 0) {
-            event.getView().setCursor(new ItemStack(Material.AIR));
+           CompatibilityUtil.setCursor(event,new ItemStack(Material.AIR));
             return;
         }
         cursor.setAmount(newAmount);
-        event.getView().setCursor(cursor);
+       CompatibilityUtil.setCursor(event,cursor);
     }
 
     private void removeItem(InventoryClickEvent event, Player player, int slot, Vault vault, VaultItem vaultItem, int amountToRemove) {
@@ -581,7 +582,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
         ItemStack newCursor = newVaultItem.isEmpty() ? vaultItem.item().clone() : newVaultItem.item().clone();
         newCursor.setAmount(amountToRemove);
-        event.getView().setCursor(newCursor);
+       CompatibilityUtil.setCursor(event,newCursor);
     }
 
     private int findCorrespondingSlot(Inventory inventory, ItemStack correspond, Vault vault) {
