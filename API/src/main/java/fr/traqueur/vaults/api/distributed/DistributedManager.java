@@ -3,7 +3,7 @@ package fr.traqueur.vaults.api.distributed;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.vaults.Vault;
-import org.bukkit.inventory.ItemStack;
+import fr.traqueur.vaults.api.vaults.VaultItem;
 import redis.clients.jedis.JedisPubSub;
 
 import java.util.concurrent.CompletableFuture;
@@ -16,7 +16,7 @@ public interface DistributedManager extends Manager {
 
     void disable();
 
-    void publishVaultUpdate(Vault vault, ItemStack item, int slot);
+    void publishVaultUpdate(Vault vault, VaultItem item, int slot);
 
     CompletableFuture<JedisPubSub> publishOpenRequest(VaultOpenEvent event);
 }

@@ -8,15 +8,15 @@ import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.distributed.DistributedManager;
 import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;
-import fr.traqueur.vaults.api.distributed.VaultUpdateRequest;
+import fr.traqueur.vaults.api.distributed.requests.VaultUpdateRequest;
 import fr.traqueur.vaults.api.distributed.requests.VaultOpenAckRequest;
 import fr.traqueur.vaults.api.distributed.requests.VaultOpenRequest;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
 import fr.traqueur.vaults.api.vaults.Vault;
+import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.distributed.adapter.VaultOpenAckRequestAdapter;
 import fr.traqueur.vaults.distributed.adapter.VaultUpdateAdapter;
-import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
@@ -24,6 +24,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class ZDistributedManager implements DistributedManager {
 
@@ -55,7 +56,7 @@ public class ZDistributedManager implements DistributedManager {
     }
 
     @Override
-    public void publishVaultUpdate(Vault vault, ItemStack item, int slot) {
+    public void publishVaultUpdate(Vault vault, VaultItem item, int slot) {
         VaultUpdateRequest vaultUpdate = new VaultUpdateRequest(serverUUID, vault, item, slot);
         try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
             publisher.publish(UPDATE_CHANNEL_NAME, gson.toJson(vaultUpdate, VaultUpdateRequest.class));
@@ -101,7 +102,8 @@ public class ZDistributedManager implements DistributedManager {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
                 VaultsLogger.info("Received vault update for vault " + vaultUpdate.vault().getUniqueId() + " on slot " + vaultUpdate.slot());
             }
-            inventory.getSpigotInventory().setItem(vaultUpdate.slot(), vaultUpdate.itemStack());
+            vaultUpdate.vault().setContent(vaultUpdate.vault().getContent().stream().map(item -> item.slot() == vaultUpdate.slot() ? vaultUpdate.itemStack() : item).collect(Collectors.toList()));
+            inventory.getSpigotInventory().setItem(vaultUpdate.slot(), vaultUpdate.itemStack().toItem(null, vaultUpdate.vault().isInfinite()));
         });
     }
 
