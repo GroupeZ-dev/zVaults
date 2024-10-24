@@ -31,10 +31,10 @@ storage-config:
 # This option is use to enable or disable the multi server sync support
 # If you enable this option, you need to configure the redis_config section
 # If you disable this option, the plugin will not share all actions between all servers using the same redis server
-multi_server_sync_support: false
+multi-server-sync-support: false
 
 # This option is use to configure the redis server
-redis_config:
+redis-config:
   host: "localhost"
   port: 6379
   password: ""

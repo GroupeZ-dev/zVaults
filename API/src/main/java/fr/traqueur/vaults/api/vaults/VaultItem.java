@@ -38,7 +38,7 @@ public record VaultItem(ItemStack item, int amount, int slot) {
                 return item;
             }
 
-            MenuItemStack item = Configuration.getConfiguration(VaultsConfiguration.class).getIcon("vault_item");
+            MenuItemStack item = Configuration.getConfiguration(VaultsConfiguration.class).getIcon("vault-item");
 
             Placeholders placeholders = new Placeholders();
             placeholders.register("material_name", MaterialLocalization.getTranslateName(this.item.getType()));

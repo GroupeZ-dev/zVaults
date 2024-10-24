@@ -231,7 +231,7 @@ public interface Configuration {
             char currentChar = camelCaseStr.charAt(i);
             if (Character.isUpperCase(currentChar)) {
                 if (i != 0) {
-                    result.append('_');
+                    result.append('-');
                 }
                 result.append(Character.toLowerCase(currentChar));
             } else {

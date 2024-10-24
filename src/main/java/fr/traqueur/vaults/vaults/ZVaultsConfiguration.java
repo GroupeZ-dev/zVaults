@@ -51,19 +51,19 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
         var file = new File(plugin.getDataFolder(), this.getFile());
         var config = YamlConfiguration.loadConfiguration(file);
         Loader<MenuItemStack> loader = new MenuItemStackLoader(plugin.getInventoryManager());
-        config.getConfigurationSection("vaults_icons").getKeys(false).forEach(key -> {
+        config.getConfigurationSection("vaults-icons").getKeys(false).forEach(key -> {
             try {
-                this.vaultsIcons.put(key, loader.load(config, "vaults_icons." + key+ ".", file));
+                this.vaultsIcons.put(key, loader.load(config, "vaults-icons." + key+ ".", file));
             } catch (InventoryException e) {
                 throw new RuntimeException(e);
             }
         });
 
-        config.getConfigurationSection("vault_title").getKeys(false).forEach(key -> {
-            this.vautlsTitle.put(key, config.getString("vault_title." + key));
+        config.getConfigurationSection("vault-title").getKeys(false).forEach(key -> {
+            this.vautlsTitle.put(key, config.getString("vault-title." + key));
         });
-        config.getConfigurationSection("max_vaults").getKeys(false).forEach(key -> {
-            this.maxVaultsByOwnerType.put(key, config.getInt("max_vaults." + key));
+        config.getConfigurationSection("max-vaults").getKeys(false).forEach(key -> {
+            this.maxVaultsByOwnerType.put(key, config.getInt("max-vaults." + key));
         });
 
         this.load = true;

@@ -82,7 +82,7 @@ public class VaultItemButton extends ZButton {
                         item = vaultItem.toItem(player, vault.isInfinite());
                     }
                 } else {
-                    item = configuration.getIcon("empty_item").build(player);
+                    item = configuration.getIcon("empty-item").build(player);
                 }
                 inventory.addItem(slot, item).setClick(event -> event.setCancelled(true));
             }

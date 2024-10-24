@@ -18,46 +18,46 @@ config-version: "${vaults_config_version}"
 # You can add a specific limit for different plugin using the format "plugin_name: limit"
 # Example: player: 5, superiorskyblock: 1
 # The plugin must be hook in zVaults, if not, ask to the developer to add it
-max_vaults:
+max-vaults:
   player: 5
   superiorskyblock: 1
 
 # Enable or disable the infinite vaults feature
-infinite_vaults: true
+infinite-vaults: true
 
 # Set the default size of vaults
-default_size: 27
+default-size: 27
 
 # Vault size management mode. Options:
 # - DEFAULT: All vaults have the same size. It is not possible to create vaults of different sizes.
 # - MIN_SIZE: Each vault has a configurable size but cannot be smaller than 'default_size'.
 # - MAX_SIZE: Each vault has a configurable size but cannot be larger than 'default_size'.
-size_mode: DEFAULT
+size-mode: DEFAULT
 
 # Set the default material use to show vaults in the vault choose menu
-open_vault_default_material: CHEST
+open-vault-default-material: CHEST
 
 # You can add specific vault title for each size
 # Example: 9: "&8Vault 9", set the title of the vault with 9 slots to "Vault 9"
 # If you don't want to change the title, you can remove the line but keep "default" line
-vault_title:
+vault-title:
   default: "&8ᴠᴀᴜʟᴛ"
   9: "&8ᴠᴀᴜʟᴛ 9"
   27: "&8ᴠᴀᴜʟᴛ 27"
   54: "&8ᴠᴀᴜʟᴛ 54"
 
 # You can change title, start message and try again message of the anvil gui for invite a player
-invite_player_menu:
+invite-player-menu:
   title: "ɪɴᴠɪᴛᴇ ᴀ ᴘʟᴀʏᴇʀ"
-  start_message: "Enter player name"
-  try_again_message: "Try Again"
+  start-message: "Enter player name"
+  try-again-message: "Try Again"
 
 # These lines represent all pagination items used in the menus
 # They work like zMenu, you can read the zMenu documentation for more information
 # https://docs.zmenu.dev/
 # Doesn't change the key value of each item. You can change the material, name, lore, etc.
-vaults_icons:
-  open_vault:
+vaults-icons:
+  open-vault:
     material: "%vault_icon%"
     model_data: 1
     name: "&8ᴠᴀᴜʟᴛ"
@@ -70,22 +70,22 @@ vaults_icons:
       - ""
       - "#92bed8ʟᴇғᴛ ᴄʟɪᴄᴋ &7 ᴛᴏ"
       - "&7ᴄᴏɴғɪɢᴜʀᴇ ʏᴏᴜʀ ᴠᴀᴜʟᴛ"
-  loading_open:
+  loading-open:
     material: ENDER_CHEST
     name: "&8ᴠᴀᴜʟᴛ"
     lore:
       - "&7ʟᴏᴀᴅɪɴɢ..."
-  vault_item:
+  vault-item:
     name: "#92bed8Sᴛᴏᴄᴋ ᴏғ &7%material_name%"
     material: "%material%"
     lore:
       - "#92bed8Sᴛᴏᴄᴋ: &f%amount%"
-  empty_item:
+  empty-item:
     material: BARRIER
     name: "&c&lᴇᴍᴘᴛʏ"
     lore:
       - "&fғᴏʀʙɪᴅᴅᴇɴ sʟᴏᴛ"
-  user_access_vault_item:
+  user-access-vault-item:
     material: PLAYER_HEAD
     name: "#92bed8%player_name%"
     lore:
