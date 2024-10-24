@@ -28,6 +28,12 @@ storage-config:
   username: "root"
   password: ""
 
+# This option permits you to configure aliases for the command
+command-aliases:
+  - "vault"
+  - "vaults"
+  - "zvault"
+
 # This option is use to enable or disable the multi server sync support
 # If you enable this option, you need to configure the redis_config section
 # If you disable this option, the plugin will not share all actions between all servers using the same redis server

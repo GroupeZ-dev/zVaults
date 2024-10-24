@@ -3,6 +3,8 @@ package fr.traqueur.vaults.commands;
 import fr.traqueur.commands.api.Arguments;
 import fr.traqueur.commands.api.Command;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
@@ -21,6 +23,8 @@ public class VaultsCommand extends Command<VaultsPlugin> {
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
         this.addSubCommand(new AdminCommand(plugin), new ReloadCommand(plugin));
+
+        this.addAlias(Configuration.getConfiguration(MainConfiguration.class).getAliases().toArray(new String[0]));
 
         this.setGameOnly(true);
     }

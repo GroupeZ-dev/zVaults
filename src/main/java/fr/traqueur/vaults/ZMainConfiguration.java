@@ -8,6 +8,8 @@ import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.config.NonLoadable;
 import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;
 
+import java.util.List;
+
 public class ZMainConfiguration implements MainConfiguration {
 
     @NonLoadable
@@ -20,6 +22,7 @@ public class ZMainConfiguration implements MainConfiguration {
     private boolean debug;
     private boolean multiServerSyncSupport;
     private RedisConnectionConfig redisConfig;
+    private List<String> commandAliases;
 
     public ZMainConfiguration(VaultsPlugin plugin) {
         this.plugin = plugin;
@@ -72,5 +75,10 @@ public class ZMainConfiguration implements MainConfiguration {
     @Override
     public boolean isMultiServerSyncSupport() {
         return multiServerSyncSupport;
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return commandAliases;
     }
 }
