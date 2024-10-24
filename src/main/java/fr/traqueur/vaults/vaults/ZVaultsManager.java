@@ -610,7 +610,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         int currentAmount = vaultItem.isEmpty() ? 0 : vaultItem.amount();
         VaultItem newVaultItem = new VaultItem(vaultItem.isEmpty() ? cursor : vaultItem.item(), currentAmount + amount, vaultItem.slot());
         vault.setContent(vault.getContent().stream().map(item -> item.slot() == newVaultItem.slot() ? newVaultItem : item).collect(Collectors.toList()));
-        System.out.println(vault.getContent());
         this.sendUpdate(user, vault, newVaultItem);
         return newVaultItem;
     }
