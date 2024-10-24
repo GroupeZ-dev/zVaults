@@ -12,6 +12,7 @@ import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -23,6 +24,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class VaultItemButton extends ZButton {
 
@@ -88,14 +90,18 @@ public class VaultItemButton extends ZButton {
 
     @Override
     public void onDrag(InventoryDragEvent event, Player player, InventoryDefault inventoryDefault) {
+        User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
         if(this.vault.isInfinite()) {
             event.setCancelled(true);
+            return;
         }
         event.getNewItems().forEach((slot, item) -> {
             if(slot < this.vault.getSize()) {
                 VaultItem vaultItem = vault.getInSlot(slot);
-                VaultUpdateEvent vaultUpdateEvent = new VaultUpdateEvent(plugin, this.userManager.getUser(player.getUniqueId()).orElseThrow(), this.vault, vaultItem, slot);
-                plugin.getServer().getPluginManager().callEvent(vaultUpdateEvent);
+                VaultItem newVaultItem = new VaultItem(this.vaultsManager.cloneItemStack(item), item.getAmount(), vaultItem.slot());
+                vault.setContent(vault.getContent().stream().map(itemInner -> itemInner.slot() == newVaultItem.slot() ? newVaultItem : itemInner).collect(Collectors.toList()));
+                VaultUpdateEvent vaultUpdateEvent = new VaultUpdateEvent(this.plugin, user, vault, newVaultItem, newVaultItem.slot());
+                Bukkit.getPluginManager().callEvent(vaultUpdateEvent);
             }
         });
     }

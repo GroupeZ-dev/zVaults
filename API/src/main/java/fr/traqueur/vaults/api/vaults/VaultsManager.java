@@ -69,4 +69,6 @@ public interface VaultsManager extends Manager {
     void closeVaultChooseMenu(User user);
 
     void changeSizeOfVault(User user, Vault vault, int size, Message success, Message transmitted);
+
+    ItemStack cloneItemStack(ItemStack itemStack);
 }

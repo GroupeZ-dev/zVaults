@@ -30,8 +30,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -611,7 +609,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         Bukkit.getPluginManager().callEvent(vaultUpdateEvent);
     }
 
-    private ItemStack cloneItemStack(ItemStack itemStack) {
+    @Override
+    public ItemStack cloneItemStack(ItemStack itemStack) {
         ItemStack clone = itemStack.clone();
         ItemMeta cloneMeta = clone.getItemMeta();
         if(cloneMeta == null) {
