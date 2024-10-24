@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class VaultShareEvent extends VaultEvent{
+public class VaultShareEvent extends UserVaultEvent {
 
     private final UUID sharedUniqueId;
     private final ShareType shareType;

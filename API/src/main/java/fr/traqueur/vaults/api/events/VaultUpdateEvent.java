@@ -6,7 +6,7 @@ import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import org.jetbrains.annotations.NotNull;
 
-public class VaultUpdateEvent extends VaultEvent {
+public class VaultUpdateEvent extends UserVaultEvent {
 
     private final VaultItem item;
     private final int slot;

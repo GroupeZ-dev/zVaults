@@ -7,7 +7,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class VaultEvent extends Event {
+public abstract class UserVaultEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
@@ -17,16 +17,22 @@ public abstract class VaultEvent extends Event {
 
     private final VaultsPlugin plugin;
     private final Vault vault;
+    private final User user;
 
-    public VaultEvent(VaultsPlugin plugin, Vault vault) {
+    public UserVaultEvent(VaultsPlugin plugin, @NotNull User who, Vault vault) {
         this.plugin = plugin;
         this.vault = vault;
+        this.user = who;
     }
 
     @NotNull
     @Override
     public HandlerList getHandlers() {
         return HANDLERS;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public Vault getVault() {

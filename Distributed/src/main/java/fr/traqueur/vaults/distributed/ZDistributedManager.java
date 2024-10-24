@@ -10,17 +10,13 @@ import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.distributed.DistributedManager;
 import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;
 import fr.traqueur.vaults.api.distributed.requests.*;
-import fr.traqueur.vaults.api.events.VaultCloseEvent;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
 import fr.traqueur.vaults.api.events.VaultShareEvent;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
-import fr.traqueur.vaults.distributed.adapter.VaultCloseRequestAdapter;
-import fr.traqueur.vaults.distributed.adapter.VaultOpenAckRequestAdapter;
-import fr.traqueur.vaults.distributed.adapter.VaultStateRequestAdapter;
-import fr.traqueur.vaults.distributed.adapter.VaultUpdateAdapter;
+import fr.traqueur.vaults.distributed.adapter.*;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
@@ -55,6 +51,8 @@ public class ZDistributedManager implements DistributedManager {
                 .registerTypeAdapter(VaultOpenAckRequest.class, new VaultOpenAckRequestAdapter())
                 .registerTypeAdapter(VaultStateRequest.class, new VaultStateRequestAdapter())
                 .registerTypeAdapter(VaultCloseRequest.class, new VaultCloseRequestAdapter())
+                .registerTypeAdapter(VaultShareRequest.class, new VaultShareRequestAdapter())
+                .registerTypeAdapter(VaultChangeSizeRequest.class, new VaultChangeSizeRequestAdapter())
                 .create();
 
         this.executorService.submit(this::subscribe);
@@ -154,6 +152,17 @@ public class ZDistributedManager implements DistributedManager {
         }
     }
 
+    @Override
+    public void publishSizeChangeRequest(Vault vault) {
+        try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+                VaultsLogger.info("Sending size change request for vault " + vault.getUniqueId());
+            }
+            VaultChangeSizeRequest sizeRequest = new VaultChangeSizeRequest(serverUUID, vault.getUniqueId(), vault.getSize());
+            publisher.publish(SIZE_CHANNEL_NAME, gson.toJson(sizeRequest, VaultChangeSizeRequest.class));
+        }
+    }
+
     private void handleVaultUpdate(VaultUpdateRequest vaultUpdate) {
         this.vaultsManager.getLinkedInventory(vaultUpdate.vault().getUniqueId()).ifPresent(inventory -> {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
@@ -226,6 +235,13 @@ public class ZDistributedManager implements DistributedManager {
         }
     }
 
+    private void handleVaultSizeChange(VaultChangeSizeRequest sizeRequest) {
+        if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+            VaultsLogger.info("Received size change request for vault " + sizeRequest.vault());
+        }
+        this.vaultsManager.getVault(sizeRequest.vault()).setSize(sizeRequest.size());
+    }
+
     private void subscribe() {
         try (Jedis subscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
             subscriber.subscribe(new JedisPubSub() {
@@ -268,10 +284,16 @@ public class ZDistributedManager implements DistributedManager {
                                 handleVaultShareRequest(shareRequest);
                             }
                         }
+                        case SIZE_CHANNEL_NAME -> {
+                            VaultChangeSizeRequest sizeRequest = gson.fromJson(message, VaultChangeSizeRequest.class);
+                            if (!sizeRequest.server().equals(serverUUID)) {
+                                handleVaultSizeChange(sizeRequest);
+                            }
+                        }
                     }
                 }
             }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME,
-                    CLOSE_CHANNEL_NAME, CREATE_CHANNEL_NAME, SHARE_CHANNEL_NAME);
+                    CLOSE_CHANNEL_NAME, CREATE_CHANNEL_NAME, SHARE_CHANNEL_NAME, SIZE_CHANNEL_NAME);
         }
     }
 

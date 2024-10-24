@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VaultOpenEvent extends VaultEvent implements Cancellable {
+public class VaultOpenEvent extends UserVaultEvent implements Cancellable {
 
     private boolean cancelled;
 

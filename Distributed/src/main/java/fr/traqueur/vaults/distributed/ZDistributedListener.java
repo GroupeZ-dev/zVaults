@@ -64,4 +64,10 @@ public class ZDistributedListener implements Listener {
                         event.getItem(), event.getSlot());
     }
 
+    @EventHandler
+    public void onVaultShareRequest(VaultChangeSizeEvent event) {
+        this.distributedManager.publishSizeChangeRequest(event.getVault());
+    }
+
+
 }

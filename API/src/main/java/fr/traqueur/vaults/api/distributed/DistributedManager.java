@@ -19,6 +19,8 @@ public interface DistributedManager extends Manager {
     String CLOSE_CHANNEL_NAME = "vaults-close";
     String CREATE_CHANNEL_NAME = "vaults-create";
     String SHARE_CHANNEL_NAME = "vaults-share";
+    String SIZE_CHANNEL_NAME = "vaults-size";
+
 
     void disable();
 
@@ -35,4 +37,6 @@ public interface DistributedManager extends Manager {
     void publishCreateRequest(Vault vault);
 
     void publishShareRequest(VaultShareEvent event);
+
+    void publishSizeChangeRequest(Vault vault);
 }
