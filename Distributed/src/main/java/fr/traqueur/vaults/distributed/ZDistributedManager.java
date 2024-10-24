@@ -129,6 +129,17 @@ public class ZDistributedManager implements DistributedManager {
         }
     }
 
+    @Override
+    public void publishCreateRequest(Vault vault) {
+        try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+                VaultsLogger.info("Sending create request for vault " + vault.getUniqueId());
+            }
+            VaultCreateRequest createRequest = new VaultCreateRequest(serverUUID, vault.getUniqueId(), this.vaultsManager.getOwnerResolver().getType(vault.getOwner().getClass()), vault.getOwner().getUniqueId(), vault.getSize(), vault.isInfinite());
+            publisher.publish(CREATE_CHANNEL_NAME, gson.toJson(createRequest, VaultCreateRequest.class));
+        }
+    }
+
     private void handleVaultUpdate(VaultUpdateRequest vaultUpdate) {
         this.vaultsManager.getLinkedInventory(vaultUpdate.vault().getUniqueId()).ifPresent(inventory -> {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
@@ -176,6 +187,15 @@ public class ZDistributedManager implements DistributedManager {
         this.vaultsManager.getVault(closeRequest.vault()).setContent(closeRequest.content());
     }
 
+    private void handleVaultCreateRequest(VaultCreateRequest createRequest) {
+        if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+            VaultsLogger.info("Received create request for vault " + createRequest.vault());
+        }
+        var owner = this.vaultsManager.getOwnerResolver().resolveOwner(createRequest.ownerType(), createRequest.owner());
+        this.vaultsManager.createVault(createRequest.vault(), owner, createRequest.size(), createRequest.infinite());
+    }
+
+
 
     private void subscribe() {
         try (Jedis subscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
@@ -207,9 +227,15 @@ public class ZDistributedManager implements DistributedManager {
                                 handleVaultCloseRequest(closeRequest);
                             }
                         }
+                        case CREATE_CHANNEL_NAME -> {
+                            VaultCreateRequest createRequest = gson.fromJson(message, VaultCreateRequest.class);
+                            if (!createRequest.server().equals(serverUUID)) {
+                                handleVaultCreateRequest(createRequest);
+                            }
+                        }
                     }
                 }
-            }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME, CLOSE_CHANNEL_NAME);
+            }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME, CLOSE_CHANNEL_NAME, CREATE_CHANNEL_NAME);
         }
     }
 

@@ -31,6 +31,9 @@ public interface VaultsManager extends Manager {
 
     void createVault(User creator, VaultOwner owner, int size, int maxVaults, boolean infinite);
 
+    void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite);
+
+
     boolean sizeIsAvailable(int size);
 
     OwnerResolver getOwnerResolver();

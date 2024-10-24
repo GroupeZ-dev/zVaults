@@ -20,7 +20,11 @@ public class ZVault implements Vault {
     private int size;
 
     public ZVault(VaultOwner owner, Material material, int size, boolean infinite) {
-        this(UUID.randomUUID(), owner, material, new ArrayList<>(), size, infinite);
+        this(UUID.randomUUID(), owner, material, size, infinite);
+    }
+
+    public ZVault(UUID uuid, VaultOwner owner, Material material, int size, boolean infinite) {
+        this(uuid, owner, material, new ArrayList<>(), size, infinite);
     }
 
     public ZVault(UUID uniqueId, VaultOwner owner, Material material, List<VaultItem> content, int size, boolean infinite) {

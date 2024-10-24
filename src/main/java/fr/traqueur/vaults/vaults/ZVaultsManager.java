@@ -11,6 +11,7 @@ import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.VaultDTO;
 import fr.traqueur.vaults.api.events.VaultCloseEvent;
+import fr.traqueur.vaults.api.events.VaultCreateEvent;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
 import fr.traqueur.vaults.api.events.VaultUpdateEvent;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
@@ -134,6 +135,14 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         this.vaults.put(vault.getUniqueId(), vault);
         creator.sendMessage(Message.VAULT_CREATED);
         owner.sendMessage(Message.RECEIVE_NEW_VAULT);
+        VaultCreateEvent event = new VaultCreateEvent(this.getPlugin(), creator, vault);
+        Bukkit.getPluginManager().callEvent(event);
+    }
+
+    @Override
+    public void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite) {
+        Vault vault = new ZVault(vaultId, owner, this.configuration.getVaultIcon(), size, infinite);
+        this.vaults.put(vaultId, vault);
     }
 
     @Override

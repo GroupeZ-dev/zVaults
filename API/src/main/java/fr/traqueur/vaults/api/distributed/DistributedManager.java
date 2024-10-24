@@ -16,6 +16,7 @@ public interface DistributedManager extends Manager {
     String OPEN_ACK_CHANNEL_NAME = "vaults-open-ack";
     String STATE_CHANNEL_NAME = "vaults-state";
     String CLOSE_CHANNEL_NAME = "vaults-close";
+    String CREATE_CHANNEL_NAME = "vaults-create";
 
     void disable();
 
@@ -28,4 +29,6 @@ public interface DistributedManager extends Manager {
     void publishStateRequest(Vault vault, VaultStateRequest.State state);
 
     void publishCloseRequest(Vault vault);
+
+    void publishCreateRequest(Vault vault);
 }
