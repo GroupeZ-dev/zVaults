@@ -125,6 +125,12 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             return;
         }
         Vault vault = new ZVault(owner, this.configuration.getVaultIcon(), size, infinite);
+        List<VaultItem> content = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            content.add(new VaultItem(new ItemStack(Material.AIR), 1, i));
+        }
+        vault.setContent(content);
+
         vaults.add(vault);
         this.vaultService.save(vault);
         this.vaults.put(vault.getUniqueId(), vault);
@@ -604,6 +610,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         int currentAmount = vaultItem.isEmpty() ? 0 : vaultItem.amount();
         VaultItem newVaultItem = new VaultItem(vaultItem.isEmpty() ? cursor : vaultItem.item(), currentAmount + amount, vaultItem.slot());
         vault.setContent(vault.getContent().stream().map(item -> item.slot() == newVaultItem.slot() ? newVaultItem : item).collect(Collectors.toList()));
+        System.out.println(vault.getContent());
         this.sendUpdate(user, vault, newVaultItem);
         return newVaultItem;
     }
