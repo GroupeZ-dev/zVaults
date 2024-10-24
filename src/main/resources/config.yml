@@ -1,7 +1,24 @@
+########################################################################################################################
+#
+#  ███████╗██╗░░░██╗░█████╗░██╗░░░██╗██╗░░░░░████████╗░██████╗
+#  ╚════██║██║░░░██║██╔══██╗██║░░░██║██║░░░░░╚══██╔══╝██╔════╝
+#  ░░███╔═╝╚██╗░██╔╝███████║██║░░░██║██║░░░░░░░░██║░░░╚█████╗░
+#  ██╔══╝░░░╚████╔╝░██╔══██║██║░░░██║██║░░░░░░░░██║░░░░╚═══██╗
+#  ███████╗░░╚██╔╝░░██║░░██║╚██████╔╝███████╗░░░██║░░░██████╔╝
+#  ╚══════╝░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░╚══════╝░░░╚═╝░░░╚═════╝░
+#
+# Documentation: https://zvaults.groupez.dev/
+#
+########################################################################################################################
+
 config-version: '${main_config_version}'
 
+# This option is use to configure the level of debuggin in console.
+# If you want support please enable it and send the logs to the support
 debug: true
 
+# This option is use to configure the storage system
+# You can choose between SQLITE and MYSQL
 storage-config:
   type: SQLITE
   host: "127.0.0.1"
@@ -16,6 +33,7 @@ storage-config:
 # If you disable this option, the plugin will not share all actions between all servers using the same redis server
 multi_server_sync_support: false
 
+# This option is use to configure the redis server
 redis_config:
   host: "localhost"
   port: 6379
