@@ -17,6 +17,7 @@ import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.distributed.adapter.*;
+import org.bukkit.Material;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
@@ -53,6 +54,7 @@ public class ZDistributedManager implements DistributedManager {
                 .registerTypeAdapter(VaultCloseRequest.class, new VaultCloseRequestAdapter())
                 .registerTypeAdapter(VaultShareRequest.class, new VaultShareRequestAdapter())
                 .registerTypeAdapter(VaultChangeSizeRequest.class, new VaultChangeSizeRequestAdapter())
+                .registerTypeAdapter(VaultIconChangeRequest.class, new VaultChangeIconRequestAdapter())
                 .create();
 
         this.executorService.submit(this::subscribe);
@@ -65,16 +67,16 @@ public class ZDistributedManager implements DistributedManager {
     }
 
     @Override
+    public boolean isOpenGlobal(Vault vault) {
+        return this.vaultStates.getOrDefault(vault.getUniqueId(), 0) > 0;
+    }
+
+    @Override
     public void publishVaultUpdate(Vault vault, VaultItem item, int slot) {
         VaultUpdateRequest vaultUpdate = new VaultUpdateRequest(serverUUID, vault, item, slot);
         try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
             publisher.publish(UPDATE_CHANNEL_NAME, gson.toJson(vaultUpdate, VaultUpdateRequest.class));
         }
-    }
-
-    @Override
-    public boolean isOpenGlobal(Vault vault) {
-        return this.vaultStates.getOrDefault(vault.getUniqueId(), 0) > 0;
     }
 
     @Override
@@ -163,6 +165,17 @@ public class ZDistributedManager implements DistributedManager {
         }
     }
 
+    @Override
+    public void publishIconChangeRequest(Vault vault, Material material) {
+        try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+                VaultsLogger.info("Sending icon change request for vault " + vault.getUniqueId());
+            }
+            VaultIconChangeRequest iconRequest = new VaultIconChangeRequest(serverUUID, vault.getUniqueId(), material);
+            publisher.publish(ICON_CHANNEL_NAME, gson.toJson(iconRequest, VaultIconChangeRequest.class));
+        }
+    }
+
     private void handleVaultUpdate(VaultUpdateRequest vaultUpdate) {
         this.vaultsManager.getLinkedInventory(vaultUpdate.vault().getUniqueId()).ifPresent(inventory -> {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
@@ -242,6 +255,13 @@ public class ZDistributedManager implements DistributedManager {
         this.vaultsManager.getVault(sizeRequest.vault()).setSize(sizeRequest.size());
     }
 
+    private void handleVaultIconChange(VaultIconChangeRequest iconRequest) {
+        if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+            VaultsLogger.info("Received icon change request for vault " + iconRequest.vault());
+        }
+        this.vaultsManager.getVault(iconRequest.vault()).setIcon(iconRequest.icon());
+    }
+
     private void subscribe() {
         try (Jedis subscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
             subscriber.subscribe(new JedisPubSub() {
@@ -290,10 +310,16 @@ public class ZDistributedManager implements DistributedManager {
                                 handleVaultSizeChange(sizeRequest);
                             }
                         }
+                        case ICON_CHANNEL_NAME -> {
+                            VaultIconChangeRequest iconRequest = gson.fromJson(message, VaultIconChangeRequest.class);
+                            if (!iconRequest.server().equals(serverUUID)) {
+                                handleVaultIconChange(iconRequest);
+                            }
+                        }
                     }
                 }
             }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME,
-                    CLOSE_CHANNEL_NAME, CREATE_CHANNEL_NAME, SHARE_CHANNEL_NAME, SIZE_CHANNEL_NAME);
+                    CLOSE_CHANNEL_NAME, CREATE_CHANNEL_NAME, SHARE_CHANNEL_NAME, SIZE_CHANNEL_NAME, ICON_CHANNEL_NAME);
         }
     }
 

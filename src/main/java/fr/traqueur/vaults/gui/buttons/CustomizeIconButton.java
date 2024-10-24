@@ -5,6 +5,7 @@ import fr.maxlego08.menu.button.ZButton;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
+import fr.traqueur.vaults.api.events.VaultChangeIconEvent;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.serialization.MaterialLocalization;
@@ -45,5 +46,7 @@ public class CustomizeIconButton extends ZButton {
         }
         vault.setIcon(itemInHand.getType());
         user.sendMessage(Message.VAULT_ICON_CHANGE, Formatter.format("%new_icon%", MaterialLocalization.getTranslateName(itemInHand.getType())));
+        VaultChangeIconEvent vaultChangeIconEvent = new VaultChangeIconEvent(this.plugin, vault, itemInHand.getType());
+        this.plugin.getServer().getPluginManager().callEvent(vaultChangeIconEvent);
     }
 }

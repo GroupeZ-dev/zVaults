@@ -69,5 +69,10 @@ public class ZDistributedListener implements Listener {
         this.distributedManager.publishSizeChangeRequest(event.getVault());
     }
 
+    @EventHandler
+    public void onChangeIcon(VaultChangeIconEvent event) {
+        this.distributedManager.publishIconChangeRequest(event.getVault(), event.getMaterial());
+    }
+
 
 }
