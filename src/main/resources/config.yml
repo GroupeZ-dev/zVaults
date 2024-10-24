@@ -11,7 +11,10 @@ storage-config:
   username: "root"
   password: ""
 
-multi_server_sync_support: true
+# This option is use to enable or disable the multi server sync support
+# If you enable this option, you need to configure the redis_config section
+# If you disable this option, the plugin will not share all actions between all servers using the same redis server
+multi_server_sync_support: false
 
 redis_config:
   host: "localhost"

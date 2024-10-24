@@ -1,64 +1,76 @@
 config-version: "${vaults_config_version}"
 
-# Nombre maximum de vaults par joueur (mettre -1 pour illimité)
+# Maximum number of vaults that a player or a team can have, or -1 for unlimited
+# You can add a specific limit for different plugin using the format "plugin_name: limit"
+# Example: player: 5, superiorskyblock: 1
+# The plugin must be hook in zVaults, if not, ask to the developer to add it
 max_vaults:
   player: 5
   superiorskyblock: 1
-# Si true, les joueurs peuvent avoir un stock illimité par items dans leurs vaults
-infinite_vaults: false
 
-# Taille par défaut d'un vault (nombre de slots)
+# Enable or disable the infinite vaults feature
+infinite_vaults: true
+
+# Set the default size of vaults
 default_size: 27
 
-# Taille des vaults
-# Mode de gestion des tailles des vaults. Options :
-# - "default" : Toutes les vaults ont la même taille. Impossible de faire des vaults de tailles différentes
-# - "min_size" : Chaque vault a une taille configurable, mais ne peut pas être plus petite que 'default_size'.
-# - "max_size" : Chaque vault a une taille configurable, mais ne peut pas être plus grande que 'default_size'.
+# Vault size management mode. Options:
+# - DEFAULT: All vaults have the same size. It is not possible to create vaults of different sizes.
+# - MIN_SIZE: Each vault has a configurable size but cannot be smaller than 'default_size'.
+# - MAX_SIZE: Each vault has a configurable size but cannot be larger than 'default_size'.
 size_mode: DEFAULT
 
+# Set the default material use to show vaults in the vault choose menu
 open_vault_default_material: CHEST
 
+# You can add specific vault title for each size
+# Example: 9: "&8Vault 9", set the title of the vault with 9 slots to "Vault 9"
+# If you don't want to change the title, you can remove the line but keep "default" line
 vault_title:
   default: "&8ᴠᴀᴜʟᴛ"
   9: "&8ᴠᴀᴜʟᴛ 9"
   27: "&8ᴠᴀᴜʟᴛ 27"
   54: "&8ᴠᴀᴜʟᴛ 54"
 
+# You can change title, start message and try again message of the anvil gui for invite a player
 invite_player_menu:
-  title: "Invitation à votre Vault"
-  start_message: "Entrez le nom du joueur à inviter :"
-  try_again_message: "&cCe joueur n'existe pas ou n'est pas connecté."
+  title: "ɪɴᴠɪᴛᴇ ᴀ ᴘʟᴀʏᴇʀ"
+  start_message: "Enter player name"
+  try_again_message: "Try Again"
 
+# These lines represent all pagination items used in the menus
+# They work like zMenu, you can read the zMenu documentation for more information
+# https://docs.zmenu.dev/
+# Doesn't change the key value of each item. You can change the material, name, lore, etc.
 vaults_icons:
   open_vault:
     material: "%vault_icon%"
     model_data: 1
     name: "&8ᴠᴀᴜʟᴛ"
     lore:
-      - "#92bed8ᴛᴀɪʟʟᴇ: &f%vault_size% &7sʟᴏᴛs"
+      - "#92bed8sɪᴢᴇ: &f%vault_size% &7sʟᴏᴛs"
       - "#92bed8Sᴛᴏᴄᴋ: &f%vault_content_size% &7oʙᴊᴇᴛs"
       - ""
-      - "#92bed8ᴄʟɪᴄᴋ ᴅʀᴏɪᴛ &7ᴘᴏᴜʀ ᴏᴜᴠʀɪʀ"
-      - "&7ᴠᴏᴛʀᴇ ᴠᴀᴜʟᴛ ᴘᴇʀsᴏɴɴᴇʟ"
+      - "#92bed8ʀɪɢʜᴛ ᴄʟɪᴄᴋ &7ᴛᴏ ᴏᴘᴇɴ"
+      - "&7ʏᴏᴜʀ ᴘᴇʀsᴏɴɴᴀʟ ᴠᴀᴜʟᴛ"
       - ""
-      - "#92bed8ᴄʟɪᴄᴋ ɢᴀᴜᴄʜᴇ&7 ᴘᴏᴜʀ"
-      - "&7ᴄᴏɴғɪɢᴜʀᴇʀ ᴠᴏᴛʀᴇ ᴠᴀᴜʟᴛ"
+      - "#92bed8ʟᴇғᴛ ᴄʟɪᴄᴋ &7 ᴛᴏ"
+      - "&7ᴄᴏɴғɪɢᴜʀᴇ ʏᴏᴜʀ ᴠᴀᴜʟᴛ"
   loading_open:
     material: ENDER_CHEST
     name: "&8ᴠᴀᴜʟᴛ"
     lore:
-      - "&7Cʜᴀʀɢᴇᴍᴇɴᴛ..."
+      - "&7ʟᴏᴀᴅɪɴɢ..."
   vault_item:
-    name: "#92bed8Sᴛᴏᴄᴋ ᴅᴇ &7%material_name%"
+    name: "#92bed8Sᴛᴏᴄᴋ ᴏғ &7%material_name%"
     material: "%material%"
     lore:
       - "#92bed8Sᴛᴏᴄᴋ: &f%amount%"
   empty_item:
     material: BARRIER
-    name: "&c&lAᴜᴄᴜɴ ᴏʙᴊᴇᴛ"
+    name: "&c&lᴇᴍᴘᴛʏ"
     lore:
-      - "&fSʟᴏᴛ Iɴᴛᴇʀᴅɪᴛ"
+      - "&fғᴏʀʙɪᴅᴅᴇɴ sʟᴏᴛ"
   user_access_vault_item:
     material: PLAYER_HEAD
     name: "#92bed8%player_name%"
