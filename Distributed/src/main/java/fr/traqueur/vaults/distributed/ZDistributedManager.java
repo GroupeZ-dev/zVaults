@@ -6,11 +6,14 @@ import fr.traqueur.vaults.api.VaultsLogger;
 import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
+import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.distributed.DistributedManager;
 import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;
 import fr.traqueur.vaults.api.distributed.requests.*;
 import fr.traqueur.vaults.api.events.VaultCloseEvent;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
+import fr.traqueur.vaults.api.events.VaultShareEvent;
+import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
@@ -140,6 +143,17 @@ public class ZDistributedManager implements DistributedManager {
         }
     }
 
+    @Override
+    public void publishShareRequest(VaultShareEvent event) {
+        try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+                VaultsLogger.info("Sending share request for vault " + event.getVault().getUniqueId());
+            }
+            VaultShareRequest shareRequest = new VaultShareRequest(serverUUID, event.getSharedUniqueId(), event.getVault().getUniqueId(), event.getUser().getUniqueId(), event.getShareType());
+            publisher.publish(SHARE_CHANNEL_NAME, gson.toJson(shareRequest, VaultShareRequest.class));
+        }
+    }
+
     private void handleVaultUpdate(VaultUpdateRequest vaultUpdate) {
         this.vaultsManager.getLinkedInventory(vaultUpdate.vault().getUniqueId()).ifPresent(inventory -> {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
@@ -195,7 +209,22 @@ public class ZDistributedManager implements DistributedManager {
         this.vaultsManager.createVault(createRequest.vault(), owner, createRequest.size(), createRequest.infinite());
     }
 
-
+    private void handleVaultShareRequest(VaultShareRequest shareRequest) {
+        if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+            VaultsLogger.info("Received share request for vault " + shareRequest.vault());
+        }
+        var vaultConfigManager = this.getPlugin().getManager(VaultConfigurationManager.class);
+        switch (shareRequest.type()) {
+            case SHARE -> {
+                var user = this.getPlugin().getManager(UserManager.class).getUser(shareRequest.player()).orElseThrow();
+                var vault = this.vaultsManager.getVault(shareRequest.vault());
+                vaultConfigManager.addSharedAccess(shareRequest.shared(),user, vault);
+            }
+            case UNSHARE -> {
+                vaultConfigManager.deleteSharedAccess(shareRequest.shared());
+            }
+        }
+    }
 
     private void subscribe() {
         try (Jedis subscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
@@ -233,9 +262,16 @@ public class ZDistributedManager implements DistributedManager {
                                 handleVaultCreateRequest(createRequest);
                             }
                         }
+                        case SHARE_CHANNEL_NAME -> {
+                            VaultShareRequest shareRequest = gson.fromJson(message, VaultShareRequest.class);
+                            if (!shareRequest.server().equals(serverUUID)) {
+                                handleVaultShareRequest(shareRequest);
+                            }
+                        }
                     }
                 }
-            }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME, CLOSE_CHANNEL_NAME, CREATE_CHANNEL_NAME);
+            }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME,
+                    CLOSE_CHANNEL_NAME, CREATE_CHANNEL_NAME, SHARE_CHANNEL_NAME);
         }
     }
 

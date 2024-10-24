@@ -1,11 +1,9 @@
 package fr.traqueur.vaults.distributed;
 
 import fr.traqueur.vaults.api.distributed.DistributedManager;
+import fr.traqueur.vaults.api.distributed.requests.VaultShareRequest;
 import fr.traqueur.vaults.api.distributed.requests.VaultStateRequest;
-import fr.traqueur.vaults.api.events.VaultCloseEvent;
-import fr.traqueur.vaults.api.events.VaultCreateEvent;
-import fr.traqueur.vaults.api.events.VaultOpenEvent;
-import fr.traqueur.vaults.api.events.VaultUpdateEvent;
+import fr.traqueur.vaults.api.events.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -52,6 +50,11 @@ public class ZDistributedListener implements Listener {
     @EventHandler
     public void onCreate(VaultCreateEvent event) {
         this.distributedManager.publishCreateRequest(event.getVault());
+    }
+
+    @EventHandler
+    public void onShare(VaultShareEvent event) {
+        this.distributedManager.publishShareRequest(event);
     }
 
     @EventHandler

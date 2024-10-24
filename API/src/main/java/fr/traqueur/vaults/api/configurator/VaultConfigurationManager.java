@@ -5,6 +5,7 @@ import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.vaults.Vault;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface VaultConfigurationManager extends Manager {
 
@@ -30,5 +31,9 @@ public interface VaultConfigurationManager extends Manager {
 
     void removeAccess(User user, Vault vault, User value);
 
+    void deleteSharedAccess(UUID uniqueId);
+
     void delete(Vault vault);
+
+    void addSharedAccess(UUID uniqueId, User user, Vault vault);
 }

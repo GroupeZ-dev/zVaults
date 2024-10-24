@@ -2,6 +2,7 @@ package fr.traqueur.vaults.api.distributed;
 
 import fr.traqueur.vaults.api.distributed.requests.VaultStateRequest;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
+import fr.traqueur.vaults.api.events.VaultShareEvent;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
@@ -17,6 +18,7 @@ public interface DistributedManager extends Manager {
     String STATE_CHANNEL_NAME = "vaults-state";
     String CLOSE_CHANNEL_NAME = "vaults-close";
     String CREATE_CHANNEL_NAME = "vaults-create";
+    String SHARE_CHANNEL_NAME = "vaults-share";
 
     void disable();
 
@@ -31,4 +33,6 @@ public interface DistributedManager extends Manager {
     void publishCloseRequest(Vault vault);
 
     void publishCreateRequest(Vault vault);
+
+    void publishShareRequest(VaultShareEvent event);
 }

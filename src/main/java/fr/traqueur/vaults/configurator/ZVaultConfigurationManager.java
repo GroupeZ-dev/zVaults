@@ -4,10 +4,12 @@ import fr.maxlego08.sarah.MigrationManager;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.InvitePlayerMenuConfiguration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
+import fr.traqueur.vaults.api.configurator.ShareType;
 import fr.traqueur.vaults.api.configurator.SharedAccess;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.SharedAccessDTO;
+import fr.traqueur.vaults.api.events.VaultShareEvent;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.storage.Service;
@@ -19,6 +21,7 @@ import fr.traqueur.vaults.configurator.access.ZSharedAccess;
 import fr.traqueur.vaults.configurator.access.ZSharedAccessRepository;
 import fr.traqueur.vaults.storage.migrations.SharedAccessMigration;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 
 import java.util.*;
 
@@ -124,10 +127,24 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
             if(!sharedAccess.getUser().getUniqueId().equals(value.getUniqueId())) {
                 return false;
             }
+            VaultShareEvent event = new VaultShareEvent(this.getPlugin(), value, vault, sharedAccess.getUniqueId(), ShareType.UNSHARE);
+            Bukkit.getPluginManager().callEvent(event);
             this.sharedAccessService.delete(sharedAccess);
             user.sendMessage(Message.SUCCESSFULLY_REMOVED_ACCESS_TO_VAULT, Formatter.format("%player%", value.getName()));
             return true;
         });
+
+    }
+
+    @Override
+    public void deleteSharedAccess(UUID uniqueId) {
+        this.sharedAccesses.values().forEach(sharedAccesses -> sharedAccesses.removeIf(sharedAccess -> {
+            if(!sharedAccess.getUniqueId().equals(uniqueId)) {
+                return false;
+            }
+            this.sharedAccessService.delete(sharedAccess);
+            return true;
+        }));
     }
 
     @Override
@@ -155,6 +172,12 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
     }
 
     @Override
+    public void addSharedAccess(UUID uniqueId, User user, Vault vault) {
+        ZSharedAccess sharedAccess = new ZSharedAccess(uniqueId, vault, user);
+        this.sharedAccesses.computeIfAbsent(sharedAccess.getVault().getUniqueId(), uuid -> new ArrayList<>()).add(sharedAccess);
+    }
+
+    @Override
     public void load() {
         this.sharedAccessService.findAll().forEach(sharedAccess -> this.sharedAccesses.computeIfAbsent(sharedAccess.getVault().getUniqueId(), uuid -> new ArrayList<>()).add(sharedAccess));
     }
@@ -173,5 +196,7 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
         this.sharedAccesses.computeIfAbsent(vault.getUniqueId(), uuid -> new ArrayList<>()).add(sharedAccess);
         this.sharedAccessService.save(sharedAccess);
         user.sendMessage(Message.SUCCESSFULLY_ADDED_ACCESS_TO_VAULT, Formatter.format("%player%", value.getName()));
+        VaultShareEvent event = new VaultShareEvent(this.getPlugin(), value, vault, sharedAccess.getUniqueId(), ShareType.SHARE);
+        Bukkit.getPluginManager().callEvent(event);
     }
 }
