@@ -8,14 +8,13 @@ import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.distributed.DistributedManager;
 import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;
-import fr.traqueur.vaults.api.distributed.requests.VaultStateRequest;
-import fr.traqueur.vaults.api.distributed.requests.VaultUpdateRequest;
-import fr.traqueur.vaults.api.distributed.requests.VaultOpenAckRequest;
-import fr.traqueur.vaults.api.distributed.requests.VaultOpenRequest;
+import fr.traqueur.vaults.api.distributed.requests.*;
+import fr.traqueur.vaults.api.events.VaultCloseEvent;
 import fr.traqueur.vaults.api.events.VaultOpenEvent;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
+import fr.traqueur.vaults.distributed.adapter.VaultCloseRequestAdapter;
 import fr.traqueur.vaults.distributed.adapter.VaultOpenAckRequestAdapter;
 import fr.traqueur.vaults.distributed.adapter.VaultStateRequestAdapter;
 import fr.traqueur.vaults.distributed.adapter.VaultUpdateAdapter;
@@ -52,6 +51,7 @@ public class ZDistributedManager implements DistributedManager {
                 .registerTypeAdapter(VaultUpdateRequest.class, new VaultUpdateAdapter(plugin.getManager(VaultsManager.class)))
                 .registerTypeAdapter(VaultOpenAckRequest.class, new VaultOpenAckRequestAdapter())
                 .registerTypeAdapter(VaultStateRequest.class, new VaultStateRequestAdapter())
+                .registerTypeAdapter(VaultCloseRequest.class, new VaultCloseRequestAdapter())
                 .create();
 
         this.executorService.submit(this::subscribe);
@@ -118,6 +118,17 @@ public class ZDistributedManager implements DistributedManager {
         }
     }
 
+    @Override
+    public void publishCloseRequest(Vault vault) {
+        try (Jedis publisher = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
+            if(Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+                VaultsLogger.info("Sending close request for vault " + vault.getUniqueId());
+            }
+            VaultCloseRequest closeRequest = new VaultCloseRequest(serverUUID, vault.getUniqueId(), vault.getContent());
+            publisher.publish(CLOSE_CHANNEL_NAME, gson.toJson(closeRequest, VaultCloseRequest.class));
+        }
+    }
+
     private void handleVaultUpdate(VaultUpdateRequest vaultUpdate) {
         this.vaultsManager.getLinkedInventory(vaultUpdate.vault().getUniqueId()).ifPresent(inventory -> {
             if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
@@ -158,6 +169,14 @@ public class ZDistributedManager implements DistributedManager {
     }
 
 
+    private void handleVaultCloseRequest(VaultCloseRequest closeRequest) {
+        if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+            VaultsLogger.info("Received close request for vault " + closeRequest.vault());
+        }
+        this.vaultsManager.getVault(closeRequest.vault()).setContent(closeRequest.content());
+    }
+
+
     private void subscribe() {
         try (Jedis subscriber = this.createJedisInstance(Configuration.getConfiguration(MainConfiguration.class).getRedisConnectionConfig())) {
             subscriber.subscribe(new JedisPubSub() {
@@ -182,9 +201,15 @@ public class ZDistributedManager implements DistributedManager {
                                 handleVaultStateChange(stateRequest);
                             }
                         }
+                        case CLOSE_CHANNEL_NAME -> {
+                            VaultCloseRequest closeRequest = gson.fromJson(message, VaultCloseRequest.class);
+                            if (!closeRequest.server().equals(serverUUID)) {
+                                handleVaultCloseRequest(closeRequest);
+                            }
+                        }
                     }
                 }
-            }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME);
+            }, UPDATE_CHANNEL_NAME, OPEN_CHANNEL_NAME, STATE_CHANNEL_NAME, CLOSE_CHANNEL_NAME);
         }
     }
 

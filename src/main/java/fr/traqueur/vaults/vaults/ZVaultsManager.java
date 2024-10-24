@@ -115,7 +115,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             VaultCloseEvent event = new VaultCloseEvent(this.getPlugin(), user, vault);
             Bukkit.getPluginManager().callEvent(event);
             this.linkedVaultToInventory.remove(vault.getUniqueId());
-            this.saveVault(vault);
+            if(event.isSave()) {
+                this.saveVault(vault);
+            }
         }
     }
 

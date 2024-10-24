@@ -41,6 +41,11 @@ public class ZDistributedListener implements Listener {
     @EventHandler
     public void onVaultClose(VaultCloseEvent event) {
         this.distributedManager.publishStateRequest(event.getVault(), VaultStateRequest.State.CLOSE);
+        if(this.distributedManager.isOpenGlobal(event.getVault())) {
+            event.setSave(false);
+        } else {
+            this.distributedManager.publishCloseRequest(event.getVault());
+        }
     }
 
     @EventHandler

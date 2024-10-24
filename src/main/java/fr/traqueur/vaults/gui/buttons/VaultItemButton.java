@@ -61,20 +61,6 @@ public class VaultItemButton extends ZButton {
     @Override
     public void onInventoryClose(Player player, InventoryDefault inventory) {
         User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
-        var inv = inventory.getSpigotInventory();
-        if(!vault.isInfinite()) {
-            List<VaultItem> content = new ArrayList<>();
-            for (int i = 0; i < vault.getSize(); i++) {
-                ItemStack item = inv.getItem(i);
-                if (item == null || item.getType() == Material.AIR) {
-                    content.add(new VaultItem(new ItemStack(Material.AIR), 1, i));
-                } else {
-                    content.add(new VaultItem(item, item.getAmount(), i));
-                }
-
-            }
-            this.vault.setContent(content);
-        }
         this.vaultsManager.closeVault(user, vault);
     }
 

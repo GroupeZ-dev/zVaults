@@ -7,9 +7,18 @@ import org.jetbrains.annotations.NotNull;
 
 public class VaultCloseEvent extends VaultEvent {
 
-    private boolean cancelled;
+    private boolean save;
 
     public VaultCloseEvent(VaultsPlugin plugin, @NotNull User who, Vault vault) {
         super(plugin, who, vault);
+        this.save = true;
+    }
+
+    public boolean isSave() {
+        return this.save;
+    }
+
+    public void setSave(boolean save) {
+        this.save = save;
     }
 }

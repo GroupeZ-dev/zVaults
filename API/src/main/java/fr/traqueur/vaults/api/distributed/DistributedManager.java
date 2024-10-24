@@ -15,6 +15,7 @@ public interface DistributedManager extends Manager {
     String OPEN_CHANNEL_NAME = "vaults-open";
     String OPEN_ACK_CHANNEL_NAME = "vaults-open-ack";
     String STATE_CHANNEL_NAME = "vaults-state";
+    String CLOSE_CHANNEL_NAME = "vaults-close";
 
     void disable();
 
@@ -25,4 +26,6 @@ public interface DistributedManager extends Manager {
     CompletableFuture<JedisPubSub> publishOpenRequest(VaultOpenEvent event);
 
     void publishStateRequest(Vault vault, VaultStateRequest.State state);
+
+    void publishCloseRequest(Vault vault);
 }
