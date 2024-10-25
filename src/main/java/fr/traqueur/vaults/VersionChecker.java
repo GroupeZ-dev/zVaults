@@ -63,7 +63,7 @@ public class VersionChecker implements Listener {
         if (!useLastVersion && event.getPlayer().hasPermission("zplugin.notifs")) {
             plugin.getScheduler().runLater(() -> {
                 plugin.getMessageResolver().sendMessage(player, "<red>[zVaults] You do not use the latest version of the plugin! Thank you for taking the latest version to avoid any risk of problem!");
-                plugin.getMessageResolver().sendMessage(player, "<white>[zVaults] Download plugin here: §a" + String.format(URL_RESOURCE, pluginID));
+                plugin.getMessageResolver().sendMessage(player, "<white>[zVaults] Download plugin here: <green>" + String.format(URL_RESOURCE, pluginID));
             }, 20 * 2);
         }
     }
