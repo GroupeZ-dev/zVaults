@@ -3,6 +3,7 @@ package fr.traqueur.vaults.commands.admin;
 import fr.traqueur.commands.api.Arguments;
 import fr.traqueur.commands.api.Command;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.commands.VCommand;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
@@ -14,7 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class SetSizeCommand extends Command<VaultsPlugin> {
+public class SetSizeCommand extends VCommand {
 
     private final UserManager userManager;
     private final VaultsManager vaultsManager;
@@ -27,6 +28,8 @@ public class SetSizeCommand extends Command<VaultsPlugin> {
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
         this.setPermission("zvaults.admin.setsize");
+        this.setUsage("/zvaults setsize <player> <vault_num> <size>");
+        this.setDescription(plugin.getMessageResolver().convertToLegacySectionFormat(Message.SET_SIZE_COMMAND_DESCRIPTION.translate()));
 
         this.addArgs("receiver:user");
         this.addArgs("vault_num:int", (sender) -> this.vaultsManager.getNumVaultsTabulation());

@@ -26,6 +26,10 @@ public class MessageResolver {
         return LegacyComponentSerializer.legacyAmpersand().serialize(miniMessage.deserialize(message));
     }
 
+    public String convertToLegacySectionFormat(String message) {
+        return LegacyComponentSerializer.legacySection().serialize(miniMessage.deserialize(message));
+    }
+
     public Component convertToComponent(String message) {
         return miniMessage.deserialize(message);
     }

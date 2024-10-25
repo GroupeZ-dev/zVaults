@@ -24,3 +24,8 @@ successfully_removed_access_to_vault: "<green>Accès retiré avec succès à %pl
 item_cant_be_null: "<red>L'item dans votre main ne peut pas être vide."
 vault_icon_change: "<green>Icone du coffre changée pour <yellow>%new_icon%<green>."
 vault_deleted: "<green>Coffre supprimé."
+
+set_size_command_description: "Définir la taille d'un coffre."
+grow_size_command_description: "Agrandir la taille d'un coffre."
+create_command_description: "Créer un nouveau coffre."
+open_command_description: "Ouvrir un coffre."

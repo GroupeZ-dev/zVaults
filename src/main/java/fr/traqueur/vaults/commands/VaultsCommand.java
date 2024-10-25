@@ -3,6 +3,7 @@ package fr.traqueur.vaults.commands;
 import fr.traqueur.commands.api.Arguments;
 import fr.traqueur.commands.api.Command;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.commands.VCommand;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.users.User;
@@ -11,7 +12,7 @@ import fr.traqueur.vaults.api.vaults.VaultsManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class VaultsCommand extends Command<VaultsPlugin> {
+public class VaultsCommand extends VCommand {
 
     private final UserManager userManager;
     private final VaultsManager vaultsManager;

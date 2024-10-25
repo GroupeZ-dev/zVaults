@@ -3,6 +3,7 @@ package fr.traqueur.vaults.commands.admin;
 import fr.traqueur.commands.api.Arguments;
 import fr.traqueur.commands.api.Command;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.commands.VCommand;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.messages.Formatter;
@@ -16,7 +17,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
-public class CreateCommand extends Command<VaultsPlugin> {
+public class CreateCommand extends VCommand {
 
     private final UserManager userManager;
     private final VaultsManager vaultsManager;
@@ -28,6 +29,8 @@ public class CreateCommand extends Command<VaultsPlugin> {
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
         this.setPermission("zvaults.admin.create");
+        this.setUsage("/vaults create <receiver> <size> (infinite) [type]");
+        this.setDescription(plugin.getMessageResolver().convertToLegacySectionFormat(Message.CREATE_COMMAND_DESCRIPTION.translate()));
 
         this.addArgs("receiver:user");
         this.addArgs("size:int", (sender) -> this.vaultsManager.getSizeTabulation());
