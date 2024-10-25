@@ -19,7 +19,7 @@ public class OpenCommand extends Command<VaultsPlugin> {
         this.userManager = plugin.getManager(UserManager.class);
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
-        this.setPermission("vaults.admin.open");
+        this.setPermission("zvaults.admin.open");
         this.addArgs("target:user");
 
         this.setGameOnly(true);

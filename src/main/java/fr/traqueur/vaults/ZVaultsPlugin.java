@@ -42,6 +42,7 @@ import fr.traqueur.vaults.storage.SQLStorage;
 import fr.traqueur.vaults.users.ZUserManager;
 import fr.traqueur.vaults.vaults.ZVaultsConfiguration;
 import fr.traqueur.vaults.vaults.ZVaultsManager;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -139,6 +140,8 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         this.scheduler.runTimerAsync(() -> this.saveables.forEach(Saveable::save), 1, 1, TimeUnit.HOURS);
 
         Bukkit.getOnlinePlayers().forEach(userManager::handleJoin);
+
+        //new Metrics(this, 12345);
 
         VaultsLogger.success("&e=== ENABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
     }

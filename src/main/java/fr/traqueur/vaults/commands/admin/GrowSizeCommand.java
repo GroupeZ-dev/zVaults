@@ -26,7 +26,7 @@ public class GrowSizeCommand extends Command<VaultsPlugin> {
         this.userManager = plugin.getManager(UserManager.class);
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
-        this.setPermission("vaults.admin.growsize");
+        this.setPermission("zvaults.admin.growsize");
 
         this.addArgs("receiver:user");
         this.addArgs("vault_num:int", (sender) -> this.vaultsManager.getNumVaultsTabulation());

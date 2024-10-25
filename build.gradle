@@ -64,6 +64,7 @@ allprojects {
         implementation "net.kyori:adventure-text-minimessage:4.17.0"
         implementation "net.kyori:adventure-api:4.17.0"
         implementation "net.kyori:adventure-platform-bukkit:4.3.4"
+        implementation "org.bstats:bstats-bukkit:3.0.2"
 
         compileOnly 'com.github.Maxlego08:zMenu-API:303d4e9178'
     }
@@ -85,6 +86,7 @@ shadowJar {
     relocate 'fr.traqueur.commands', 'fr.traqueur.vaults.api.commands'
     relocate 'com.tcoded.folialib', 'fr.traqueur.vaults.api.platform.folia'
     relocate 'dev.dejvokep.boostedyaml', 'fr.traqueur.vaults.api.boostedyaml'
+    relocate 'org.bstats', 'fr.traqueur.vaults.api.bstats'
 
     archiveFileName = rootProject.name + "-" + rootProject.version + ".jar"
     destinationDirectory = rootProject.targetFolder

@@ -27,7 +27,7 @@ public class CreateCommand extends Command<VaultsPlugin> {
         this.userManager = plugin.getManager(UserManager.class);
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
-        this.setPermission("vaults.admin.create");
+        this.setPermission("zvaults.admin.create");
 
         this.addArgs("receiver:user");
         this.addArgs("size:int", (sender) -> this.vaultsManager.getSizeTabulation());

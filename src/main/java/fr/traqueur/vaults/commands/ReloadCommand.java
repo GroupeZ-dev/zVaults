@@ -14,7 +14,7 @@ public class ReloadCommand extends Command<VaultsPlugin> {
 
         this.setUsage("/zvaults reload");
         this.setDescription("Reload le plugin.");
-        this.setPermission("vaults.command.reload");
+        this.setPermission("zvaults.admin.reload");
     }
 
 
