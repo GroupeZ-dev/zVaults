@@ -141,7 +141,8 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         Bukkit.getOnlinePlayers().forEach(userManager::handleJoin);
 
-        //new Metrics(this, 12345);
+        new Metrics(this, 23712);
+        new VersionChecker(this, 328);
 
         VaultsLogger.success("&e=== ENABLE DONE" + " &7(&6" + (System.currentTimeMillis() - start) + "ms&7)&e ===");
     }
