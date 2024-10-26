@@ -80,6 +80,9 @@ vaults-icons:
     material: "%material%"
     lore:
       - "#92bed8Sᴛᴏᴄᴋ: &f%amount%"
+      - ""
+      - "#92bed8ʟᴇғᴛ ᴄʟɪᴄᴋ &7ᴛᴏ ᴘɪᴄᴋ 64"
+      - "#92bed8ʀɪɢʜᴛ ᴄʟɪᴄᴋ &7ᴛᴏ ᴘɪᴄᴋ 1"
   empty-item:
     material: BARRIER
     name: "&c&lᴇᴍᴘᴛʏ"
