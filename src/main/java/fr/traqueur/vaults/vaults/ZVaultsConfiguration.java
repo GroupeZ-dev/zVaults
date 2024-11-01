@@ -32,6 +32,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private final Map<String, String> vautlsTitle;
     private Material openVaultDefaultMaterial;
     private final Map<String, Integer> maxVaultsByOwnerType;
+    private boolean closeVaultOpenChooseMenu;
 
     public ZVaultsConfiguration() {
         this.vaultsIcons = new HashMap<>();
@@ -112,5 +113,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public int getMaxVaultsByOwnerType(String ownerType) {
         return this.maxVaultsByOwnerType.getOrDefault(ownerType, -1);
+    }
+
+    @Override
+    public boolean isCloseVaultOpenChooseMenu() {
+        return closeVaultOpenChooseMenu;
     }
 }

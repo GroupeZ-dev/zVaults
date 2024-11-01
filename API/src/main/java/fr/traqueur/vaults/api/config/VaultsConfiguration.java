@@ -21,4 +21,6 @@ public interface VaultsConfiguration extends Configuration {
     Material getVaultIcon();
 
     int getMaxVaultsByOwnerType(String ownerType);
+
+    boolean isCloseVaultOpenChooseMenu();
 }

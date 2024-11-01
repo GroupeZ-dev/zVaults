@@ -35,3 +35,10 @@ items:
       lore:
         - ""
         - "#92bed8ᴄʟɪᴄᴋ &7ᴛᴏ ᴅᴇʟᴇᴛᴇ ᴠᴀᴜʟᴛ"
+  close:
+    type: ZVAULTS_VAULT_CONFIG_CLOSE
+    isPermanent: true
+    slot: 22
+    item:
+      material: BARRIER
+      name: "&cClose"

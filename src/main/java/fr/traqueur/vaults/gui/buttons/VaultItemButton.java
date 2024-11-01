@@ -61,6 +61,9 @@ public class VaultItemButton extends ZButton {
         this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
             Vault vault = this.vaultsManager.getOpenedVault(user);
             this.vaultsManager.closeVault(user, vault);
+            if(Configuration.getConfiguration(VaultsConfiguration.class).isCloseVaultOpenChooseMenu()) {
+                this.vaultsManager.openVaultChooseMenu(user, user);
+            }
         });
     }
 

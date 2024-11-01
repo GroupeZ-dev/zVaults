@@ -40,6 +40,13 @@ items:
       item:
         material: GRAY_STAINED_GLASS_PANE
         name: "&e"
+  close:
+    type: ZVAULTS_ACCESS_MANAGER_CLOSE
+    isPermanent: true
+    slot: 49
+    item:
+      material: BARRIER
+      name: "&cClose"
   items:
     isPermanent: true
     update: true

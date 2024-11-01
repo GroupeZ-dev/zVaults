@@ -34,6 +34,9 @@ default-size: 27
 # - MAX_SIZE: Each vault has a configurable size but cannot be larger than 'default_size'.
 size-mode: DEFAULT
 
+# Enable or disable the opening of the vaults chosen menu when a player closes a vault
+close-vault-open-choose-menu: false
+
 # Set the default material use to show vaults in the vault choose menu
 open-vault-default-material: CHEST
 
