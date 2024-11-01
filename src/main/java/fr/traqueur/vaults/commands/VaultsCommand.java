@@ -6,11 +6,18 @@ import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.commands.VCommand;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
+import fr.traqueur.vaults.api.config.VaultsConfiguration;
+import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
+import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
+import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.List;
+import java.util.Optional;
 
 public class VaultsCommand extends VCommand {
 
@@ -27,12 +34,24 @@ public class VaultsCommand extends VCommand {
 
         this.addAlias(Configuration.getConfiguration(MainConfiguration.class).getAliases().toArray(new String[0]));
 
+        this.addOptinalArgs("vault:int", (sender) -> List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"));
+
         this.setGameOnly(true);
     }
 
     @Override
     public void execute(CommandSender commandSender, Arguments arguments) {
         User user = this.userManager.getUser(((Player) commandSender).getUniqueId()).orElseThrow();
-        this.vaultsManager.openVaultChooseMenu(user, user);
+        Optional<Integer> vault = arguments.get("vault");
+        if(vault.isPresent()) {
+            try {
+                Vault vaultToOpen = this.vaultsManager.getVault(user, vault.get());
+                this.vaultsManager.openVault(user, vaultToOpen);
+            } catch (IndexOutOfBoundVaultException ignored) {
+               user.sendMessage(Message.VAULT_NOT_FOUND);
+            }
+        } else {
+            this.vaultsManager.openVaultChooseMenu(user, user);
+        }
     }
 }
