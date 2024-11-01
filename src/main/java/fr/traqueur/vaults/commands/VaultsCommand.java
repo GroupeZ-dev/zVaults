@@ -42,7 +42,7 @@ public class VaultsCommand extends VCommand {
     @Override
     public void execute(CommandSender commandSender, Arguments arguments) {
         User user = this.userManager.getUser(((Player) commandSender).getUniqueId()).orElseThrow();
-        Optional<Integer> vault = arguments.get("vault");
+        Optional<Integer> vault = arguments.getOptional("vault");
         if(vault.isPresent()) {
             try {
                 Vault vaultToOpen = this.vaultsManager.getVault(user, vault.get());
