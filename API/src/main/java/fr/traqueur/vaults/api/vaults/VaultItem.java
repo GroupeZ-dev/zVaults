@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public record VaultItem(ItemStack item, int amount, int slot) {
 
@@ -38,20 +39,33 @@ public record VaultItem(ItemStack item, int amount, int slot) {
                 return item;
             }
 
+            ItemStack menuItem = this.item.clone();
+            ItemMeta meta = menuItem.getItemMeta();
+
             MenuItemStack item = Configuration.getConfiguration(VaultsConfiguration.class).getIcon("vault-item");
 
             Placeholders placeholders = new Placeholders();
-            placeholders.register("material_name", MaterialLocalization.getTranslateName(this.item.getType()));
+            String materialName = MaterialLocalization.getTranslateName(this.item.getType());
+            if(meta != null && meta.hasDisplayName()) {
+                materialName = meta.getDisplayName();
+            }
+
+            placeholders.register("material_name", materialName);
             placeholders.register("amount", this.formatNumber(this.amount));
             placeholders.register("material", this.item.getType().name());
 
             ItemStack templateItem = item.build(player, true, placeholders);
-            ItemStack menuItem = this.item.clone();
-            ItemMeta meta = menuItem.getItemMeta();
             ItemMeta templateMeta = templateItem.getItemMeta();
 
             meta.setDisplayName(templateMeta.getDisplayName());
-            meta.setLore(templateMeta.getLore());
+
+            ArrayList<String> lore = new ArrayList<>();
+            if(meta.hasLore()) {
+                lore.addAll(meta.getLore());
+            }
+            lore.addAll(templateMeta.getLore());
+            meta.setLore(lore);
+
             menuItem.setItemMeta(meta);
             menuItem.setAmount(1);
 
