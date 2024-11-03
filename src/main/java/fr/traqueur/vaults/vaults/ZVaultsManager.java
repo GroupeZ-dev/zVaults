@@ -228,7 +228,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             InventoryAction action = event.getAction();
             switch (action) {
                 case PLACE_ALL -> {
-                    var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), cursor.getAmount());
+                    var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), cursor.getAmount(), event);
                     event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
                     CompatibilityUtil.setCursor(event, new ItemStack(Material.AIR));
                 }
@@ -237,7 +237,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     int amountToAdd = cursor.getAmount();
                     int newAmount = Math.min(vaultItem.item().getMaxStackSize(), vaultItem.amount() + amountToAdd);
                     int restInCursor = amountToAdd - (newAmount - vaultItem.amount());
-                    var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), newAmount - vaultItem.amount());
+                    var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), newAmount - vaultItem.amount(), event);
                     event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
                     ItemStack newCursor = this.cloneItemStack(cursor);
                     if(restInCursor == 0) {
@@ -301,7 +301,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                    CompatibilityUtil.setCursor(event,toAdd);
                 }
                 case PLACE_ONE -> {
-                    var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), 1);
+                    var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(cursor), 1, event);
                     event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
                     ItemStack newCursor = this.cloneItemStack(cursor);
                     if(cursor.getAmount() - 1 == 0) {
@@ -330,7 +330,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     return;
                 }
                 VaultItem vaultItem = vault.getInSlot(slotToAdd);
-                var newVaultItem = this.addToVaultItem(user, vault, vaultItem, current, current.getAmount());
+                var newVaultItem = this.addToVaultItem(user, vault, vaultItem, current, current.getAmount(), event);
                 event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
                 event.setCurrentItem(new ItemStack(Material.AIR));
             }
@@ -348,7 +348,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                     ItemStack virtual = virtualInv.getItem(i);
                     ItemStack real = event.getInventory().getItem(i);
                     if(this.isDifferent(virtual, real, true)) {
-                        var newVaultItem = this.addToVaultItem(user, vault, new VaultItem(new ItemStack(Material.AIR), 1, i), virtual, virtual.getAmount());
+                        var newVaultItem = this.addToVaultItem(user, vault, new VaultItem(new ItemStack(Material.AIR), 1, i), virtual, virtual.getAmount(), event);
                         event.getInventory().setItem(i, newVaultItem.toItem(player, vault.isInfinite()));
                     }
                 }
@@ -406,7 +406,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             }
         } else {
             if(vaultItem.isEmpty() && hotbarItem != null && !hotbarItem.getType().isAir()) {
-                var newVaultItem = this.addToVaultItem(user, vault, new VaultItem(new ItemStack(Material.AIR), 1, slot), hotbarItem, hotbarItem.getAmount());
+                var newVaultItem = this.addToVaultItem(user, vault, new VaultItem(new ItemStack(Material.AIR), 1, slot), hotbarItem, hotbarItem.getAmount(),event);
                 event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
                 player.getInventory().setItem(event.getHotbarButton(), new ItemStack(Material.AIR));
             } else if(!vaultItem.isEmpty() && (hotbarItem == null || hotbarItem.getType().isAir())) {
@@ -418,7 +418,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             } else if (hotbarItem != null && !this.isDifferent(this.cloneItemStack(vaultItem.item()), hotbarItem, false)) {
                 int newAmount = Math.min(vaultItem.amount() + hotbarItem.getAmount(), vaultItem.item().getMaxStackSize());
                 int rest = hotbarItem.getAmount() - (newAmount - vaultItem.amount());
-                var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(hotbarItem), newAmount - vaultItem.amount());
+                var newVaultItem = this.addToVaultItem(user, vault, vaultItem, this.cloneItemStack(hotbarItem), newAmount - vaultItem.amount(), event);
                 event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
                 ItemStack newHotbarItem = this.cloneItemStack(hotbarItem);
                 if(rest == 0) {
@@ -582,7 +582,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     private void switchWithCursor(InventoryClickEvent event, Player player, ItemStack cursor, int slot, Vault vault, User user, VaultItem vaultItem) {
-        var newVaultItem = this.addToVaultItem(user, vault, new VaultItem(new ItemStack(Material.AIR), 1, slot), cursor, cursor.getAmount());
+        var newVaultItem = this.addToVaultItem(user, vault, new VaultItem(new ItemStack(Material.AIR), 1, slot), cursor, cursor.getAmount(), event);
         event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
         ItemStack toAdd = this.cloneItemStack(vaultItem.item());
         toAdd.setAmount(vaultItem.amount());
@@ -594,7 +594,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         VaultItem vaultItem;
         int slotToAdd = this.findCorrespondingSlot(event.getInventory(), hotbarItem, vault);
         vaultItem = vault.getInSlot(slotToAdd);
-        var newVaultItem = this.addToVaultItem(user, vault, vaultItem, hotbarItem, hotbarItem.getAmount());
+        var newVaultItem = this.addToVaultItem(user, vault, vaultItem, hotbarItem, hotbarItem.getAmount(), event);
         event.getInventory().setItem(slotToAdd, newVaultItem.toItem(player, vault.isInfinite()));
         player.getInventory().setItem(event.getHotbarButton(), new ItemStack(Material.AIR));
     }
@@ -605,7 +605,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     private void addItem(InventoryClickEvent event, Player player, int slot, Vault vault, VaultItem vaultItem, ItemStack cursor, int amountToAdd) {
         User user = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId()).orElseThrow();
-        var newVaultItem = this.addToVaultItem(user, vault, vaultItem, cursor, amountToAdd);
+        var newVaultItem = this.addToVaultItem(user, vault, vaultItem, cursor, amountToAdd, event);
         event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
         int newAmount = cursor.getAmount() - amountToAdd;
         if(newAmount == 0) {
@@ -647,11 +647,35 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         return newVaultItem;
     }
 
-    private VaultItem addToVaultItem(User user, Vault vault, VaultItem vaultItem, ItemStack cursor, int amount) {
+    private VaultItem addToVaultItem(User user, Vault vault, VaultItem vaultItem, ItemStack cursor, int amount, InventoryClickEvent event) {
+        int maxStackSize = this.getMaxStackSize(vault, cursor);
+        int remainingAmount = amount;
         int currentAmount = vaultItem.isEmpty() ? 0 : vaultItem.amount();
-        VaultItem newVaultItem = new VaultItem(vaultItem.isEmpty() ? cursor : vaultItem.item(), currentAmount + amount, vaultItem.slot());
-        vault.setContent(vault.getContent().stream().map(item -> item.slot() == newVaultItem.slot() ? newVaultItem : item).collect(Collectors.toList()));
+
+        // Add to current slot up to max stack size
+        int amountToAddInCurrent = Math.min(maxStackSize - currentAmount, remainingAmount);
+        VaultItem newVaultItem = new VaultItem(vaultItem.isEmpty() ? cursor : vaultItem.item(), currentAmount + amountToAddInCurrent, vaultItem.slot());
+        vault.setContent(vault.getContent().stream().map(v -> v.slot() == newVaultItem.slot() ? newVaultItem : v).collect(Collectors.toList()));
         this.sendUpdate(user, vault, newVaultItem);
+
+        remainingAmount -= amountToAddInCurrent;
+        if (remainingAmount <= 0) {
+            return newVaultItem;
+        }
+
+        // Add remaining amount in other empty slots
+        for (VaultItem slot : vault.getContent()) {
+            if (slot.isEmpty()) {
+                int amountToAdd = Math.min(maxStackSize, remainingAmount);
+                VaultItem additionalVaultItem = new VaultItem(cursor, amountToAdd, slot.slot());
+                vault.setContent(vault.getContent().stream().map(v -> v.slot() == additionalVaultItem.slot() ? additionalVaultItem : v).collect(Collectors.toList()));
+                this.sendUpdate(user, vault, additionalVaultItem);
+                event.getInventory().setItem(slot.slot(), additionalVaultItem.toItem(user.getPlayer(), vault.isInfinite()));
+                remainingAmount -= amountToAdd;
+                if (remainingAmount <= 0) break;
+            }
+        }
+
         return newVaultItem;
     }
 
