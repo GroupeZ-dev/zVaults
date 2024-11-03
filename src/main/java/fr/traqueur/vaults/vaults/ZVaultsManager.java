@@ -642,7 +642,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     public int addItem(Vault vault, ItemStack item) {
         VaultItem vaultItem = vault.getContent()
                 .stream()
-                .filter(vaultItem1 -> !this.isDifferent(vaultItem1.item(), item, false))
+                .filter(vaultItem1 -> vaultItem1.item().isSimilar(item))
                 .findFirst().orElseGet(() -> vault.getContent()
                         .stream()
                         .filter(VaultItem::isEmpty)

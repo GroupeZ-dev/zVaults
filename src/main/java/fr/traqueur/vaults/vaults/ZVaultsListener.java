@@ -29,12 +29,19 @@ public class ZVaultsListener implements Listener {
         if(event.getEntity().getType() != EntityType.PLAYER) return;
         Player player = (Player) event.getEntity();
         this.userManager.getUser(player.getUniqueId()).ifPresent(user ->{
-            List<Vault> vaults = this.vaultsManager.getVaults(user).stream().filter(Vault::isAutoPickup).toList();
+            List<Vault> vaults = this.vaultsManager.getVaults(user)
+                    .stream()
+                    .filter(Vault::isAutoPickup)
+                    .toList();
+
+            if(vaults.isEmpty()) {
+                return;
+            }
+
             ItemStack item = event.getItem().getItemStack();
             int remaining = item.getAmount();
             for (Vault vault : vaults) {
                 remaining = this.vaultsManager.addItem(vault, item);
-                System.out.println("remaining: " + remaining);
                 if(remaining == 0) {
                     event.setCancelled(true);
                     event.getItem().remove();
@@ -42,7 +49,6 @@ public class ZVaultsListener implements Listener {
                 }
             }
             if(remaining != 0) {
-                System.out.println("remaining: " + remaining);
                 event.setCancelled(true);
                 item.setAmount(remaining);
                 player.getInventory().addItem(item);
