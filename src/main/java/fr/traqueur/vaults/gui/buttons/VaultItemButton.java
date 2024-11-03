@@ -122,11 +122,11 @@ public class VaultItemButton extends ZButton {
             int slot = event.getRawSlot();
             int inventorySize = inventoryDefault.getSpigotInventory().getSize();
 
-            if(slot >= inventorySize && slot >= vault.getSize() && !clickType.isShiftClick() && clickType != ClickType.DOUBLE_CLICK || slot < 0) {
+            event.setCancelled(true);
+
+            if(slot >= vault.getSize() && !clickType.isShiftClick() && clickType != ClickType.DOUBLE_CLICK || slot < 0) {
                 return;
             }
-
-            event.setCancelled(true);
 
             switch (clickType) {
                 case LEFT -> this.vaultsManager.handleLeftClick(event, player, cursor, slot, vault);
