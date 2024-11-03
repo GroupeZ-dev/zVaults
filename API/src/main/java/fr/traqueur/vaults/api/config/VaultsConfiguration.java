@@ -25,4 +25,6 @@ public interface VaultsConfiguration extends Configuration {
     boolean isCloseVaultOpenChooseMenu();
 
     String getAutoPickupValue(boolean autoPickup);
+
+    int getStackSizeInfiniteVaults();
 }

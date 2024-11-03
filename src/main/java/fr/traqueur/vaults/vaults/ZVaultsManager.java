@@ -482,6 +482,44 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
+    public ItemStack cloneItemStack(ItemStack itemStack) {
+        ItemStack clone = itemStack.clone();
+        ItemMeta cloneMeta = clone.getItemMeta();
+        if(cloneMeta == null) {
+            return clone;
+        }
+        PersistentDataContainer container = cloneMeta.getPersistentDataContainer();
+        NamespacedKey key = new NamespacedKey(Bukkit.getServer().getPluginManager().getPlugin("zMenu"), DupeManager.KEY);
+        if(container.has(key)) {
+            container.remove(key);
+        }
+        clone.setItemMeta(cloneMeta);
+        return clone;
+    }
+
+    @Override
+    public int addItem(Vault vault, ItemStack item) {
+        VaultItem vaultItem = vault.getContent()
+                .stream()
+                .filter(vaultItem1 -> vaultItem1.item().isSimilar(item) && vaultItem1.amount() < this.getMaxStackSize(vault, item))
+                .findFirst().orElseGet(() -> vault.getContent()
+                        .stream()
+                        .filter(VaultItem::isEmpty)
+                        .findFirst()
+                        .orElse(null));
+        if(vaultItem == null) {
+            return item.getAmount();
+        }
+        int amount = item.getAmount();
+        int baseAmount = vaultItem.isEmpty() ? 0 : vaultItem.amount();
+        int newAmount = vault.isInfinite() ? baseAmount + amount : Math.min(vaultItem.item().getMaxStackSize(), baseAmount + amount);
+        vaultItem = new VaultItem(this.cloneItemStack(item), newAmount, vaultItem.slot());
+        VaultItem finalVaultItem = vaultItem;
+        vault.setContent(vault.getContent().stream().map(vaultItem1 -> vaultItem1.slot() == finalVaultItem.slot() ? finalVaultItem : vaultItem1).collect(Collectors.toList()));
+        return Math.max(0, amount - (newAmount - baseAmount));
+    }
+
+    @Override
     public void load() {
         this.vaultService.findAll().forEach(vault -> this.vaults.put(vault.getUniqueId(), vault));
     }
@@ -575,7 +613,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             return;
         }
         cursor.setAmount(newAmount);
-       CompatibilityUtil.setCursor(event,cursor);
+        CompatibilityUtil.setCursor(event,cursor);
     }
 
     private void removeItem(InventoryClickEvent event, Player player, int slot, Vault vault, VaultItem vaultItem, int amountToRemove) {
@@ -584,12 +622,12 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         event.getInventory().setItem(slot, newVaultItem.toItem(player, vault.isInfinite()));
         ItemStack newCursor = newVaultItem.isEmpty() ? vaultItem.item().clone() : newVaultItem.item().clone();
         newCursor.setAmount(amountToRemove);
-       CompatibilityUtil.setCursor(event,newCursor);
+        CompatibilityUtil.setCursor(event,newCursor);
     }
 
     private int findCorrespondingSlot(Inventory inventory, ItemStack correspond, Vault vault) {
         for (VaultItem vaultItem : vault.getContent()) {
-            if(correspond.isSimilar(vaultItem.item())) {
+            if(correspond.isSimilar(vaultItem.item()) && vaultItem.amount() < this.getMaxStackSize(vault, vaultItem.item())) {
                 return vaultItem.slot();
             }
         }
@@ -622,42 +660,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         Bukkit.getPluginManager().callEvent(vaultUpdateEvent);
     }
 
-    @Override
-    public ItemStack cloneItemStack(ItemStack itemStack) {
-        ItemStack clone = itemStack.clone();
-        ItemMeta cloneMeta = clone.getItemMeta();
-        if(cloneMeta == null) {
-            return clone;
-        }
-        PersistentDataContainer container = cloneMeta.getPersistentDataContainer();
-        NamespacedKey key = new NamespacedKey(Bukkit.getServer().getPluginManager().getPlugin("zMenu"), DupeManager.KEY);
-        if(container.has(key)) {
-            container.remove(key);
-        }
-        clone.setItemMeta(cloneMeta);
-        return clone;
-    }
-
-    @Override
-    public int addItem(Vault vault, ItemStack item) {
-        VaultItem vaultItem = vault.getContent()
-                .stream()
-                .filter(vaultItem1 -> vaultItem1.item().isSimilar(item))
-                .findFirst().orElseGet(() -> vault.getContent()
-                        .stream()
-                        .filter(VaultItem::isEmpty)
-                        .findFirst()
-                        .orElse(null));
-        if(vaultItem == null) {
-            return item.getAmount();
-        }
-        int amount = item.getAmount();
-        int baseAmount = vaultItem.isEmpty() ? 0 : vaultItem.amount();
-        int newAmount = vault.isInfinite() ? baseAmount + amount : Math.min(vaultItem.item().getMaxStackSize(), baseAmount + amount);
-        vaultItem = new VaultItem(this.cloneItemStack(item), newAmount, vaultItem.slot());
-        VaultItem finalVaultItem = vaultItem;
-        vault.setContent(vault.getContent().stream().map(vaultItem1 -> vaultItem1.slot() == finalVaultItem.slot() ? finalVaultItem : vaultItem1).collect(Collectors.toList()));
-        return Math.max(0, amount - (newAmount - baseAmount));
+    private int getMaxStackSize(Vault vault, ItemStack item) {
+        return vault.isInfinite() ? (vault.getMaxStackSize() == -1 ? Integer.MAX_VALUE : vault.getMaxStackSize())  : item.getMaxStackSize();
     }
 
     private void registerResolvers(OwnerResolver ownerResolver) {
@@ -666,4 +670,5 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             ownerResolver.registerOwnerType("superiorskyblock", ZSuperiorOwner.class);
         }
     }
+
 }

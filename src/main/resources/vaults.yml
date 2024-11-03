@@ -24,6 +24,8 @@ max-vaults:
 
 # Enable or disable the infinite vaults feature
 infinite-vaults: true
+# Set the stack size of the infinite vaults, or -1 for unlimited
+stack-size-infinite-vaults: -1
 
 # Set the default size of vaults
 default-size: 27

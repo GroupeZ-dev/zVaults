@@ -35,6 +35,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private final Map<String, Integer> maxVaultsByOwnerType;
     private boolean closeVaultOpenChooseMenu;
     private AutoPickupConfig autopickupValues;
+    private int stackSizeInfiniteVaults;
 
     public ZVaultsConfiguration() {
         this.vaultsIcons = new HashMap<>();
@@ -125,5 +126,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public String getAutoPickupValue(boolean autoPickup) {
         return autoPickup ? autopickupValues.trueValue() : autopickupValues.falseValue();
+    }
+
+    @Override
+    public int getStackSizeInfiniteVaults() {
+        return stackSizeInfiniteVaults;
     }
 }

@@ -45,4 +45,8 @@ public interface Vault {
     }
 
     void setAutoPickup(boolean autoPickup);
+
+    void setMaxStackSize(int maxStackSize);
+
+    int getMaxStackSize();
 }

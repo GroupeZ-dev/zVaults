@@ -1,5 +1,7 @@
 package fr.traqueur.vaults.vaults;
 
+import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
 import fr.traqueur.vaults.api.vaults.VaultOwner;
@@ -19,16 +21,17 @@ public class ZVault implements Vault {
     private Material material;
     private int size;
     private boolean autoPickup;
+    private int maxStackSize;
 
     public ZVault(VaultOwner owner, Material material, int size, boolean infinite) {
         this(UUID.randomUUID(), owner, material, size, infinite);
     }
 
     public ZVault(UUID uuid, VaultOwner owner, Material material, int size, boolean infinite) {
-        this(uuid, owner, material, new ArrayList<>(), size, infinite, false);
+        this(uuid, owner, material, new ArrayList<>(), size, infinite, false, Configuration.getConfiguration(VaultsConfiguration.class).getStackSizeInfiniteVaults());
     }
 
-    public ZVault(UUID uniqueId, VaultOwner owner, Material material, List<VaultItem> content, int size, boolean infinite, boolean autoPickup) {
+    public ZVault(UUID uniqueId, VaultOwner owner, Material material, List<VaultItem> content, int size, boolean infinite, boolean autoPickup, int maxStackSize) {
         this.uniqueId = uniqueId;
         this.owner = owner;
         this.material = material;
@@ -36,6 +39,7 @@ public class ZVault implements Vault {
         this.size = size;
         this.infinite = infinite;
         this.autoPickup = autoPickup;
+        this.maxStackSize = maxStackSize;
     }
 
     @Override
@@ -97,5 +101,15 @@ public class ZVault implements Vault {
     @Override
     public void setAutoPickup(boolean autoPickup) {
         this.autoPickup = autoPickup;
+    }
+
+    @Override
+    public void setMaxStackSize(int maxStackSize) {
+        this.maxStackSize = maxStackSize;
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return this.maxStackSize;
     }
 }

@@ -44,7 +44,12 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
             icon = Material.valueOf(vaultDTO.icon());
         }
 
-        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite(), vaultDTO.autoPickup() != null && vaultDTO.autoPickup());
+        Integer maxStackSize = vaultDTO.maxStackSize();
+        if (maxStackSize == null) {
+            maxStackSize = Configuration.getConfiguration(VaultsConfiguration.class).getStackSizeInfiniteVaults();
+        }
+
+        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite(), vaultDTO.autoPickup() != null && vaultDTO.autoPickup(), maxStackSize);
     }
 
     @Override
@@ -55,6 +60,7 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
                             serializedContent,
                             entity.getSize(),
                             entity.isInfinite(),
-                            entity.isAutoPickup());
+                            entity.isAutoPickup(),
+                            entity.getMaxStackSize());
     }
 }
