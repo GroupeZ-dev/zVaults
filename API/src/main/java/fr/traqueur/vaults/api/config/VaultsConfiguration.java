@@ -23,4 +23,6 @@ public interface VaultsConfiguration extends Configuration {
     int getMaxVaultsByOwnerType(String ownerType);
 
     boolean isCloseVaultOpenChooseMenu();
+
+    String getAutoPickupValue(boolean autoPickup);
 }

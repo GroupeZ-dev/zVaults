@@ -57,6 +57,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         this.linkedVaultToInventory = new HashMap<>();
         this.targetUserVaultsChoose = new HashMap<>();
 
+        this.getPlugin().getServer().getPluginManager().registerEvents(new ZVaultsListener(this, this.getPlugin().getManager(UserManager.class)), this.getPlugin());
+
         this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this.ownerResolver), VAULT_TABLE_NAME);
         MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
     }
@@ -634,6 +636,28 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         }
         clone.setItemMeta(cloneMeta);
         return clone;
+    }
+
+    @Override
+    public int addItem(Vault vault, ItemStack item) {
+        VaultItem vaultItem = vault.getContent()
+                .stream()
+                .filter(vaultItem1 -> !this.isDifferent(vaultItem1.item(), item, false))
+                .findFirst().orElseGet(() -> vault.getContent()
+                        .stream()
+                        .filter(VaultItem::isEmpty)
+                        .findFirst()
+                        .orElse(null));
+        if(vaultItem == null) {
+            return item.getAmount();
+        }
+        int amount = item.getAmount();
+        int baseAmount = vaultItem.isEmpty() ? 0 : vaultItem.amount();
+        int newAmount = vault.isInfinite() ? baseAmount + amount : Math.min(vaultItem.item().getMaxStackSize(), baseAmount + amount);
+        vaultItem = new VaultItem(this.cloneItemStack(item), newAmount, vaultItem.slot());
+        VaultItem finalVaultItem = vaultItem;
+        vault.setContent(vault.getContent().stream().map(vaultItem1 -> vaultItem1.slot() == finalVaultItem.slot() ? finalVaultItem : vaultItem1).collect(Collectors.toList()));
+        return Math.max(0, amount - (newAmount - baseAmount));
     }
 
     private void registerResolvers(OwnerResolver ownerResolver) {

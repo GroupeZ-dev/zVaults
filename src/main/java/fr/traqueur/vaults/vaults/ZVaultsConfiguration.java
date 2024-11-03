@@ -5,6 +5,7 @@ import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.config.AutoPickupConfig;
 import fr.traqueur.vaults.api.config.InvitePlayerMenuConfiguration;
 import fr.traqueur.vaults.api.config.NonLoadable;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
@@ -33,6 +34,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private Material openVaultDefaultMaterial;
     private final Map<String, Integer> maxVaultsByOwnerType;
     private boolean closeVaultOpenChooseMenu;
+    private AutoPickupConfig autopickupValues;
 
     public ZVaultsConfiguration() {
         this.vaultsIcons = new HashMap<>();
@@ -118,5 +120,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public boolean isCloseVaultOpenChooseMenu() {
         return closeVaultOpenChooseMenu;
+    }
+
+    @Override
+    public String getAutoPickupValue(boolean autoPickup) {
+        return autoPickup ? autopickupValues.trueValue() : autopickupValues.falseValue();
     }
 }

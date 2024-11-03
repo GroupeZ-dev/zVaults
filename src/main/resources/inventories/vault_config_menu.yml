@@ -25,6 +25,17 @@ items:
       lore:
         - ""
         - "#92bed8ᴄʟɪᴄᴋ &7ᴛᴏ ᴄʜᴀɴɢᴇ ɪᴄᴏɴ ᴏғ ᴠᴀᴜʟᴛ"
+  autopickup:
+    type: ZVAULTS_TOGGLE_AUTO_PICKUP
+    permission: "zvaults.toggle.auto_pickup"
+    slot: 14
+    refreshOnClick: true
+    item:
+      material: HOPPER
+      name: "#92bed8ᴀᴜᴛᴏ ᴘɪᴄᴋᴜᴘ"
+      lore:
+        - "#92bed8ᴄᴜʀʀᴇɴᴛʟʏ &7%autopickup%"
+        - "#92bed8ᴄʟɪᴄᴋ &7ᴛᴏ ᴛᴏɢɢʟᴇ ᴀᴜᴛᴏ ᴘɪᴄᴋᴜᴘ"
   delete:
     type: ZVAULTS_DELETE
     permission: "zvaults.delete"

@@ -49,6 +49,11 @@ vault-title:
   27: "&8ᴠᴀᴜʟᴛ 27"
   54: "&8ᴠᴀᴜʟᴛ 54"
 
+# You can specify the return value of 'autopickup' placeholder
+autopickup-values:
+  true-value: "&aᴇɴᴀʙʟᴇᴅ"
+  false-value: "&cᴅɪsᴀʙʟᴇᴅ"
+
 # You can change title, start message and try again message of the anvil gui for invite a player
 invite-player-menu:
   title: "ɪɴᴠɪᴛᴇ ᴀ ᴘʟᴀʏᴇʀ"

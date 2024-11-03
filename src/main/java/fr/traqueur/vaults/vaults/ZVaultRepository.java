@@ -44,7 +44,7 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
             icon = Material.valueOf(vaultDTO.icon());
         }
 
-        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite());
+        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite(), vaultDTO.autoPickup() != null && vaultDTO.autoPickup());
     }
 
     @Override
@@ -54,6 +54,7 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
                             entity.getIcon().name(),
                             serializedContent,
                             entity.getSize(),
-                            entity.isInfinite());
+                            entity.isInfinite(),
+                            entity.isAutoPickup());
     }
 }

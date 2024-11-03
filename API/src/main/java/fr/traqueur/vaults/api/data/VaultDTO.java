@@ -10,5 +10,6 @@ public record VaultDTO(@Column(value = "unique_id", primary = true) UUID uniqueI
                        String icon,
                        @Column(value = "content", type = "LONGTEXT") String content,
                        int size,
-                       boolean infinite) {
+                       boolean infinite,
+                       Boolean autoPickup) {
 }

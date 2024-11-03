@@ -4,6 +4,7 @@ import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.users.User;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
@@ -31,6 +32,8 @@ public interface Vault {
 
     VaultItem getInSlot(int slot);
 
+    boolean isAutoPickup();
+
     default boolean isOwner(User user) {
         return this.getOwner().hasAccess(user.getUniqueId());
     }
@@ -40,4 +43,6 @@ public interface Vault {
         ;
         return this.getOwner().hasAccess(receiver.getUniqueId()) || plugin.getManager(VaultConfigurationManager.class).hasAccess(this, receiver);
     }
+
+    void setAutoPickup(boolean autoPickup);
 }
