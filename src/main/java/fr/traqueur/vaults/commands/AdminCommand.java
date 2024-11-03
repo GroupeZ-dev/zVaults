@@ -7,10 +7,7 @@ import fr.traqueur.vaults.api.commands.VCommand;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.vaults.SizeMode;
-import fr.traqueur.vaults.commands.admin.CreateCommand;
-import fr.traqueur.vaults.commands.admin.GrowSizeCommand;
-import fr.traqueur.vaults.commands.admin.OpenCommand;
-import fr.traqueur.vaults.commands.admin.SetSizeCommand;
+import fr.traqueur.vaults.commands.admin.*;
 import org.bukkit.command.CommandSender;
 
 public class AdminCommand extends VCommand {
@@ -23,7 +20,7 @@ public class AdminCommand extends VCommand {
             this.addSubCommand(new GrowSizeCommand(plugin), new SetSizeCommand(plugin));
         }
 
-        this.addSubCommand(new CreateCommand(plugin), new OpenCommand(plugin));
+        this.addSubCommand(new CreateCommand(plugin), new OpenCommand(plugin), new SetStackLimitCommand(plugin));
     }
 
     @Override

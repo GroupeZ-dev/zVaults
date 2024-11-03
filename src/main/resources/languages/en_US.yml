@@ -24,8 +24,11 @@ successfully_removed_access_to_vault: "<green>Successfully removed access to %pl
 item_cant_be_null: "<red>The item in your and can't be empty."
 vault_icon_change: "<green>Vault icon changed to <yellow>%new_icon%<green>."
 vault_deleted: "<green>Vault deleted."
+vault_not_infinite: "<red>This vault is not infinite."
+stacklimit_set: "<green>Stack limit set to %stacklimit%."
 
 set_size_command_description: "Set the size of a vault."
 grow_size_command_description: "Grow the size of a vault."
 create_command_description: "Create a new vault."
 open_command_description: "Open a vault."
+stacklimit_command_description: "Set the stack limit of a vault."
