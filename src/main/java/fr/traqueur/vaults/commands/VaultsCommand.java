@@ -1,12 +1,10 @@
 package fr.traqueur.vaults.commands;
 
 import fr.traqueur.commands.api.Arguments;
-import fr.traqueur.commands.api.Command;
 import fr.traqueur.vaults.api.VaultsPlugin;
-import fr.traqueur.vaults.api.commands.VCommand;
+import fr.traqueur.vaults.api.commands.VaultCommand;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
-import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
@@ -19,7 +17,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.Optional;
 
-public class VaultsCommand extends VCommand {
+public class VaultsCommand extends VaultCommand {
 
     private final UserManager userManager;
     private final VaultsManager vaultsManager;
@@ -34,7 +32,7 @@ public class VaultsCommand extends VCommand {
 
         this.addAlias(Configuration.getConfiguration(MainConfiguration.class).getAliases().toArray(new String[0]));
 
-        this.addOptinalArgs("vault:int", (sender) -> List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"));
+        this.addOptionalArgs("vault:int", (sender, args) -> List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"));
 
         this.setGameOnly(true);
     }

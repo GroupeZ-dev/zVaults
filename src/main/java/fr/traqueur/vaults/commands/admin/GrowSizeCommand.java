@@ -1,9 +1,8 @@
 package fr.traqueur.vaults.commands.admin;
 
 import fr.traqueur.commands.api.Arguments;
-import fr.traqueur.commands.api.Command;
 import fr.traqueur.vaults.api.VaultsPlugin;
-import fr.traqueur.vaults.api.commands.VCommand;
+import fr.traqueur.vaults.api.commands.VaultCommand;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
@@ -15,7 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class GrowSizeCommand extends VCommand {
+public class GrowSizeCommand extends VaultCommand {
 
     private final UserManager userManager;
     private final VaultsManager vaultsManager;
@@ -32,8 +31,8 @@ public class GrowSizeCommand extends VCommand {
         this.setDescription(plugin.getMessageResolver().convertToLegacySectionFormat(Message.GROW_SIZE_COMMAND_DESCRIPTION.translate()));
 
         this.addArgs("receiver:user");
-        this.addArgs("vault_num:int", (sender) -> this.vaultsManager.getNumVaultsTabulation());
-        this.addOptinalArgs("size:int", (sender) -> List.of("9", "18", "27"));
+        this.addArgs("vault_num:int", (sender, args) -> this.vaultsManager.getNumVaultsTabulation());
+        this.addOptionalArgs("size:int", (sender, args) -> List.of("9", "18", "27"));
         this.setGameOnly(true);
     }
 

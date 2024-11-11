@@ -108,6 +108,25 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
+    public void convertVault(UUID playerOwner, int size, boolean infinite, List<ItemStack> content, Material icon) {
+        ZPlayerOwner owner = new ZPlayerOwner(playerOwner);
+        Vault vault = new ZVault(owner, icon, size, infinite);
+        List<VaultItem> vaultItems = new ArrayList<>();
+        for (int i = 0; i < content.size(); i++) {
+            VaultItem item;
+            if(content.get(i) == null) {
+               item = new VaultItem(new ItemStack(Material.AIR), 1, i);
+            } else {
+                item = new VaultItem(content.get(i), 1, i);
+            }
+            vaultItems.add(item);
+        }
+        vault.setContent(vaultItems);
+        this.vaults.put(vault.getUniqueId(), vault);
+        this.saveVault(vault);
+    }
+
+    @Override
     public void closeVault(User user, Vault vault) {
         this.openedVaults.computeIfAbsent(vault.getUniqueId(), k -> new ArrayList<>()).remove(user.getUniqueId());
         if(this.openedVaults.getOrDefault(vault.getUniqueId(), Collections.emptyList()).isEmpty()) {

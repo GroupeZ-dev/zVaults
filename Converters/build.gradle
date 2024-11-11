@@ -1,0 +1,7 @@
+group 'Converters'
+
+allprojects {
+    dependencies {
+        implementation project(":API")
+    }
+}

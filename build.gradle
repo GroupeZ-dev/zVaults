@@ -60,9 +60,9 @@ allprojects {
         compileOnly "net.kyori:adventure-api:4.17.0"
         compileOnly "net.kyori:adventure-platform-bukkit:4.3.4"
 
-        implementation 'com.github.Maxlego08:Sarah:1.12'
+        implementation 'com.github.Maxlego08:Sarah:1.12.2'
         implementation "com.github.technicallycoded:FoliaLib:main-SNAPSHOT"
-        implementation "com.github.Traqueur-dev:CommandsAPI:1.5.1"
+        implementation "com.github.Traqueur-dev:CommandsAPI:2.0.0"
         implementation "net.wesjd:anvilgui:1.10.2-SNAPSHOT"
         implementation "org.bstats:bstats-bukkit:3.0.2"
 
@@ -76,6 +76,9 @@ dependencies {
         implementation project(subproject.path)
     }
     implementation(project(':Distributed'))
+    rootProject.subprojects.findAll { it.path.startsWith(':Converters:') }.each { subproject ->
+        implementation project(subproject.path)
+    }
 }
 
 shadowJar {

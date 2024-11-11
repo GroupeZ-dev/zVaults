@@ -5,6 +5,7 @@ import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -24,6 +25,8 @@ public interface VaultsManager extends Manager {
     void linkVaultToInventory(User user, InventoryDefault inventory);
 
     Vault getOpenedVault(User user);
+
+    void convertVault(UUID playerOwner, int size, boolean infinite, List<ItemStack> content, Material icon);
 
     void closeVault(User user, Vault vault);
 
