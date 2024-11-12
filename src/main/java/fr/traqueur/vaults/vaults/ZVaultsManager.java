@@ -117,7 +117,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             if(content.get(i) == null) {
                item = new VaultItem(new ItemStack(Material.AIR), 1, i);
             } else {
-                item = new VaultItem(content.get(i), 1, i);
+                item = new VaultItem(content.get(i), content.get(i).getAmount(), i);
             }
             vaultItems.add(item);
         }

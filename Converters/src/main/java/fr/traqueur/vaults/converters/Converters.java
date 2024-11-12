@@ -10,6 +10,7 @@ public enum Converters {
     AXVAULTS("AxVaults", AxVaultsConverter.class),
     PLAYERVAULTX("PlayerVaults", PlayerVaultXConverter.class),
     ENDERVAULTS("EnderVaults", EnderVaultsConverter.class),
+    COCOVAULTS("CocoVaults-Lite", CocoVaultsConverter.class),
     ;
 
     private final String name;

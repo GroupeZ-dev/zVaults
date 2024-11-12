@@ -13,6 +13,7 @@ dependencies {
     compileOnly('com.drtshock:PlayerVaultsX:4.2.15') {
         exclude group: 'org.kitteh'
     }
+    compileOnly files('libs/CocoVaults-Lite-1.2.1.jar')
     compileOnly files('libs/AxVaults-2.3.0.jar')
     compileOnly files('libs/EnderVaults-Bukkit-v1.1.1.jar')
 }
