@@ -15,7 +15,7 @@ public class ConvertCommand extends VaultCommand {
     public ConvertCommand(VaultsPlugin plugin) {
         super(plugin, "convert");
 
-        this.addArgs("plugin", Converters.class, ((commandSender, list) -> Arrays.stream(Converters.values()).filter(Converters::isEnable).map(Converters::getName).toList()));
+        this.addArgs("plugin", Converters.class, ((commandSender, list) -> Arrays.stream(Converters.values()).filter(Converters::isEnable).map(Converters::name).toList()));
 
         this.setPermission("zvaults.admin.convert");
         this.setUsage("/vaults convert <plugin>");

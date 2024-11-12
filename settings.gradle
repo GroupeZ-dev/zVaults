@@ -5,6 +5,4 @@ include 'Hooks:SuperiorSkyblock'
 findProject(':Hooks:SuperiorSkyblock')?.name = 'SuperiorSkyblock'
 include 'Distributed'
 include 'Converters'
-include 'Converters:AxVaults'
-findProject(':Converters:AxVaults')?.name = 'AxVaults'
 

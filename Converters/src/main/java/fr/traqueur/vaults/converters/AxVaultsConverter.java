@@ -16,7 +16,7 @@ public class AxVaultsConverter implements Converter {
     @Override
     public void convert() {
 
-        VaultsManager vaultsManager = this.getPlugin().getManager(VaultsManager.class);
+        VaultsManager vaultsManager = this.getManager();
 
         for (Vault vault : VaultManager.getVaults().stream()
                 .filter(v -> Arrays.stream(v.getStorage().getContents()).anyMatch(Objects::nonNull)).toList()) {

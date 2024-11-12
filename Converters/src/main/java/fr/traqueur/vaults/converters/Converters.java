@@ -8,6 +8,8 @@ import java.lang.reflect.InvocationTargetException;
 public enum Converters {
 
     AXVAULTS("AxVaults", AxVaultsConverter.class),
+    PLAYERVAULTX("PlayerVaults", PlayerVaultXConverter.class),
+    ENDERVAULTS("EnderVaults", EnderVaultsConverter.class),
     ;
 
     private final String name;

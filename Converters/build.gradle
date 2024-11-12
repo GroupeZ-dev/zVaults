@@ -1,7 +1,18 @@
 group 'Converters'
 
-allprojects {
-    dependencies {
-        implementation project(":API")
+repositories {
+    maven{
+        name = 'ender-repo'
+        url = 'https://ci.ender.zone/plugin/repository/everything/'
     }
+}
+
+dependencies {
+    implementation project(":API")
+
+    compileOnly('com.drtshock:PlayerVaultsX:4.2.15') {
+        exclude group: 'org.kitteh'
+    }
+    compileOnly files('libs/AxVaults-2.3.0.jar')
+    compileOnly files('libs/EnderVaults-Bukkit-v1.1.1.jar')
 }

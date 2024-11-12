@@ -1,5 +1,0 @@
-group 'AxVaults'
-
-dependencies {
-    compileOnly files('libs/AxVaults-2.3.0.jar')
-}

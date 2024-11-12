@@ -76,9 +76,7 @@ dependencies {
         implementation project(subproject.path)
     }
     implementation(project(':Distributed'))
-    rootProject.subprojects.findAll { it.path.startsWith(':Converters:') }.each { subproject ->
-        implementation project(subproject.path)
-    }
+    implementation(project(':Converters'))
 }
 
 shadowJar {
