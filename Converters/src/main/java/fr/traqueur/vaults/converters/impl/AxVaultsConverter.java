@@ -1,4 +1,4 @@
-package fr.traqueur.vaults.converters;
+package fr.traqueur.vaults.converters.impl;
 
 import com.artillexstudios.axvaults.vaults.Vault;
 import com.artillexstudios.axvaults.vaults.VaultManager;

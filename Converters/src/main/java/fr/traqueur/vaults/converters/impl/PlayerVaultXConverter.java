@@ -1,4 +1,4 @@
-package fr.traqueur.vaults.converters;
+package fr.traqueur.vaults.converters.impl;
 
 import com.drtshock.playervaults.PlayerVaults;
 import com.drtshock.playervaults.vaultmanagement.CardboardBoxSerialization;
@@ -6,7 +6,6 @@ import com.drtshock.playervaults.vaultmanagement.VaultManager;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.converters.Converter;
-import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;

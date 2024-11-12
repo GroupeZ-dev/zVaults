@@ -1,4 +1,4 @@
-package fr.traqueur.vaults.converters;
+package fr.traqueur.vaults.converters.impl;
 
 import fr.traqueur.vaults.api.converters.Converter;
 import fr.traqueur.vaults.api.vaults.VaultsManager;

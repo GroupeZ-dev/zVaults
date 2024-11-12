@@ -1,9 +1,7 @@
-package fr.traqueur.vaults.converters;
+package fr.traqueur.vaults.converters.impl;
 
 import com.github.dig.endervaults.api.EnderVaultsPlugin;
 import com.github.dig.endervaults.api.VaultPluginProvider;
-import com.github.dig.endervaults.api.vault.Vault;
-import com.github.dig.endervaults.api.vault.VaultPersister;
 import com.github.dig.endervaults.api.vault.VaultRegistry;
 import com.github.dig.endervaults.api.vault.metadata.VaultDefaultMetadata;
 import com.github.dig.endervaults.bukkit.vault.BukkitVault;

@@ -1,6 +1,7 @@
 package fr.traqueur.vaults.converters;
 
 import fr.traqueur.vaults.api.converters.Converter;
+import fr.traqueur.vaults.converters.impl.*;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
