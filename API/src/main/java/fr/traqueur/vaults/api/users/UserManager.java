@@ -22,4 +22,6 @@ public interface UserManager extends Manager {
     void saveUser(User user);
 
     List<User> getUsers();
+
+    void tryCreateDefaultVaults(User user);
 }

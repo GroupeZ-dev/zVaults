@@ -30,6 +30,14 @@ stack-size-infinite-vaults: -1
 # Set the default size of vaults
 default-size: 27
 
+first-join-give-vault:
+    enabled: true
+    vaults:
+      - size: 27
+        infinite: false
+      - size: 54
+        infinite: true
+
 # Vault size management mode. Options:
 # - DEFAULT: All vaults have the same size. It is not possible to create vaults of different sizes.
 # - MIN_SIZE: Each vault has a configurable size but cannot be smaller than 'default_size'.

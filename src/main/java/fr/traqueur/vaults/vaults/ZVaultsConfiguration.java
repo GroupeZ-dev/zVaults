@@ -5,10 +5,7 @@ import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.traqueur.vaults.api.VaultsPlugin;
-import fr.traqueur.vaults.api.config.AutoPickupConfig;
-import fr.traqueur.vaults.api.config.InvitePlayerMenuConfiguration;
-import fr.traqueur.vaults.api.config.NonLoadable;
-import fr.traqueur.vaults.api.config.VaultsConfiguration;
+import fr.traqueur.vaults.api.config.*;
 import fr.traqueur.vaults.api.vaults.SizeMode;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ZVaultsConfiguration implements VaultsConfiguration {
 
@@ -36,6 +34,8 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private boolean closeVaultOpenChooseMenu;
     private AutoPickupConfig autopickupValues;
     private int stackSizeInfiniteVaults;
+    @NonLoadable
+    private FirstJoinConfig firstJoinGiveVault;
 
     public ZVaultsConfiguration() {
         this.vaultsIcons = new HashMap<>();
@@ -69,6 +69,16 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
         config.getConfigurationSection("max-vaults").getKeys(false).forEach(key -> {
             this.maxVaultsByOwnerType.put(key, config.getInt("max-vaults." + key));
         });
+
+        boolean enabled = config.getBoolean("first-join-give-vault.enabled");
+
+        var presets = config.getMapList("first-join-give-vault.vaults").stream().map(map -> {
+            boolean infinite = Boolean.parseBoolean(map.get("infinite").toString());
+            int size = Integer.parseInt(map.get("size").toString());
+            return new VaultPreset(size, infinite);
+        }).collect(Collectors.toList());
+
+        this.firstJoinGiveVault = new FirstJoinConfig(enabled, presets);
 
         this.load = true;
     }
@@ -131,5 +141,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public int getStackSizeInfiniteVaults() {
         return stackSizeInfiniteVaults;
+    }
+
+    @Override
+    public FirstJoinConfig getFirstJoinGiveVault() {
+        return firstJoinGiveVault;
     }
 }

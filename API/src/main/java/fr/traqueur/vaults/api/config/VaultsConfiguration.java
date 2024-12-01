@@ -27,4 +27,6 @@ public interface VaultsConfiguration extends Configuration {
     String getAutoPickupValue(boolean autoPickup);
 
     int getStackSizeInfiniteVaults();
+
+    FirstJoinConfig getFirstJoinGiveVault();
 }

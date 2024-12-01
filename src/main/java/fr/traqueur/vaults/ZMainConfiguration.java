@@ -4,6 +4,7 @@ import dev.dejvokep.boostedyaml.YamlDocument;
 import fr.maxlego08.sarah.DatabaseConfiguration;
 import fr.maxlego08.sarah.database.DatabaseType;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.config.FirstJoinConfig;
 import fr.traqueur.vaults.api.config.MainConfiguration;
 import fr.traqueur.vaults.api.config.NonLoadable;
 import fr.traqueur.vaults.api.distributed.RedisConnectionConfig;

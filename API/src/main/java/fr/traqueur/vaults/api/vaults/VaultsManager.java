@@ -32,7 +32,7 @@ public interface VaultsManager extends Manager {
 
     void openVault(User user, Vault vault);
 
-    void createVault(User creator, VaultOwner owner, int size, int maxVaults, boolean infinite);
+    void createVault(User creator, VaultOwner owner, int size, int maxVaults, boolean infinite, boolean silent);
 
     void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite);
 

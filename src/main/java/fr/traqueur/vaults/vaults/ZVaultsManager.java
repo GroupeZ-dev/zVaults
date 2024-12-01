@@ -140,10 +140,12 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public void createVault(User creator, VaultOwner owner, int size, int playerVaults, boolean infinite) {
+    public void createVault(User creator, VaultOwner owner, int size, int playerVaults, boolean infinite, boolean silent) {
         var vaults = this.getVaults(owner.getUniqueId());
         if(playerVaults != -1 &&  vaults.size() >= playerVaults) {
-            creator.sendMessage(Message.MAX_VAULTS_REACHED);
+            if(!silent) {
+                creator.sendMessage(Message.MAX_VAULTS_REACHED);
+            }
             return;
         }
         Vault vault = new ZVault(owner, this.configuration.getVaultIcon(), size, infinite);
@@ -156,8 +158,10 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         vaults.add(vault);
         this.vaultService.save(vault);
         this.vaults.put(vault.getUniqueId(), vault);
-        creator.sendMessage(Message.VAULT_CREATED);
-        owner.sendMessage(Message.RECEIVE_NEW_VAULT);
+        if(!silent) {
+            creator.sendMessage(Message.VAULT_CREATED);
+            owner.sendMessage(Message.RECEIVE_NEW_VAULT);
+        }
         VaultCreateEvent event = new VaultCreateEvent(this.getPlugin(), creator, vault);
         Bukkit.getPluginManager().callEvent(event);
     }

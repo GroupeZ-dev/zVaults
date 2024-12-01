@@ -1,11 +1,17 @@
 package fr.traqueur.vaults.users;
 
 import fr.maxlego08.sarah.MigrationManager;
+import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.FirstJoinConfig;
+import fr.traqueur.vaults.api.config.VaultPreset;
+import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.data.UserDTO;
 import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
+import fr.traqueur.vaults.api.vaults.VaultOwner;
+import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.storage.migrations.UserMigration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -70,6 +76,20 @@ public class ZUserManager implements UserManager, Saveable {
         return new ArrayList<>(this.users.values());
     }
 
+    @Override
+    public void tryCreateDefaultVaults(User user) {
+        FirstJoinConfig config = Configuration.getConfiguration(VaultsConfiguration.class).getFirstJoinGiveVault();
+        if(!config.enabled()) {
+            return;
+        }
+        VaultsManager vaultsManager = this.getPlugin().getManager(VaultsManager.class);
+        VaultOwner owner = vaultsManager.generateOwner("player", user);
+        int maxVaults = Configuration.getConfiguration(VaultsConfiguration.class).getMaxVaultsByOwnerType("player");
+        for (VaultPreset vault : config.vaults()) {
+            vaultsManager.createVault(user, owner, vault.size(), maxVaults, vault.infinite(), true);
+        }
+    }
+
     private void generateUser(Player player) {
         if(this.users.containsKey(player.getUniqueId())) {
             return;
@@ -79,6 +99,9 @@ public class ZUserManager implements UserManager, Saveable {
             var user = new ZUser(player.getUniqueId(), player.getName());
             this.userService.save(user);
             this.users.put(player.getUniqueId(), user);
+
+            this.tryCreateDefaultVaults(user);
+
             return;
         }
         var user = list.getFirst();
