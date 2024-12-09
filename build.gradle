@@ -69,6 +69,16 @@ allprojects {
 
         compileOnly 'com.github.Maxlego08:zMenu-API:1.0.3.5'
     }
+
+    shadowJar {
+        dependsOn(jar)
+
+        relocate 'net.wesjd.anvilgui', 'fr.traqueur.vaults.api.anvilgui'
+        relocate 'fr.maxlego08.sarah', "fr.traqueur.vaults.api.orm"
+        relocate 'fr.traqueur.commands', 'fr.traqueur.vaults.api.commands'
+        relocate 'com.tcoded.folialib', 'fr.traqueur.vaults.api.platform.folia'
+        relocate 'org.bstats', 'fr.traqueur.vaults.api.bstats'
+    }
 }
 
 dependencies {
@@ -81,13 +91,6 @@ dependencies {
 }
 
 shadowJar {
-    dependsOn(jar)
-
-    relocate 'net.wesjd.anvilgui', 'fr.traqueur.vaults.api.anvilgui'
-    relocate 'fr.maxlego08.sarah', "fr.traqueur.vaults.api.orm"
-    relocate 'fr.traqueur.commands', 'fr.traqueur.vaults.api.commands'
-    relocate 'com.tcoded.folialib', 'fr.traqueur.vaults.api.platform.folia'
-    relocate 'org.bstats', 'fr.traqueur.vaults.api.bstats'
 
     archiveFileName = rootProject.name + "-" + rootProject.version + ".jar"
     destinationDirectory = rootProject.targetFolder

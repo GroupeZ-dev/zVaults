@@ -1,5 +1,3 @@
-group 'Converters'
-
 repositories {
     maven{
         name = 'ender-repo'

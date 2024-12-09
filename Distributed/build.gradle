@@ -1,5 +1,3 @@
-group "Distributed"
-
 dependencies {
     implementation project(":API")
     compileOnly 'redis.clients:jedis:5.2.0'

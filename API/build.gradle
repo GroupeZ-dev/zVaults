@@ -2,8 +2,6 @@ plugins {
     id 'maven-publish'
 }
 
-group 'API'
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
