@@ -2,6 +2,7 @@
 .idea/
 personal.properties
 target/
+target-api/
 
 *.iml
 *.ipr
