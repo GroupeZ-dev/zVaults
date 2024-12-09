@@ -18,6 +18,7 @@ if (propertiesFile.exists()) {
 
 project.ext {
     targetFolder = file('target')
+    apiFolder = file('target-api')
 }
 
 allprojects {
@@ -95,6 +96,10 @@ shadowJar {
 tasks.register('copyFiles', Copy) {
     from "${rootProject.targetFolder}"
     into rootProject.testFolder
+}
+
+tasks.register('publish') {
+    dependsOn ':API:publish'
 }
 
 if(propertiesFile.exists()) {

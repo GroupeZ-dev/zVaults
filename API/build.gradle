@@ -1,4 +1,20 @@
+plugins {
+    id 'maven-publish'
+}
+
 group 'API'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+shadowJar {
+    destinationDirectory = rootProject.apiFolder
+}
 
 dependencies {
     compileOnly 'redis.clients:jedis:5.2.0'
