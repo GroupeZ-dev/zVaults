@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ZUserManager implements UserManager, Saveable {
 
+    public static final User CONSOLE_USER = new ZUser(UUID.fromString("00000000-0000-0000-0000-000000000000"), "CONSOLE");
+
     private final Service<User, UserDTO> userService;
     private final Map<UUID, User> users;
 

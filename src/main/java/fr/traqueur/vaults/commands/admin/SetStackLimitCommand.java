@@ -10,6 +10,7 @@ import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
+import fr.traqueur.vaults.users.ZUserManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -33,12 +34,16 @@ public class SetStackLimitCommand extends VaultCommand {
         this.addArgs("receiver:user");
         this.addArgs("vault_num:int", (sender, args) -> this.vaultsManager.getNumVaultsTabulation());
         this.addOptionalArgs("stacklimit:int", (sender,args) -> List.of("64", "128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608", "16777216", "33554432", "67108864", "134217728", "268435456", "536870912", "1073741824", "2147483647"));
-        this.setGameOnly(true);
     }
 
     @Override
     public void execute(CommandSender commandSender, Arguments arguments) {
-        User user = this.userManager.getUser(((Player) commandSender).getUniqueId()).orElseThrow();
+        User user;
+        if(!(commandSender instanceof Player)) {
+            user = ZUserManager.CONSOLE_USER;
+        } else {
+            user = this.userManager.getUser(((Player) commandSender).getUniqueId()).orElseThrow();
+        }
         User receiver = arguments.get("receiver");
         int size = arguments.get("stacklimit");
         int vaultNum = arguments.get("vault_num");

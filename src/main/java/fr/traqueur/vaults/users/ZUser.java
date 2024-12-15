@@ -4,6 +4,7 @@ import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
 import fr.traqueur.vaults.api.users.User;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,6 +36,11 @@ public class ZUser implements User {
 
     @Override
     public void sendMessage(Message message, Formatter... formatters) {
+        if(this.uuid.equals(UUID.fromString("00000000-0000-0000-0000-000000000000"))) {
+            JavaPlugin.getPlugin(VaultsPlugin.class).getMessageResolver().sendMessage(Bukkit.getConsoleSender(),message.translate(formatters));
+            return;
+        }
+
         var player = this.getPlayer();
         if (player != null) {
             JavaPlugin.getPlugin(VaultsPlugin.class).getMessageResolver().sendMessage(player, message.translate(formatters));

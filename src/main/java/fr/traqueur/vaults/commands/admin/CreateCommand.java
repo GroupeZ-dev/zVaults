@@ -11,6 +11,7 @@ import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.VaultOwner;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
+import fr.traqueur.vaults.users.ZUserManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -37,12 +38,16 @@ public class CreateCommand extends VaultCommand {
             this.addArgs("infinite:boolean");
         }
         this.addOptionalArgs("type:ownerType");
-        this.setGameOnly(true);
     }
 
     @Override
     public void execute(CommandSender commandSender, Arguments arguments) {
-        User user = this.userManager.getUser(((Player) commandSender).getUniqueId()).orElseThrow();
+        User user;
+        if(!(commandSender instanceof Player)) {
+            user = ZUserManager.CONSOLE_USER;
+        } else {
+            user = this.userManager.getUser(((Player) commandSender).getUniqueId()).orElseThrow();
+        }
         User receiver = arguments.get("receiver");
         int size = arguments.get("size");
         Optional<String> opt = arguments.getOptional("type");
