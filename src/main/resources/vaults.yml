@@ -65,10 +65,16 @@ autopickup-values:
   true-value: "&aᴇɴᴀʙʟᴇᴅ"
   false-value: "&cᴅɪsᴀʙʟᴇᴅ"
 
-# You can change title, start message and try again message of the anvil gui for invite a player
+# You can change title, start message and try again message of the anvil gui to invite a player
 invite-player-menu:
   title: "ɪɴᴠɪᴛᴇ ᴀ ᴘʟᴀʏᴇʀ"
   start-message: "Enter player name"
+  try-again-message: "Try Again"
+
+# You can change title, start message and try again message of the anvil gui to change vault name
+change-name-menu:
+  title: "ᴄʜᴀɴɢᴇ ʏᴏᴜʀ ɴᴀᴍᴇ"
+  start-message: "Enter new name"
   try-again-message: "Try Again"
 
 # These lines represent all pagination items used in the menus

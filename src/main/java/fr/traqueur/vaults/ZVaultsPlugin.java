@@ -210,6 +210,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         buttonManager.register(new NoneLoader(this, VaultCloseButton.class, "zvaults_vault_close"));
         buttonManager.register(new NoneLoader(this, VaultAccessManagerCloseButton.class, "zvaults_access_manager_close"));
         buttonManager.register(new NoneLoader(this, VaultConfiguratorCloseButton.class, "zvaults_vault_config_close"));
+        buttonManager.register(new NoneLoader(this, VaultNameModifierButton.class, "zvaults_name_modifier"));
         buttonManager.register(new ManipulationSizeButtonLoader(this, SetSizeButton.class, "zvaults_set_size"));
         buttonManager.register(new ManipulationSizeButtonLoader(this, GrowSizeButton.class, "zvaults_grow_size"));
 

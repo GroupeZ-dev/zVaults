@@ -3,6 +3,7 @@ package fr.traqueur.vaults.api.configurator;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.vaults.Vault;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,4 +37,6 @@ public interface VaultConfigurationManager extends Manager {
     void delete(Vault vault);
 
     void addSharedAccess(UUID uniqueId, User user, Vault vault);
+
+    void openNameModifier(User user, Vault vault);
 }

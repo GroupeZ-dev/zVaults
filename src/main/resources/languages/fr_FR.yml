@@ -26,6 +26,8 @@ vault_icon_change: "<green>Icone du coffre changée pour <yellow>%new_icon%<gree
 vault_deleted: "<green>Coffre supprimé."
 vault_not_infinite: "<red>Ce coffre n'est pas infini."
 stacklimit_set: "<green>Limite de stack définie à %stacklimit%."
+vault_name_already_set: "<red>Le nom du coffre est déjà celui qui vous avez écrit."
+vault_name_changed: "<green>Nom du coffre changé pour <yellow>%name%<green>."
 
 plugin_to_convert_not_enable: "<red>Le plugin que vous essayez de convertir n'est pas activé."
 convert_command_success: "<green>Plugin %plugin% converti avec succès."

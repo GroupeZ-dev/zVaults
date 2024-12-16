@@ -2,7 +2,7 @@ package fr.traqueur.vaults.configurator;
 
 import fr.maxlego08.sarah.MigrationManager;
 import fr.traqueur.vaults.api.config.Configuration;
-import fr.traqueur.vaults.api.config.InvitePlayerMenuConfiguration;
+import fr.traqueur.vaults.api.config.AnvilMenuConfiguration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.configurator.ShareType;
 import fr.traqueur.vaults.api.configurator.SharedAccess;
@@ -70,7 +70,7 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
     @Override
     public void openInvitationMenu(User user, Vault vault) {
         this.closeVaultConfig(user);
-        InvitePlayerMenuConfiguration config = Configuration.get(VaultsConfiguration.class).getInvitePlayerMenuConfiguration();
+        AnvilMenuConfiguration config = Configuration.get(VaultsConfiguration.class).getInvitePlayerMenuConfiguration();
         UserManager userManager = this.getPlugin().getManager(UserManager.class);
         new AnvilGUI.Builder()
                 .onClick((slot, stateSnapshot) -> {
@@ -85,6 +85,29 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
                     return target.map(value -> List.of(AnvilGUI.ResponseAction.run(() -> {
                         this.addSharedAccess(user, vault, value);
                     }), AnvilGUI.ResponseAction.close())).orElseGet(() -> List.of(AnvilGUI.ResponseAction.replaceInputText(config.tryAgainMessage())));
+                })
+                .text(config.startMessage())
+                .title(config.title())
+                .plugin(this.getPlugin())
+                .open(user.getPlayer());
+    }
+
+    @Override
+    public void openNameModifier(User user, Vault vault) {
+        this.closeVaultConfig(user);
+        AnvilMenuConfiguration config = Configuration.get(VaultsConfiguration.class).getChangeNameMenu();
+        new AnvilGUI.Builder()
+                .onClick((slot, stateSnapshot) -> {
+                    if(slot != AnvilGUI.Slot.OUTPUT) {
+                        return Collections.emptyList();
+                    }
+                    String name = stateSnapshot.getText();
+                    if(name.equals(vault.getName())) {
+                        return List.of(AnvilGUI.ResponseAction.replaceInputText(Message.VAULT_NAME_ALREADY_SET.translate()));
+                    }
+                    vault.setName(name);
+                    user.sendMessage(Message.VAULT_NAME_CHANGED, Formatter.format("%name%", name));
+                    return List.of(AnvilGUI.ResponseAction.close());
                 })
                 .text(config.startMessage())
                 .title(config.title())

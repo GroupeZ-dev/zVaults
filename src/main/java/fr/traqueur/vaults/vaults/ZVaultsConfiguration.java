@@ -24,7 +24,8 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private int defaultSize;
     private boolean infiniteVaults;
     private SizeMode sizeMode;
-    private InvitePlayerMenuConfiguration invitePlayerMenu;
+    private AnvilMenuConfiguration invitePlayerMenu;
+    private AnvilMenuConfiguration changeNameMenu;
     @NonLoadable
     private final Map<String, MenuItemStack> vaultsIcons;
     @NonLoadable
@@ -115,7 +116,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     }
 
     @Override
-    public InvitePlayerMenuConfiguration getInvitePlayerMenuConfiguration() {
+    public AnvilMenuConfiguration getInvitePlayerMenuConfiguration() {
         return this.invitePlayerMenu;
     }
 
@@ -152,5 +153,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public String getDefaultVaultName() {
         return defaultVaultName;
+    }
+
+    @Override
+    public AnvilMenuConfiguration getChangeNameMenu() {
+        return changeNameMenu;
     }
 }

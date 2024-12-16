@@ -16,7 +16,7 @@ public interface VaultsConfiguration extends Configuration {
 
     String getVaultTitle(String key);
 
-    InvitePlayerMenuConfiguration getInvitePlayerMenuConfiguration();
+    AnvilMenuConfiguration getInvitePlayerMenuConfiguration();
 
     Material getVaultIcon();
 
@@ -31,4 +31,6 @@ public interface VaultsConfiguration extends Configuration {
     FirstJoinConfig getFirstJoinGiveVault();
 
     String getDefaultVaultName();
+
+    AnvilMenuConfiguration getChangeNameMenu();
 }
