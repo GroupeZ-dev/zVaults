@@ -26,9 +26,6 @@ public class VaultConfiguratorCloseButton extends ZButton {
 
     @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryDefault inventory, int slot, Placeholders placeholders) {
-        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
-            this.vaultConfigurationManager.closeVaultConfig(user);
-            this.vaultsManager.openVaultChooseMenu(user, user);
-        });
+        player.closeInventory();
     }
 }
