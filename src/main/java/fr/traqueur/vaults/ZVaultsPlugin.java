@@ -80,6 +80,8 @@ public final class ZVaultsPlugin extends VaultsPlugin {
             return;
         }
 
+        Placeholders.load(this);
+
         this.messageResolver = new MessageResolver(this);
 
         LangConfiguration langConfiguration = Configuration.registerConfiguration(LangConfiguration.class, new ZLangConfiguration(this));
@@ -130,8 +132,6 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         this.storage.onEnable();
 
         this.saveables.forEach(Saveable::load);
-
-        Placeholders.load(this);
 
         this.scheduler.runTimerAsync(() -> this.saveables.forEach(Saveable::save), 1, 1, TimeUnit.HOURS);
 
