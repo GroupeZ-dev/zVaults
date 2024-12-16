@@ -26,7 +26,7 @@ public class DeleteCommand extends Command<VaultsPlugin> {
         this.userManager = plugin.getManager(UserManager.class);
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
-        this.setPermission("vaults.command.delete");
+        this.setPermission("zvaults.admin.delete");
         this.setUsage("/zvaults admin delete <player> <vault_number>");
 
         this.addArgs("receiver:user");
