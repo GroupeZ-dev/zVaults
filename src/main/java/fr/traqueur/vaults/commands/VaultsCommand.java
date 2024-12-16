@@ -30,7 +30,7 @@ public class VaultsCommand extends VaultCommand {
 
         this.addSubCommand(new AdminCommand(plugin), new ReloadCommand(plugin));
 
-        this.addAlias(Configuration.getConfiguration(MainConfiguration.class).getAliases().toArray(new String[0]));
+        this.addAlias(Configuration.get(MainConfiguration.class).getAliases().toArray(new String[0]));
 
         this.addOptionalArgs("vault:int", (sender, args) -> List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"));
 

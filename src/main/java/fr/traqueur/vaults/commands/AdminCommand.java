@@ -15,7 +15,7 @@ public class AdminCommand extends VaultCommand {
 
         this.setPermission("zvaults.admin");
 
-        if (Configuration.getConfiguration(VaultsConfiguration.class).getSizeMode() != SizeMode.DEFAULT) {
+        if (Configuration.get(VaultsConfiguration.class).getSizeMode() != SizeMode.DEFAULT) {
             this.addSubCommand(new GrowSizeCommand(plugin), new SetSizeCommand(plugin));
         }
 

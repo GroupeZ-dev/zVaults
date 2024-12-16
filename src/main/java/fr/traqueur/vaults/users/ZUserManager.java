@@ -80,13 +80,13 @@ public class ZUserManager implements UserManager, Saveable {
 
     @Override
     public void tryCreateDefaultVaults(User user) {
-        FirstJoinConfig config = Configuration.getConfiguration(VaultsConfiguration.class).getFirstJoinGiveVault();
+        FirstJoinConfig config = Configuration.get(VaultsConfiguration.class).getFirstJoinGiveVault();
         if(!config.enabled()) {
             return;
         }
         VaultsManager vaultsManager = this.getPlugin().getManager(VaultsManager.class);
         VaultOwner owner = vaultsManager.generateOwner("player", user);
-        int maxVaults = Configuration.getConfiguration(VaultsConfiguration.class).getMaxVaultsByOwnerType("player");
+        int maxVaults = Configuration.get(VaultsConfiguration.class).getMaxVaultsByOwnerType("player");
         for (VaultPreset vault : config.vaults()) {
             vaultsManager.createVault(user, owner, vault.size(), maxVaults, vault.infinite(), true);
         }

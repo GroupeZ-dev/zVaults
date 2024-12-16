@@ -29,7 +29,7 @@ public interface Configuration {
         return configuration;
     }
 
-    static <T extends Configuration> T getConfiguration(Class<T> clazz) {
+    static <T extends Configuration> T get(Class<T> clazz) {
         var config = REGISTRY.get(clazz);
         if(clazz.isInstance(config)) {
             return clazz.cast(config);

@@ -67,7 +67,7 @@ public class UserAccessButton extends ZButton implements PaginateButton {
     }
 
     private ItemStack getItem(User user, User value) {
-        VaultsConfiguration configuration = Configuration.getConfiguration(VaultsConfiguration.class);
+        VaultsConfiguration configuration = Configuration.get(VaultsConfiguration.class);
         var menuItem = configuration.getIcon("user-access-vault-item");
         Placeholders placeholders = new Placeholders();
         placeholders.register("player_name", value.getName());

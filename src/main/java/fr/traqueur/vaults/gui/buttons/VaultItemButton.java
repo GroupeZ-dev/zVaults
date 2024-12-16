@@ -7,7 +7,6 @@ import fr.traqueur.vaults.api.VaultsPlugin;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.events.VaultUpdateEvent;
-import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultItem;
@@ -21,9 +20,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class VaultItemButton extends ZButton {
@@ -38,7 +34,7 @@ public class VaultItemButton extends ZButton {
         this.plugin = (VaultsPlugin) plugin;
         this.vaultsManager = this.plugin.getManager(VaultsManager.class);
         this.userManager =  this.plugin.getManager(UserManager.class);
-        this.configuration =  Configuration.getConfiguration(VaultsConfiguration.class);
+        this.configuration =  Configuration.get(VaultsConfiguration.class);
     }
 
     @Override
@@ -61,7 +57,7 @@ public class VaultItemButton extends ZButton {
         this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
             Vault vault = this.vaultsManager.getOpenedVault(user);
             this.vaultsManager.closeVault(user, vault);
-            if(Configuration.getConfiguration(VaultsConfiguration.class).isCloseVaultOpenChooseMenu()) {
+            if(Configuration.get(VaultsConfiguration.class).isCloseVaultOpenChooseMenu()) {
                 this.vaultsManager.openVaultChooseMenu(user, user);
             }
         });

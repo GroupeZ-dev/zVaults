@@ -33,7 +33,7 @@ public enum Message {
     public String translate(boolean legacy, Formatter... formatters) {
         VaultsPlugin plugin = JavaPlugin.getPlugin(VaultsPlugin.class);
 
-        String message = Configuration.getConfiguration(LangConfiguration.class).translate(this);
+        String message = Configuration.get(LangConfiguration.class).translate(this);
         for (Formatter formatter : formatters) {
             message = formatter.handle(plugin, message);
         }

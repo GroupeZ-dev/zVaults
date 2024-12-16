@@ -29,4 +29,6 @@ public interface VaultsConfiguration extends Configuration {
     int getStackSizeInfiniteVaults();
 
     FirstJoinConfig getFirstJoinGiveVault();
+
+    String getDefaultVaultName();
 }

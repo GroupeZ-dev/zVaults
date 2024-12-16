@@ -104,7 +104,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
             }
         });
 
-        var vaultConfig = Configuration.registerConfiguration(VaultsConfiguration.class, new ZVaultsConfiguration());
+        Configuration.registerConfiguration(VaultsConfiguration.class, new ZVaultsConfiguration());
 
         Configuration.REGISTRY.values().forEach(configuration -> {
             if(!configuration.isLoad()) {
@@ -113,7 +113,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         });
 
         UserManager userManager = this.registerManager(new ZUserManager(), UserManager.class);
-        VaultsManager vaultsManager = this.registerManager(new ZVaultsManager(vaultConfig), VaultsManager.class);
+        VaultsManager vaultsManager = this.registerManager(new ZVaultsManager(), VaultsManager.class);
         this.registerManager(new ZVaultConfigurationManager(), VaultConfigurationManager.class);
         if(config.isMultiServerSyncSupport()) {
             this.registerManager(new ZDistributedManager(this), DistributedManager.class);
@@ -234,7 +234,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
     private <I extends Manager, T extends I> I registerManager(T instance, Class<I> clazz) {
         this.getServer().getServicesManager().register(clazz, instance, this, ServicePriority.Normal);
-        if (Configuration.getConfiguration(MainConfiguration.class).isDebug()) {
+        if (Configuration.get(MainConfiguration.class).isDebug()) {
             VaultsLogger.info("Registered manager: " + clazz.getSimpleName());
         }
         if(instance instanceof Saveable saveable) {

@@ -34,6 +34,7 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     private boolean closeVaultOpenChooseMenu;
     private AutoPickupConfig autopickupValues;
     private int stackSizeInfiniteVaults;
+    private String defaultVaultName;
     @NonLoadable
     private FirstJoinConfig firstJoinGiveVault;
 
@@ -146,5 +147,10 @@ public class ZVaultsConfiguration implements VaultsConfiguration {
     @Override
     public FirstJoinConfig getFirstJoinGiveVault() {
         return firstJoinGiveVault;
+    }
+
+    @Override
+    public String getDefaultVaultName() {
+        return defaultVaultName;
     }
 }

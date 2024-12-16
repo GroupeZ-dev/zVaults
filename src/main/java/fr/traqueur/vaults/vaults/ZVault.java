@@ -18,20 +18,21 @@ public class ZVault implements Vault {
     private final VaultOwner owner;
     private final List<VaultItem> content;
     private final boolean infinite;
+    private String name;
     private Material material;
     private int size;
     private boolean autoPickup;
     private int maxStackSize;
 
-    public ZVault(VaultOwner owner, Material material, int size, boolean infinite) {
-        this(UUID.randomUUID(), owner, material, size, infinite);
+    public ZVault(VaultOwner owner, Material material, int size, boolean infinite, String name) {
+        this(UUID.randomUUID(), owner, material, size, infinite, name);
     }
 
-    public ZVault(UUID uuid, VaultOwner owner, Material material, int size, boolean infinite) {
-        this(uuid, owner, material, new ArrayList<>(), size, infinite, false, Configuration.getConfiguration(VaultsConfiguration.class).getStackSizeInfiniteVaults());
+    public ZVault(UUID uuid, VaultOwner owner, Material material, int size, boolean infinite, String name) {
+        this(uuid, owner, material, new ArrayList<>(), size, infinite, false, Configuration.get(VaultsConfiguration.class).getStackSizeInfiniteVaults(), name);
     }
 
-    public ZVault(UUID uniqueId, VaultOwner owner, Material material, List<VaultItem> content, int size, boolean infinite, boolean autoPickup, int maxStackSize) {
+    public ZVault(UUID uniqueId, VaultOwner owner, Material material, List<VaultItem> content, int size, boolean infinite, boolean autoPickup, int maxStackSize, String name) {
         this.uniqueId = uniqueId;
         this.owner = owner;
         this.material = material;
@@ -40,6 +41,7 @@ public class ZVault implements Vault {
         this.infinite = infinite;
         this.autoPickup = autoPickup;
         this.maxStackSize = maxStackSize;
+        this.name = name;
     }
 
     @Override
@@ -50,6 +52,16 @@ public class ZVault implements Vault {
     @Override
     public VaultOwner getOwner() {
         return this.owner;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

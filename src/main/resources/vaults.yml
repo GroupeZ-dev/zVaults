@@ -29,6 +29,7 @@ stack-size-infinite-vaults: -1
 
 # Set the default size of vaults
 default-size: 27
+default-vault-name: "&8ᴠᴀᴜʟᴛ"
 
 first-join-give-vault:
     enabled: true
@@ -78,7 +79,7 @@ vaults-icons:
   open-vault:
     material: "%vault_icon%"
     model_data: 1
-    name: "&8ᴠᴀᴜʟᴛ"
+    name: "%vault_name%"
     lore:
       - "#92bed8sɪᴢᴇ: &f%vault_size% &7sʟᴏᴛs"
       - "#92bed8Sᴛᴏᴄᴋ: &f%vault_content_size% &7oʙᴊᴇᴛs"

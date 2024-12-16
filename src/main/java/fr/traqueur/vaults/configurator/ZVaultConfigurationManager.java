@@ -70,7 +70,7 @@ public class ZVaultConfigurationManager implements VaultConfigurationManager, Sa
     @Override
     public void openInvitationMenu(User user, Vault vault) {
         this.closeVaultConfig(user);
-        InvitePlayerMenuConfiguration config = Configuration.getConfiguration(VaultsConfiguration.class).getInvitePlayerMenuConfiguration();
+        InvitePlayerMenuConfiguration config = Configuration.get(VaultsConfiguration.class).getInvitePlayerMenuConfiguration();
         UserManager userManager = this.getPlugin().getManager(UserManager.class);
         new AnvilGUI.Builder()
                 .onClick((slot, stateSnapshot) -> {
