@@ -48,8 +48,12 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
         if (maxStackSize == null) {
             maxStackSize = Configuration.get(VaultsConfiguration.class).getStackSizeInfiniteVaults();
         }
+        String name = vaultDTO.name();
+        if (name == null || name.isEmpty()) {
+            name = Configuration.get(VaultsConfiguration.class).getDefaultVaultName();
+        }
 
-        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite(), vaultDTO.autoPickup() != null && vaultDTO.autoPickup(), maxStackSize, vaultDTO.name());
+        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite(), vaultDTO.autoPickup() != null && vaultDTO.autoPickup(), maxStackSize, name);
     }
 
     @Override
