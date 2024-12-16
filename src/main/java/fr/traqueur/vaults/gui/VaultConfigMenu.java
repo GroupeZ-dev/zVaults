@@ -31,10 +31,5 @@ public class VaultConfigMenu extends ZInventory {
     public void closeInventory(Player player, InventoryDefault inventoryDefault) {
         User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
         this.configurationManager.closeVaultConfig(user);
-        if(Configuration.get(VaultsConfiguration.class).isCloseVaultOpenChooseMenu()) {
-            ((VaultsPlugin) getPlugin()).getScheduler().runNextTick((t) -> {
-                ((VaultsPlugin) getPlugin()).getManager(VaultsManager.class).openVaultChooseMenu(user, user);
-            });
-        }
     }
 }

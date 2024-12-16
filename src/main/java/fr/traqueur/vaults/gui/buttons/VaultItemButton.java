@@ -47,6 +47,17 @@ public class VaultItemButton extends ZButton {
     }
 
     @Override
+    public void onInventoryClose(Player player, InventoryDefault inventory) {
+        this.plugin.getManager(UserManager.class).getUser(player.getUniqueId()).ifPresent(user -> {
+            if(Configuration.get(VaultsConfiguration.class).isCloseVaultOpenChooseMenu()) {
+                this.plugin.getScheduler().runNextTick((t) -> {
+                    this.plugin.getManager(VaultsManager.class).openVaultChooseMenu(user, user);
+                });
+            }
+        });
+    }
+
+    @Override
     public void onRender(Player player, InventoryDefault inventory) {
         this.plugin.getManager(UserManager.class).getUser(player.getUniqueId()).ifPresent(user -> {
             Vault vault = this.plugin.getManager(VaultsManager.class).getOpenedVault(user);

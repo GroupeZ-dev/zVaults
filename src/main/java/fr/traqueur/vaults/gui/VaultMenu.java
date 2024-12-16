@@ -37,11 +37,6 @@ public class VaultMenu extends ZInventory {
         this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
             Vault vault = this.vaultsManager.getOpenedVault(user);
             this.vaultsManager.closeVault(user, vault);
-            if(Configuration.get(VaultsConfiguration.class).isCloseVaultOpenChooseMenu()) {
-                ((VaultsPlugin) getPlugin()).getScheduler().runNextTick((t) -> {
-                    ((VaultsPlugin) getPlugin()).getManager(VaultsManager.class).openVaultChooseMenu(user, user);
-                });
-            }
         });
     }
 }

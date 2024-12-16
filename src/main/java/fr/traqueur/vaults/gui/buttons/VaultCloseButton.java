@@ -14,14 +14,6 @@ import org.bukkit.plugin.Plugin;
 
 public class VaultCloseButton extends ZButton {
 
-    private final VaultsManager vaultsManager;
-    private final UserManager userManager;
-
-    public VaultCloseButton(Plugin plugin) {
-        this.vaultsManager = ((VaultsPlugin) plugin).getManager(VaultsManager.class);
-        this.userManager =  ((VaultsPlugin) plugin).getManager(UserManager.class);
-    }
-
     @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryDefault inventory, int slot, Placeholders placeholders) {
        player.closeInventory();

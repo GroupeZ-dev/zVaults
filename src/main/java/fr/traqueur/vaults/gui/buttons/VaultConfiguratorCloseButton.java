@@ -4,6 +4,8 @@ import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.button.ZButton;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
@@ -26,6 +28,12 @@ public class VaultConfiguratorCloseButton extends ZButton {
 
     @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryDefault inventory, int slot, Placeholders placeholders) {
-        player.closeInventory();
+        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
+            if(Configuration.get(VaultsConfiguration.class).isCloseVaultOpenChooseMenu()) {
+                this.userManager.getPlugin().getScheduler().runNextTick((t) -> {
+                    this.userManager.getPlugin().getManager(VaultsManager.class).openVaultChooseMenu(user, user);
+                });
+            }
+        });
     }
 }
