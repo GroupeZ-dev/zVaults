@@ -32,6 +32,9 @@ public class ZUserManager implements UserManager, Saveable {
         this.users = new HashMap<>();
 
         MigrationManager.registerMigration(new UserMigration(USER_TABLE_NAME));
+
+        Bukkit.getOnlinePlayers().forEach(this::handleJoin);
+
         Bukkit.getServer().getPluginManager().registerEvents(new ZUserListener(this), this.getPlugin());
     }
 

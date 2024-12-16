@@ -135,8 +135,6 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
         this.scheduler.runTimerAsync(() -> this.saveables.forEach(Saveable::save), 1, 1, TimeUnit.HOURS);
 
-        Bukkit.getOnlinePlayers().forEach(userManager::handleJoin);
-
         new Metrics(this, 23712);
         new VersionChecker(this, 328);
 

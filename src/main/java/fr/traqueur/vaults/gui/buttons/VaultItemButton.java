@@ -26,15 +26,9 @@ public class VaultItemButton extends ZButton {
 
 
     private final VaultsPlugin plugin;
-    private final VaultsConfiguration configuration;
-    private final VaultsManager vaultsManager;
-    private final UserManager userManager;
 
     public VaultItemButton(Plugin plugin) {
         this.plugin = (VaultsPlugin) plugin;
-        this.vaultsManager = this.plugin.getManager(VaultsManager.class);
-        this.userManager =  this.plugin.getManager(UserManager.class);
-        this.configuration =  Configuration.get(VaultsConfiguration.class);
     }
 
     @Override
@@ -46,27 +40,27 @@ public class VaultItemButton extends ZButton {
     public void onInventoryOpen(Player player, InventoryDefault inventory, Placeholders placeholders) {
 
         inventory.setDisablePlayerInventoryClick(false);
-        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
-            Vault vault = this.vaultsManager.getOpenedVault(user);
-            placeholders.register("vault_name", configuration.getVaultTitle(vault.getSize() + ""));
+        this.plugin.getManager(UserManager.class).getUser(player.getUniqueId()).ifPresent(user -> {
+            Vault vault = this.plugin.getManager(VaultsManager.class).getOpenedVault(user);
+            placeholders.register("vault_name", Configuration.get(VaultsConfiguration.class).getVaultTitle(vault.getSize() + ""));
         });
     }
 
     @Override
     public void onInventoryClose(Player player, InventoryDefault inventory) {
-        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
-            Vault vault = this.vaultsManager.getOpenedVault(user);
-            this.vaultsManager.closeVault(user, vault);
+        this.plugin.getManager(UserManager.class).getUser(player.getUniqueId()).ifPresent(user -> {
+            Vault vault = this.plugin.getManager(VaultsManager.class).getOpenedVault(user);
+            this.plugin.getManager(VaultsManager.class).closeVault(user, vault);
             if(Configuration.get(VaultsConfiguration.class).isCloseVaultOpenChooseMenu()) {
-                this.vaultsManager.openVaultChooseMenu(user, user);
+                this.plugin.getManager(VaultsManager.class).openVaultChooseMenu(user, user);
             }
         });
     }
 
     @Override
     public void onRender(Player player, InventoryDefault inventory) {
-        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
-            Vault vault = this.vaultsManager.getOpenedVault(user);
+        this.plugin.getManager(UserManager.class).getUser(player.getUniqueId()).ifPresent(user -> {
+            Vault vault = this.plugin.getManager(VaultsManager.class).getOpenedVault(user);
             int vaultSize = vault.getSize();
             for (int slot : this.slots) {
                 ItemStack item;
@@ -81,7 +75,7 @@ public class VaultItemButton extends ZButton {
                         item = vaultItem.toItem(player, vault.isInfinite());
                     }
                 } else {
-                    item = configuration.getIcon("empty-item").build(player);
+                    item = Configuration.get(VaultsConfiguration.class).getIcon("empty-item").build(player);
                 }
                 inventory.addItem(slot, item).setClick(event -> event.setCancelled(true));
             }
@@ -90,8 +84,8 @@ public class VaultItemButton extends ZButton {
 
     @Override
     public void onDrag(InventoryDragEvent event, Player player, InventoryDefault inventoryDefault) {
-        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
-            Vault vault = this.vaultsManager.getOpenedVault(user);
+        this.plugin.getManager(UserManager.class).getUser(player.getUniqueId()).ifPresent(user -> {
+            Vault vault = this.plugin.getManager(VaultsManager.class).getOpenedVault(user);
             if(vault.isInfinite()) {
                 event.setCancelled(true);
                 return;
@@ -99,7 +93,7 @@ public class VaultItemButton extends ZButton {
             event.getNewItems().forEach((slot, item) -> {
                 if(slot < vault.getSize()) {
                     VaultItem vaultItem = vault.getInSlot(slot);
-                    VaultItem newVaultItem = new VaultItem(this.vaultsManager.cloneItemStack(item), item.getAmount(), vaultItem.slot());
+                    VaultItem newVaultItem = new VaultItem(this.plugin.getManager(VaultsManager.class).cloneItemStack(item), item.getAmount(), vaultItem.slot());
                     vault.setContent(vault.getContent().stream().map(itemInner -> itemInner.slot() == newVaultItem.slot() ? newVaultItem : itemInner).collect(Collectors.toList()));
                     VaultUpdateEvent vaultUpdateEvent = new VaultUpdateEvent(this.plugin, user, vault, newVaultItem, newVaultItem.slot());
                     Bukkit.getPluginManager().callEvent(vaultUpdateEvent);
@@ -110,8 +104,8 @@ public class VaultItemButton extends ZButton {
 
     @Override
     public void onInventoryClick(InventoryClickEvent event, Player player, InventoryDefault inventoryDefault) {
-        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
-            Vault vault = this.vaultsManager.getOpenedVault(user);
+        this.plugin.getManager(UserManager.class).getUser(player.getUniqueId()).ifPresent(user -> {
+            Vault vault = this.plugin.getManager(VaultsManager.class).getOpenedVault(user);
             ClickType clickType = event.getClick();
             ItemStack cursor = event.getCursor();
             ItemStack current = event.getCurrentItem();
@@ -132,11 +126,11 @@ public class VaultItemButton extends ZButton {
             event.setCancelled(true);
 
             switch (clickType) {
-                case LEFT -> this.vaultsManager.handleLeftClick(event, player, cursor, slot, vault);
-                case RIGHT -> this.vaultsManager.handleRightClick(event, player, cursor, current, slot, inventorySize, vault);
-                case SHIFT_LEFT, SHIFT_RIGHT -> this.vaultsManager.handleShift(event, player, cursor, current, slot, inventorySize, vault);
-                case DROP, CONTROL_DROP -> this.vaultsManager.handleDrop(event, player, cursor, current, slot, inventorySize, vault, clickType == ClickType.CONTROL_DROP);
-                case NUMBER_KEY -> this.vaultsManager.handleNumberKey(event, player, cursor, current, slot, inventorySize, vault);
+                case LEFT -> this.plugin.getManager(VaultsManager.class).handleLeftClick(event, player, cursor, slot, vault);
+                case RIGHT -> this.plugin.getManager(VaultsManager.class).handleRightClick(event, player, cursor, current, slot, inventorySize, vault);
+                case SHIFT_LEFT, SHIFT_RIGHT -> this.plugin.getManager(VaultsManager.class).handleShift(event, player, cursor, current, slot, inventorySize, vault);
+                case DROP, CONTROL_DROP -> this.plugin.getManager(VaultsManager.class).handleDrop(event, player, cursor, current, slot, inventorySize, vault, clickType == ClickType.CONTROL_DROP);
+                case NUMBER_KEY -> this.plugin.getManager(VaultsManager.class).handleNumberKey(event, player, cursor, current, slot, inventorySize, vault);
             }
         });
 
