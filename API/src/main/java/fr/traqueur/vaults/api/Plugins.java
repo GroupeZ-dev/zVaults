@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 public enum Plugins {
 
     PAPI("PlaceholderAPI"),
+    SUPERIOR("SuperiorSkyblock2")
     ;
 
     private final String name;
