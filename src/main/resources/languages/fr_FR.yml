@@ -26,6 +26,7 @@ vault_icon_change: "<green>Icone du coffre changée pour <yellow>%new_icon%<gree
 vault_deleted: "<green>Coffre supprimé."
 vault_not_infinite: "<red>Ce coffre n'est pas infini."
 stacklimit_set: "<green>Limite de stack définie à %stacklimit%."
+stacklimit_add: "<green>Limite de stack ajoutée à %stacklimit%."
 vault_name_already_set: "<red>Le nom du coffre est déjà celui qui vous avez écrit."
 vault_name_changed: "<green>Nom du coffre changé pour <yellow>%name%<green>."
 
@@ -37,4 +38,5 @@ grow_size_command_description: "Agrandir la taille d'un coffre."
 create_command_description: "Créer un nouveau coffre."
 open_command_description: "Ouvrir un coffre."
 stacklimit_command_description: "Définir la limite de stack d'un coffre."
+addstacklimit_command_description: "Ajouter une limite de stack à un coffre."
 convert_command_description: "Convertir un plugin de coffre en données zvault."
