@@ -20,6 +20,7 @@ import fr.traqueur.vaults.api.data.Saveable;
 import fr.traqueur.vaults.api.distributed.DistributedManager;
 import fr.traqueur.vaults.api.managers.Manager;
 import fr.traqueur.vaults.api.messages.MessageResolver;
+import fr.traqueur.vaults.api.placeholders.Placeholders;
 import fr.traqueur.vaults.api.storage.Storage;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
@@ -118,20 +119,6 @@ public final class ZVaultsPlugin extends VaultsPlugin {
             this.registerManager(new ZDistributedManager(this), DistributedManager.class);
         }
 
-        buttonManager.unregisters(this);
-        buttonManager.register(new NoneLoader(this, VaultButton.class, "zvaults_vaults"));
-        buttonManager.register(new NoneLoader(this, VaultItemButton.class, "zvaults_vault_items"));
-        buttonManager.register(new NoneLoader(this, VaultInviteButton.class, "zvaults_invite_player"));
-        buttonManager.register(new NoneLoader(this, UserAccessButton.class, "zvaults_vault_users_access"));
-        buttonManager.register(new NoneLoader(this, CustomizeIconButton.class, "zvaults_customize_icon"));
-        buttonManager.register(new NoneLoader(this, DeleteVaultButton.class, "zvaults_delete"));
-        buttonManager.register(new NoneLoader(this, AutoPickupVaultButton.class, "zvaults_toggle_auto_pickup"));
-        buttonManager.register(new NoneLoader(this, VaultCloseButton.class, "zvaults_vault_close"));
-        buttonManager.register(new NoneLoader(this, VaultAccessManagerCloseButton.class, "zvaults_access_manager_close"));
-        buttonManager.register(new NoneLoader(this, VaultConfiguratorCloseButton.class, "zvaults_vault_config_close"));
-        buttonManager.register(new ManipulationSizeButtonLoader(this, SetSizeButton.class, "zvaults_set_size"));
-        buttonManager.register(new ManipulationSizeButtonLoader(this, GrowSizeButton.class, "zvaults_grow_size"));
-
         this.loadInventories();
 
         commandManager.registerConverter(String.class, "ownerType", new OwnerTypeArgument(vaultsManager.getOwnerResolver()));
@@ -143,6 +130,8 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         this.storage.onEnable();
 
         this.saveables.forEach(Saveable::load);
+
+        Placeholders.load(this);
 
         this.scheduler.runTimerAsync(() -> this.saveables.forEach(Saveable::save), 1, 1, TimeUnit.HOURS);
 
@@ -210,6 +199,21 @@ public final class ZVaultsPlugin extends VaultsPlugin {
 
     @Override
     public void loadInventories() {
+        buttonManager.unregisters(this);
+        buttonManager.register(new NoneLoader(this, VaultButton.class, "zvaults_vaults"));
+        buttonManager.register(new NoneLoader(this, VaultItemButton.class, "zvaults_vault_items"));
+        buttonManager.register(new NoneLoader(this, VaultInviteButton.class, "zvaults_invite_player"));
+        buttonManager.register(new NoneLoader(this, UserAccessButton.class, "zvaults_vault_users_access"));
+        buttonManager.register(new NoneLoader(this, CustomizeIconButton.class, "zvaults_customize_icon"));
+        buttonManager.register(new NoneLoader(this, DeleteVaultButton.class, "zvaults_delete"));
+        buttonManager.register(new NoneLoader(this, AutoPickupVaultButton.class, "zvaults_toggle_auto_pickup"));
+        buttonManager.register(new NoneLoader(this, VaultCloseButton.class, "zvaults_vault_close"));
+        buttonManager.register(new NoneLoader(this, VaultAccessManagerCloseButton.class, "zvaults_access_manager_close"));
+        buttonManager.register(new NoneLoader(this, VaultConfiguratorCloseButton.class, "zvaults_vault_config_close"));
+        buttonManager.register(new ManipulationSizeButtonLoader(this, SetSizeButton.class, "zvaults_set_size"));
+        buttonManager.register(new ManipulationSizeButtonLoader(this, GrowSizeButton.class, "zvaults_grow_size"));
+
+
         inventoryManager.deleteInventories(this);
         try {
             this.inventoryManager.loadInventoryOrSaveResource(this, "inventories/vaults_choose_menu.yml", VaultsChooseMenu.class);

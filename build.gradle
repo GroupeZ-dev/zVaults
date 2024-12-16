@@ -67,6 +67,7 @@ allprojects {
         implementation "net.wesjd:anvilgui:1.10.2-SNAPSHOT"
         implementation "org.bstats:bstats-bukkit:3.0.2"
 
+        compileOnly 'me.clip:placeholderapi:2.11.6'
         compileOnly 'com.github.Maxlego08:zMenu-API:1.0.3.5'
     }
 
