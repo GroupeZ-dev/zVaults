@@ -53,3 +53,13 @@ items:
     item:
       material: BARRIER
       name: "&cClose"
+  change_name:
+    type: ZVAULTS_NAME_MODIFIER
+    permission: "zvaults.modify.name"
+    slot: 17
+    item:
+      material: NAME_TAG
+      name: "#92bed8ᴄʜᴀɴɢᴇ ɴᴀᴍᴇ"
+      lore:
+        - ""
+        - "#92bed8ᴄʟɪᴄᴋ &7ᴛᴏ ᴄʜᴀɴɢᴇ ɴᴀᴍᴇ"

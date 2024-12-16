@@ -42,7 +42,7 @@ public record VaultItem(ItemStack item, int amount, int slot) {
             ItemStack menuItem = this.item.clone();
             ItemMeta meta = menuItem.getItemMeta();
 
-            MenuItemStack item = Configuration.getConfiguration(VaultsConfiguration.class).getIcon("vault-item");
+            MenuItemStack item = Configuration.get(VaultsConfiguration.class).getIcon("vault-item");
 
             Placeholders placeholders = new Placeholders();
             String materialName = MaterialLocalization.getTranslateName(this.item.getType());

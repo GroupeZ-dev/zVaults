@@ -9,7 +9,6 @@ import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.configurator.VaultConfigurationManager;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.Vault;
-import fr.traqueur.vaults.api.vaults.VaultsManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -31,7 +30,7 @@ public class AutoPickupVaultButton extends ZButton {
         Placeholders placeholders = new Placeholders();
         this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
             Vault vault = this.vaultConfigurationManager.getOpenedConfig(user);
-            placeholders.register("autopickup", Configuration.getConfiguration(VaultsConfiguration.class).getAutoPickupValue(vault.isAutoPickup()));
+            placeholders.register("autopickup", Configuration.get(VaultsConfiguration.class).getAutoPickupValue(vault.isAutoPickup()));
         });
         return super.getItemStack().build(player, true, placeholders);
     }

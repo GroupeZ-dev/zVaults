@@ -39,17 +39,21 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
                     .map(VaultItem::deserialize)
                     .collect(Collectors.toList());
         }
-        Material icon = Configuration.getConfiguration(VaultsConfiguration.class).getVaultIcon();
+        Material icon = Configuration.get(VaultsConfiguration.class).getVaultIcon();
         if (vaultDTO.icon() != null && !vaultDTO.icon().isEmpty()) {
             icon = Material.valueOf(vaultDTO.icon());
         }
 
         Integer maxStackSize = vaultDTO.maxStackSize();
         if (maxStackSize == null) {
-            maxStackSize = Configuration.getConfiguration(VaultsConfiguration.class).getStackSizeInfiniteVaults();
+            maxStackSize = Configuration.get(VaultsConfiguration.class).getStackSizeInfiniteVaults();
+        }
+        String name = vaultDTO.name();
+        if (name == null || name.isEmpty()) {
+            name = Configuration.get(VaultsConfiguration.class).getDefaultVaultName();
         }
 
-        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite(), vaultDTO.autoPickup() != null && vaultDTO.autoPickup(), maxStackSize);
+        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite(), vaultDTO.autoPickup() != null && vaultDTO.autoPickup(), maxStackSize, name);
     }
 
     @Override
@@ -61,6 +65,7 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
                             entity.getSize(),
                             entity.isInfinite(),
                             entity.isAutoPickup(),
-                            entity.getMaxStackSize());
+                            entity.getMaxStackSize(),
+                            entity.getName());
     }
 }

@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ZUserManager implements UserManager, Saveable {
 
+    public static final User CONSOLE_USER = new ZUser(UUID.fromString("00000000-0000-0000-0000-000000000000"), "CONSOLE");
+
     private final Service<User, UserDTO> userService;
     private final Map<UUID, User> users;
 
@@ -30,6 +32,9 @@ public class ZUserManager implements UserManager, Saveable {
         this.users = new HashMap<>();
 
         MigrationManager.registerMigration(new UserMigration(USER_TABLE_NAME));
+
+        Bukkit.getOnlinePlayers().forEach(this::handleJoin);
+
         Bukkit.getServer().getPluginManager().registerEvents(new ZUserListener(this), this.getPlugin());
     }
 
@@ -78,13 +83,13 @@ public class ZUserManager implements UserManager, Saveable {
 
     @Override
     public void tryCreateDefaultVaults(User user) {
-        FirstJoinConfig config = Configuration.getConfiguration(VaultsConfiguration.class).getFirstJoinGiveVault();
+        FirstJoinConfig config = Configuration.get(VaultsConfiguration.class).getFirstJoinGiveVault();
         if(!config.enabled()) {
             return;
         }
         VaultsManager vaultsManager = this.getPlugin().getManager(VaultsManager.class);
         VaultOwner owner = vaultsManager.generateOwner("player", user);
-        int maxVaults = Configuration.getConfiguration(VaultsConfiguration.class).getMaxVaultsByOwnerType("player");
+        int maxVaults = Configuration.get(VaultsConfiguration.class).getMaxVaultsByOwnerType("player");
         for (VaultPreset vault : config.vaults()) {
             vaultsManager.createVault(user, owner, vault.size(), maxVaults, vault.infinite(), true);
         }

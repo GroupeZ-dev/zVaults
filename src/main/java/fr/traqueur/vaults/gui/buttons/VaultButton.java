@@ -49,7 +49,7 @@ public class VaultButton extends ZButton implements PaginateButton {
     }
 
     private void displayItems(Player player, InventoryDefault inventory) {
-        VaultsConfiguration configuration = Configuration.getConfiguration(VaultsConfiguration.class);
+        VaultsConfiguration configuration = Configuration.get(VaultsConfiguration.class);
         this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
             Pagination<Vault> pagination = new Pagination<>();
             User target = this.vaultsManager.getTargetUser(user);
@@ -64,10 +64,12 @@ public class VaultButton extends ZButton implements PaginateButton {
                 Vault vault = buttons.get(i);
 
                 Placeholders placeholders = new Placeholders();
+                placeholders.register("vault_name", vault.getName());
                 placeholders.register("vault_icon", vault.getIcon().name());
                 placeholders.register("vault_size", vault.getSize() +"");
                 int contentSize = vault.getContent().stream().filter(vaultItem -> vaultItem.item() != null && !vaultItem.item().getType().isAir()).toList().size();
                 placeholders.register("vault_content_size", contentSize + "");
+                placeholders.register("vault_max_stack_size", vault.getMaxStackSize() + "");
 
                 inventory.addItem(slot, configuration.getIcon("open-vault").build(player, false, placeholders)).setClick(event -> {
                     if(event.getClick() == ClickType.LEFT) {

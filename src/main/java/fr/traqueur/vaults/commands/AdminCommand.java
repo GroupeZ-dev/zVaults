@@ -15,11 +15,16 @@ public class AdminCommand extends VaultCommand {
 
         this.setPermission("zvaults.admin");
 
-        if (Configuration.getConfiguration(VaultsConfiguration.class).getSizeMode() != SizeMode.DEFAULT) {
+        if (Configuration.get(VaultsConfiguration.class).getSizeMode() != SizeMode.DEFAULT) {
             this.addSubCommand(new GrowSizeCommand(plugin), new SetSizeCommand(plugin));
         }
 
-        this.addSubCommand(new CreateCommand(plugin), new OpenCommand(plugin), new SetStackLimitCommand(plugin), new ConvertCommand(plugin));
+        this.addSubCommand(new CreateCommand(plugin),
+                new OpenCommand(plugin),
+                new SetStackLimitCommand(plugin),
+                new ConvertCommand(plugin),
+                new AddStackLimitCommand(plugin),
+                new DeleteCommand(plugin));
     }
 
     @Override

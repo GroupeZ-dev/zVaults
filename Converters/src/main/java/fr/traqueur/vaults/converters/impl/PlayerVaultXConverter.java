@@ -44,7 +44,7 @@ public class PlayerVaultXConverter implements Converter {
             ItemStack[] deserialized = CardboardBoxSerialization.fromStorage(data, name);
             int size = deserialized.length;
             size = Math.min(((size + 8) / 9) * 9, 54);
-            Material material = Configuration.getConfiguration(VaultsConfiguration.class).getVaultIcon();
+            Material material = Configuration.get(VaultsConfiguration.class).getVaultIcon();
             vaultsManager.convertVault(UUID.fromString(name), size, false, Arrays.asList(deserialized), material);
 
         }

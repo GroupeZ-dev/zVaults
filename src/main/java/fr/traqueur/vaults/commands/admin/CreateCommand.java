@@ -11,6 +11,7 @@ import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.VaultOwner;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
+import fr.traqueur.vaults.users.ZUserManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -33,23 +34,27 @@ public class CreateCommand extends VaultCommand {
 
         this.addArgs("receiver:user");
         this.addArgs("size:int", (sender, args) -> this.vaultsManager.getSizeTabulation());
-        if (Configuration.getConfiguration(VaultsConfiguration.class).isVaultsInfinity()) {
+        if (Configuration.get(VaultsConfiguration.class).isVaultsInfinity()) {
             this.addArgs("infinite:boolean");
         }
         this.addOptionalArgs("type:ownerType");
-        this.setGameOnly(true);
     }
 
     @Override
     public void execute(CommandSender commandSender, Arguments arguments) {
-        User user = this.userManager.getUser(((Player) commandSender).getUniqueId()).orElseThrow();
+        User user;
+        if(!(commandSender instanceof Player)) {
+            user = ZUserManager.CONSOLE_USER;
+        } else {
+            user = this.userManager.getUser(((Player) commandSender).getUniqueId()).orElseThrow();
+        }
         User receiver = arguments.get("receiver");
         int size = arguments.get("size");
         Optional<String> opt = arguments.getOptional("type");
         String type = opt.orElse("player");
         boolean infinite = false;
 
-        if (Configuration.getConfiguration(VaultsConfiguration.class).isVaultsInfinity()) {
+        if (Configuration.get(VaultsConfiguration.class).isVaultsInfinity()) {
             infinite = arguments.get("infinite");
         }
 
@@ -58,7 +63,7 @@ public class CreateCommand extends VaultCommand {
             return;
         }
         VaultOwner owner = this.vaultsManager.generateOwner(type, receiver);
-        int maxVaults = Configuration.getConfiguration(VaultsConfiguration.class).getMaxVaultsByOwnerType(type.toLowerCase());
+        int maxVaults = Configuration.get(VaultsConfiguration.class).getMaxVaultsByOwnerType(type.toLowerCase());
         this.vaultsManager.createVault(user, owner, size, maxVaults, infinite, false);
     }
 }

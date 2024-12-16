@@ -16,20 +16,20 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class SetStackLimitCommand extends VaultCommand {
+public class AddStackLimitCommand extends VaultCommand {
 
     private final UserManager userManager;
     private final VaultsManager vaultsManager;
 
-    public SetStackLimitCommand(VaultsPlugin plugin) {
-        super(plugin, "setstacklimit");
+    public AddStackLimitCommand(VaultsPlugin plugin) {
+        super(plugin, "addstacklimit");
 
         this.userManager = plugin.getManager(UserManager.class);
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
-        this.setPermission("zvaults.admin.setstacklimit");
-        this.setUsage("/zvaults setstacklimit <player> <vault_num> <stacklimit>");
-        this.setDescription(plugin.getMessageResolver().convertToLegacySectionFormat(Message.STACKLIMIT_COMMAND_DESCRIPTION.translate()));
+        this.setPermission("zvaults.admin.addstacklimit");
+        this.setUsage("/zvaults addstacklimit <player> <vault_num> <stacklimit>");
+        this.setDescription(plugin.getMessageResolver().convertToLegacySectionFormat(Message.ADDSTACKLIMIT_COMMAND_DESCRIPTION.translate()));
 
         this.addArgs("receiver:user");
         this.addArgs("vault_num:int", (sender, args) -> this.vaultsManager.getNumVaultsTabulation());
@@ -58,7 +58,8 @@ public class SetStackLimitCommand extends VaultCommand {
             user.sendMessage(Message.VAULT_NOT_INFINITE);
             return;
         }
-        vault.setMaxStackSize(size);
-        user.sendMessage(Message.STACKLIMIT_SET, Formatter.format("%stacklimit%", size));
+        int maxStackSize = Math.max(1, vault.getMaxStackSize() + size);
+        vault.setMaxStackSize(maxStackSize);
+        user.sendMessage(Message.STACKLIMIT_ADD, Formatter.format("%stacklimit%", size));
     }
 }

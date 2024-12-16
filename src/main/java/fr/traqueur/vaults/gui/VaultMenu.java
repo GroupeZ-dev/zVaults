@@ -4,8 +4,11 @@ import fr.maxlego08.menu.ZInventory;
 import fr.maxlego08.menu.api.button.Button;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.traqueur.vaults.api.VaultsPlugin;
+import fr.traqueur.vaults.api.config.Configuration;
+import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
+import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -27,5 +30,13 @@ public class VaultMenu extends ZInventory {
     public void postOpenInventory(Player player, InventoryDefault inventoryDefault) {
         User user = this.userManager.getUser(player.getUniqueId()).orElseThrow();
         this.vaultsManager.linkVaultToInventory(user, inventoryDefault);
+    }
+
+    @Override
+    public void closeInventory(Player player, InventoryDefault inventoryDefault) {
+        this.userManager.getUser(player.getUniqueId()).ifPresent(user -> {
+            Vault vault = this.vaultsManager.getOpenedVault(user);
+            this.vaultsManager.closeVault(user, vault);
+        });
     }
 }

@@ -16,6 +16,10 @@ public interface Vault {
 
     VaultOwner getOwner();
 
+    String getName();
+
+    void setName(String name);
+
     int getSize();
 
     void setSize(int size);

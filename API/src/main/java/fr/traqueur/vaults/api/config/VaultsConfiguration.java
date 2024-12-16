@@ -16,7 +16,7 @@ public interface VaultsConfiguration extends Configuration {
 
     String getVaultTitle(String key);
 
-    InvitePlayerMenuConfiguration getInvitePlayerMenuConfiguration();
+    AnvilMenuConfiguration getInvitePlayerMenuConfiguration();
 
     Material getVaultIcon();
 
@@ -29,4 +29,8 @@ public interface VaultsConfiguration extends Configuration {
     int getStackSizeInfiniteVaults();
 
     FirstJoinConfig getFirstJoinGiveVault();
+
+    String getDefaultVaultName();
+
+    AnvilMenuConfiguration getChangeNameMenu();
 }

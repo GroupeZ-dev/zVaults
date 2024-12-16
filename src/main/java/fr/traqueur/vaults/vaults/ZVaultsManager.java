@@ -4,6 +4,7 @@ import fr.maxlego08.menu.api.dupe.DupeManager;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.sarah.MigrationManager;
 import fr.traqueur.vaults.api.CompatibilityUtil;
+import fr.traqueur.vaults.api.Plugins;
 import fr.traqueur.vaults.api.VaultsLogger;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.MainConfiguration;
@@ -15,6 +16,7 @@ import fr.traqueur.vaults.api.events.*;
 import fr.traqueur.vaults.api.exceptions.IndexOutOfBoundVaultException;
 import fr.traqueur.vaults.api.messages.Formatter;
 import fr.traqueur.vaults.api.messages.Message;
+import fr.traqueur.vaults.api.placeholders.Placeholders;
 import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
@@ -38,8 +40,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ZVaultsManager implements VaultsManager, Saveable {
-
-    private final VaultsConfiguration configuration;
+    
     private final OwnerResolver ownerResolver;
     private final Service<Vault, VaultDTO> vaultService;
     private final Map<UUID, Vault> vaults;
@@ -47,8 +48,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     private final Map<UUID, InventoryDefault> linkedVaultToInventory;
     private final Map<UUID, User> targetUserVaultsChoose;
 
-    public ZVaultsManager(VaultsConfiguration configuration) {
-        this.configuration = configuration;
+    public ZVaultsManager() {
         this.ownerResolver = new OwnerResolver();
         this.registerResolvers(this.ownerResolver);
 
@@ -56,11 +56,96 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         this.openedVaults = new HashMap<>();
         this.linkedVaultToInventory = new HashMap<>();
         this.targetUserVaultsChoose = new HashMap<>();
+        
+        this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this.ownerResolver), VAULT_TABLE_NAME);
+        MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
 
         this.getPlugin().getServer().getPluginManager().registerEvents(new ZVaultsListener(this, this.getPlugin().getManager(UserManager.class)), this.getPlugin());
 
-        this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this.ownerResolver), VAULT_TABLE_NAME);
-        MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
+        this.registerPlaceholders();
+
+    }
+
+    private void registerPlaceholders() {
+        Placeholders.register("slots_occuped", (player, args) -> {
+            var optuser = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId());
+            if(optuser.isEmpty()) {
+                return "0";
+            }
+            User user = optuser.get();
+            String vaultNumber= args.getFirst();
+            try {
+                Vault vault = this.getVault(user, Integer.parseInt(vaultNumber));
+                return String.valueOf(vault.getContent().stream().filter(vaultItem -> !vaultItem.isEmpty()).count());
+            } catch (IndexOutOfBoundVaultException e) {
+                return "No Vault found";
+            } catch (NumberFormatException e) {
+                return "0";
+            }
+        });
+
+        Placeholders.register("size", (player, args) -> {
+            var optuser = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId());
+            if(optuser.isEmpty()) {
+                return "0";
+            }
+            User user = optuser.get();
+            String vaultNumber= args.getFirst();
+            try {
+                Vault vault = this.getVault(user, Integer.parseInt(vaultNumber));
+                return String.valueOf(vault.getSize());
+            } catch (IndexOutOfBoundVaultException e) {
+                return "No Vault found";
+            } catch (NumberFormatException e) {
+                return "0";
+            }
+        });
+
+        Placeholders.register("slots_empty", (player, args) -> {
+            var optuser = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId());
+            if(optuser.isEmpty()) {
+                return "0";
+            }
+            User user = optuser.get();
+            String vaultNumber = args.getFirst();
+            try {
+                Vault vault = this.getVault(user, Integer.parseInt(vaultNumber));
+                return String.valueOf(vault.getContent().stream().filter(VaultItem::isEmpty).count());
+            } catch (IndexOutOfBoundVaultException e) {
+                return "No Vault found";
+            } catch (NumberFormatException e) {
+                return "0";
+            }
+        });
+
+        Placeholders.register("is_infinite", (player, args) -> {
+            var optuser = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId());
+            if(optuser.isEmpty()) {
+                return "false";
+            }
+            User user = optuser.get();
+            String vaultNumber= args.getFirst();
+            try {
+                Vault vault = this.getVault(user, Integer.parseInt(vaultNumber));
+                return String.valueOf(vault.isInfinite());
+            } catch (IndexOutOfBoundVaultException | NumberFormatException e) {
+                return "false";
+            }
+        });
+        Placeholders.register("max_stack_size", (player, args) -> {
+            var optuser = this.getPlugin().getManager(UserManager.class).getUser(player.getUniqueId());
+            if(optuser.isEmpty()) {
+                return "false";
+            }
+            User user = optuser.get();
+            String vaultNumber= args.getFirst();
+            try {
+                Vault vault = this.getVault(user, Integer.parseInt(vaultNumber));
+                return String.valueOf(vault.getMaxStackSize());
+            } catch (IndexOutOfBoundVaultException | NumberFormatException e) {
+                return "false";
+            }
+        });
     }
 
     @Override
@@ -92,7 +177,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public void linkVaultToInventory(User user, InventoryDefault inventory) {
         Vault vault = this.getOpenedVault(user);
-        if(Configuration.getConfiguration(MainConfiguration.class).isDebug()){
+        if(Configuration.get(MainConfiguration.class).isDebug()){
             VaultsLogger.info("Vault " + vault.getUniqueId() + " linked to spigot inventory !");
         }
         this.linkedVaultToInventory.put(vault.getUniqueId(), inventory);
@@ -110,7 +195,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public void convertVault(UUID playerOwner, int size, boolean infinite, List<ItemStack> content, Material icon) {
         ZPlayerOwner owner = new ZPlayerOwner(playerOwner);
-        Vault vault = new ZVault(owner, icon, size, infinite);
+        Vault vault = new ZVault(owner, icon, size, infinite, Configuration.get(VaultsConfiguration.class).getDefaultVaultName());
         List<VaultItem> vaultItems = new ArrayList<>();
         for (int i = 0; i < content.size(); i++) {
             VaultItem item;
@@ -141,6 +226,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void createVault(User creator, VaultOwner owner, int size, int playerVaults, boolean infinite, boolean silent) {
+        var config = Configuration.get(VaultsConfiguration.class);
         var vaults = this.getVaults(owner.getUniqueId());
         if(playerVaults != -1 &&  vaults.size() >= playerVaults) {
             if(!silent) {
@@ -148,7 +234,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             }
             return;
         }
-        Vault vault = new ZVault(owner, this.configuration.getVaultIcon(), size, infinite);
+        Vault vault = new ZVault(owner, config.getVaultIcon(), size, infinite, config.getDefaultVaultName());
         List<VaultItem> content = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             content.add(new VaultItem(new ItemStack(Material.AIR), 1, i));
@@ -168,16 +254,17 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite) {
-        Vault vault = new ZVault(vaultId, owner, this.configuration.getVaultIcon(), size, infinite);
+        var config = Configuration.get(VaultsConfiguration.class);
+        Vault vault = new ZVault(vaultId, owner, config.getVaultIcon(), size, infinite, config.getDefaultVaultName());
         this.vaults.put(vaultId, vault);
     }
 
     @Override
     public boolean sizeIsAvailable(int size) {
-        return switch (configuration.getSizeMode()) {
-            case DEFAULT -> size == configuration.getDefaultSize();
-            case MIN_SIZE -> size >= configuration.getDefaultSize() && size <= 54;
-            case MAX_SIZE -> size <= configuration.getDefaultSize();
+        return switch (Configuration.get(VaultsConfiguration.class).getSizeMode()) {
+            case DEFAULT -> size == Configuration.get(VaultsConfiguration.class).getDefaultSize();
+            case MIN_SIZE -> size >= Configuration.get(VaultsConfiguration.class).getDefaultSize() && size <= 54;
+            case MAX_SIZE -> size <= Configuration.get(VaultsConfiguration.class).getDefaultSize();
         };
     }
 
@@ -188,14 +275,14 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public List<String> getSizeTabulation() {
-        return switch (configuration.getSizeMode()) {
-            case DEFAULT -> Stream.of(configuration.getDefaultSize()).map(String::valueOf).toList();
-            case MIN_SIZE -> IntStream.iterate(configuration.getDefaultSize(), n -> n + 1)
-                    .limit((54 - configuration.getDefaultSize()) + 1)
+        return switch (Configuration.get(VaultsConfiguration.class).getSizeMode()) {
+            case DEFAULT -> Stream.of(Configuration.get(VaultsConfiguration.class).getDefaultSize()).map(String::valueOf).toList();
+            case MIN_SIZE -> IntStream.iterate(Configuration.get(VaultsConfiguration.class).getDefaultSize(), n -> n + 1)
+                    .limit((54 - Configuration.get(VaultsConfiguration.class).getDefaultSize()) + 1)
                     .filter(n -> n <= 54).mapToObj(String::valueOf).toList();
             case MAX_SIZE -> IntStream.iterate(1, n -> n + 1)
-                    .limit((configuration.getDefaultSize()) + 1)
-                    .filter(n -> n <= configuration.getDefaultSize()).mapToObj(String::valueOf).toList();
+                    .limit((Configuration.get(VaultsConfiguration.class).getDefaultSize()) + 1)
+                    .filter(n -> n <= Configuration.get(VaultsConfiguration.class).getDefaultSize()).mapToObj(String::valueOf).toList();
         };
     }
 
@@ -713,7 +800,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     private void registerResolvers(OwnerResolver ownerResolver) {
         ownerResolver.registerOwnerType("player", ZPlayerOwner.class);
-        if(Bukkit.getServer().getPluginManager().getPlugin("SuperiorSkyblock2") != null) {
+        if(Plugins.SUPERIOR.isEnable()) {
             ownerResolver.registerOwnerType("superiorskyblock", ZSuperiorOwner.class);
         }
     }

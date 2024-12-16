@@ -61,12 +61,13 @@ allprojects {
         compileOnly "net.kyori:adventure-api:4.17.0"
         compileOnly "net.kyori:adventure-platform-bukkit:4.3.4"
 
-        implementation 'com.github.Maxlego08:Sarah:1.12.2'
+        implementation 'com.github.Maxlego08:Sarah:1.12.1'
         implementation "com.github.technicallycoded:FoliaLib:main-SNAPSHOT"
         implementation "com.github.Traqueur-dev:CommandsAPI:2.0.0"
         implementation "net.wesjd:anvilgui:1.10.2-SNAPSHOT"
         implementation "org.bstats:bstats-bukkit:3.0.2"
 
+        compileOnly 'me.clip:placeholderapi:2.11.6'
         compileOnly 'com.github.Maxlego08:zMenu-API:1.0.3.5'
     }
 
@@ -101,12 +102,18 @@ tasks.register('copyFiles', Copy) {
     into rootProject.testFolder
 }
 
+tasks.register("clean-files", Delete) {
+    delete rootProject.targetFolder
+    delete rootProject.apiFolder
+}
+
 if(propertiesFile.exists()) {
     shadowJar.finalizedBy('copyFiles')
 } else {
     println "No personal.properties file found, skipping copyFiles task"
 }
 
+clean.finalizedBy('clean-files')
 build.finalizedBy(shadowJar)
 build.shouldRunAfter subprojects.build
 
