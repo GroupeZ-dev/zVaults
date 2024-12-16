@@ -109,7 +109,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
                 return "0";
             }
             User user = optuser.get();
-            String vaultNumber= args.getFirst();
+            String vaultNumber = args.getFirst();
             try {
                 Vault vault = this.getVault(user, Integer.parseInt(vaultNumber));
                 return String.valueOf(vault.getContent().stream().filter(VaultItem::isEmpty).count());
