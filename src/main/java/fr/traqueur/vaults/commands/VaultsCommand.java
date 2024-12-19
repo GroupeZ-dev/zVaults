@@ -33,23 +33,29 @@ public class VaultsCommand extends VaultCommand {
         this.addAlias(Configuration.get(MainConfiguration.class).getAliases().toArray(new String[0]));
 
         this.addOptionalArgs("vault:int", (sender, args) -> List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"));
-
+        this.addOptionalArgs("user:user");
         this.setGameOnly(true);
     }
 
     @Override
     public void execute(CommandSender commandSender, Arguments arguments) {
         User user = this.userManager.getUser(((Player) commandSender).getUniqueId()).orElseThrow();
+        Optional<User> targetOpt = arguments.getOptional("user");
         Optional<Integer> vault = arguments.getOptional("vault");
+        User target = targetOpt.orElse(user);
         if(vault.isPresent()) {
             try {
-                Vault vaultToOpen = this.vaultsManager.getVault(user, vault.get());
+                Vault vaultToOpen = this.vaultsManager.getVault(target, vault.get());
+                if(!vaultToOpen.hasAccess(user)) {
+                    user.sendMessage(Message.VAULT_NO_ACCESS);
+                    return;
+                }
                 this.vaultsManager.openVault(user, vaultToOpen);
             } catch (IndexOutOfBoundVaultException ignored) {
                user.sendMessage(Message.VAULT_NOT_FOUND);
             }
         } else {
-            this.vaultsManager.openVaultChooseMenu(user, user);
+            this.vaultsManager.openVaultChooseMenu(user, target);
         }
     }
 }

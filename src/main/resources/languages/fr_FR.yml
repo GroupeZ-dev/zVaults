@@ -32,6 +32,7 @@ vault_name_changed: "<green>Nom du coffre changé pour <yellow>%name%<green>."
 user_not_owner: "<red>L'utilisateur %user% n'est pas propriétaire de ce coffre."
 vault_bound: "<green>Coffre lié à l'identifiant %id%."
 vault_id_already_exists: "<red>Cet identifiant %id% existe déjà."
+vault_no_access: "<red>Vous n'avez pas accès à ce coffre."
 
 
 plugin_to_convert_not_enable: "<red>Le plugin que vous essayez de convertir n'est pas activé."

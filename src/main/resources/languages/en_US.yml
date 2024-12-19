@@ -32,6 +32,7 @@ vault_name_changed: "<green>Vault name changed to <yellow>%name%<green>."
 user_not_owner: "<red>User %user% is not owner of this vault."
 vault_bound: "<green>Vault bound to id %id%."
 vault_id_already_exists: "<red>This id %id% already exists."
+vault_no_access: "<red>You do not have access to this vault."
 
 plugin_to_convert_not_enable: "<red>The plugin you are trying to convert is not enabled."
 convert_command_success: "<green>Plugin %plugin% converted successfully."
