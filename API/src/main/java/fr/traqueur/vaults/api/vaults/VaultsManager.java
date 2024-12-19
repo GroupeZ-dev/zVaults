@@ -26,15 +26,21 @@ public interface VaultsManager extends Manager {
 
     Vault getOpenedVault(User user);
 
+    long getNextVaultId(VaultOwner owner);
+
+    boolean idExists(VaultOwner owner, long id);
+
+    long generateId(VaultOwner owner);
+
     void convertVault(UUID playerOwner, int size, boolean infinite, List<ItemStack> content, Material icon);
 
     void closeVault(User user, Vault vault);
 
     void openVault(User user, Vault vault);
 
-    void createVault(User creator, VaultOwner owner, int size, int maxVaults, boolean infinite, boolean silent);
+    void createVault(User creator, VaultOwner owner, int size, int maxVaults, boolean infinite, boolean silent, long id);
 
-    void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite);
+    void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite, long id);
 
     boolean sizeIsAvailable(int size);
 

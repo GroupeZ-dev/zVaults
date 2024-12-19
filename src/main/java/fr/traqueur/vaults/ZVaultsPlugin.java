@@ -24,11 +24,13 @@ import fr.traqueur.vaults.api.placeholders.Placeholders;
 import fr.traqueur.vaults.api.storage.Storage;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
+import fr.traqueur.vaults.api.vaults.Vault;
 import fr.traqueur.vaults.api.vaults.VaultsManager;
 import fr.traqueur.vaults.commands.VaultsCommand;
 import fr.traqueur.vaults.commands.arguments.ConverterArgument;
 import fr.traqueur.vaults.commands.arguments.OwnerTypeArgument;
 import fr.traqueur.vaults.commands.arguments.UserArgument;
+import fr.traqueur.vaults.commands.arguments.VaultArgument;
 import fr.traqueur.vaults.configurator.ZVaultConfigurationManager;
 import fr.traqueur.vaults.converters.Converters;
 import fr.traqueur.vaults.distributed.ZDistributedManager;
@@ -126,6 +128,7 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         commandManager.registerConverter(String.class, "ownerType", new OwnerTypeArgument(vaultsManager.getOwnerResolver()));
         commandManager.registerConverter(User.class, new UserArgument(userManager));
         commandManager.registerConverter(Converters.class, new ConverterArgument());
+        commandManager.registerConverter(Vault.class, new VaultArgument(vaultsManager, userManager));
 
         this.loadCommands();
 

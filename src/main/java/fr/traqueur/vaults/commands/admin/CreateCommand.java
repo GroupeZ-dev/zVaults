@@ -37,6 +37,7 @@ public class CreateCommand extends VaultCommand {
         if (Configuration.get(VaultsConfiguration.class).isVaultsInfinity()) {
             this.addArgs("infinite:boolean");
         }
+        this.addArgs("id", Long.class);
         this.addOptionalArgs("type:ownerType");
     }
 
@@ -52,6 +53,7 @@ public class CreateCommand extends VaultCommand {
         int size = arguments.get("size");
         Optional<String> opt = arguments.getOptional("type");
         String type = opt.orElse("player");
+        long vaultId = arguments.get("id");
         boolean infinite = false;
 
         if (Configuration.get(VaultsConfiguration.class).isVaultsInfinity()) {
@@ -63,7 +65,12 @@ public class CreateCommand extends VaultCommand {
             return;
         }
         VaultOwner owner = this.vaultsManager.generateOwner(type, receiver);
+
+        if(this.vaultsManager.idExists(owner, vaultId)) {
+            user.sendMessage(Message.VAULT_ID_ALREADY_EXISTS, Formatter.format("%id%", vaultId));
+            return;
+        }
         int maxVaults = Configuration.get(VaultsConfiguration.class).getMaxVaultsByOwnerType(type.toLowerCase());
-        this.vaultsManager.createVault(user, owner, size, maxVaults, infinite, false);
+        this.vaultsManager.createVault(user, owner, size, maxVaults, infinite, false, vaultId);
     }
 }

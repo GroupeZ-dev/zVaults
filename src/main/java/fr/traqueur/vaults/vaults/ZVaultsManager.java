@@ -57,7 +57,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         this.linkedVaultToInventory = new HashMap<>();
         this.targetUserVaultsChoose = new HashMap<>();
         
-        this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this.ownerResolver), VAULT_TABLE_NAME);
+        this.vaultService = new Service<>(this.getPlugin(), VaultDTO.class, new ZVaultRepository(this,this.ownerResolver), VAULT_TABLE_NAME);
         MigrationManager.registerMigration(new VaultsMigration(VAULT_TABLE_NAME));
 
         this.getPlugin().getServer().getPluginManager().registerEvents(new ZVaultsListener(this, this.getPlugin().getManager(UserManager.class)), this.getPlugin());
@@ -193,9 +193,36 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
+    public long getNextVaultId(VaultOwner owner) {
+        return this.vaults.values().stream()
+                .filter(vault -> vault.getOwner().getUniqueId().equals(owner.getUniqueId()))
+                .map(Vault::getId)
+                .max(Long::compareTo)
+                .orElse(0L) + 1;
+    }
+
+    @Override
+    public boolean idExists(VaultOwner owner, long id) {
+        return this.vaults.values().stream()
+                .filter(vault -> vault.getOwner().getUniqueId().equals(owner.getUniqueId()))
+                .map(Vault::getId)
+                .anyMatch(vaultId -> vaultId == id);
+    }
+
+    @Override
+    public long generateId(VaultOwner owner) {
+        long id = this.getNextVaultId(owner);
+        while(this.idExists(owner, id)) {
+            id++;
+        }
+        return id;
+    }
+
+
+    @Override
     public void convertVault(UUID playerOwner, int size, boolean infinite, List<ItemStack> content, Material icon) {
         ZPlayerOwner owner = new ZPlayerOwner(playerOwner);
-        Vault vault = new ZVault(owner, icon, size, infinite, Configuration.get(VaultsConfiguration.class).getDefaultVaultName());
+        Vault vault = new ZVault(owner, icon, size, infinite, Configuration.get(VaultsConfiguration.class).getDefaultVaultName(), this.generateId(owner));
         List<VaultItem> vaultItems = new ArrayList<>();
         for (int i = 0; i < content.size(); i++) {
             VaultItem item;
@@ -225,7 +252,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public void createVault(User creator, VaultOwner owner, int size, int playerVaults, boolean infinite, boolean silent) {
+    public void createVault(User creator, VaultOwner owner, int size, int playerVaults, boolean infinite, boolean silent, long id) {
         var config = Configuration.get(VaultsConfiguration.class);
         var vaults = this.getVaults(owner.getUniqueId());
         if(playerVaults != -1 &&  vaults.size() >= playerVaults) {
@@ -234,7 +261,8 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             }
             return;
         }
-        Vault vault = new ZVault(owner, config.getVaultIcon(), size, infinite, config.getDefaultVaultName());
+
+        Vault vault = new ZVault(owner, config.getVaultIcon(), size, infinite, config.getDefaultVaultName(), id);
         List<VaultItem> content = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             content.add(new VaultItem(new ItemStack(Material.AIR), 1, i));
@@ -253,9 +281,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     }
 
     @Override
-    public void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite) {
+    public void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite, long id) {
         var config = Configuration.get(VaultsConfiguration.class);
-        Vault vault = new ZVault(vaultId, owner, config.getVaultIcon(), size, infinite, config.getDefaultVaultName());
+        Vault vault = new ZVault(vaultId, owner, config.getVaultIcon(), size, infinite, config.getDefaultVaultName(), id);
         this.vaults.put(vaultId, vault);
     }
 
@@ -296,6 +324,14 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     @Override
     public Vault getVault(User receiver, int vaultNum) throws IndexOutOfBoundVaultException {
         var list = this.getVaults(receiver);
+        Vault vault = list.stream()
+                .filter(vault1 -> vault1.getId() == vaultNum)
+                .findFirst()
+                .orElse(null);
+        if(vault != null) {
+            return vault;
+        }
+
         if(vaultNum < 0 || vaultNum >= list.size()) {
             throw new IndexOutOfBoundVaultException();
         }

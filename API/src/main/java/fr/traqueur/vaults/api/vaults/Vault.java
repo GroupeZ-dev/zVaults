@@ -14,6 +14,10 @@ public interface Vault {
 
     UUID getUniqueId();
 
+    long getId();
+
+    void setId(long id);
+
     VaultOwner getOwner();
 
     String getName();

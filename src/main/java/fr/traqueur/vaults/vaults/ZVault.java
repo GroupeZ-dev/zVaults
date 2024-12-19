@@ -15,6 +15,7 @@ import java.util.UUID;
 public class ZVault implements Vault {
 
     private final UUID uniqueId;
+    private long id;
     private final VaultOwner owner;
     private final List<VaultItem> content;
     private final boolean infinite;
@@ -24,15 +25,15 @@ public class ZVault implements Vault {
     private boolean autoPickup;
     private int maxStackSize;
 
-    public ZVault(VaultOwner owner, Material material, int size, boolean infinite, String name) {
-        this(UUID.randomUUID(), owner, material, size, infinite, name);
+    public ZVault(VaultOwner owner, Material material, int size, boolean infinite, String name, Long id) {
+        this(UUID.randomUUID(), owner, material, size, infinite, name, id);
     }
 
-    public ZVault(UUID uuid, VaultOwner owner, Material material, int size, boolean infinite, String name) {
-        this(uuid, owner, material, new ArrayList<>(), size, infinite, false, Configuration.get(VaultsConfiguration.class).getStackSizeInfiniteVaults(), name);
+    public ZVault(UUID uuid, VaultOwner owner, Material material, int size, boolean infinite, String name, Long id) {
+        this(uuid, owner, material, new ArrayList<>(), size, infinite, false, Configuration.get(VaultsConfiguration.class).getStackSizeInfiniteVaults(), name, id);
     }
 
-    public ZVault(UUID uniqueId, VaultOwner owner, Material material, List<VaultItem> content, int size, boolean infinite, boolean autoPickup, int maxStackSize, String name) {
+    public ZVault(UUID uniqueId, VaultOwner owner, Material material, List<VaultItem> content, int size, boolean infinite, boolean autoPickup, int maxStackSize, String name, Long id) {
         this.uniqueId = uniqueId;
         this.owner = owner;
         this.material = material;
@@ -42,11 +43,22 @@ public class ZVault implements Vault {
         this.autoPickup = autoPickup;
         this.maxStackSize = maxStackSize;
         this.name = name;
+        this.id = id;
     }
 
     @Override
     public UUID getUniqueId() {
         return this.uniqueId;
+    }
+
+    @Override
+    public long getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(long id) {
+        this.id = id;
     }
 
     @Override

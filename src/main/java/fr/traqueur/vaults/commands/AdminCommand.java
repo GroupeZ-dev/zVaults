@@ -24,7 +24,8 @@ public class AdminCommand extends VaultCommand {
                 new SetStackLimitCommand(plugin),
                 new ConvertCommand(plugin),
                 new AddStackLimitCommand(plugin),
-                new DeleteCommand(plugin));
+                new DeleteCommand(plugin),
+                new BindCommand(plugin));
     }
 
     @Override

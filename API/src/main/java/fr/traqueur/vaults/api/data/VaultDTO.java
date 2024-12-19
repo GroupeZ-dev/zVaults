@@ -13,5 +13,6 @@ public record VaultDTO(@Column(value = "unique_id", primary = true) UUID uniqueI
                        boolean infinite,
                        Boolean autoPickup,
                        Integer maxStackSize,
-                       String name) {
+                       String name,
+                       Long id) {
 }

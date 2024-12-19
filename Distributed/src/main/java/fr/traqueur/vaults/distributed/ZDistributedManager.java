@@ -139,7 +139,7 @@ public class ZDistributedManager implements DistributedManager {
             if (Configuration.get(MainConfiguration.class).isDebug()) {
                 VaultsLogger.info("Sending create request for vault " + vault.getUniqueId());
             }
-            VaultCreateRequest createRequest = new VaultCreateRequest(serverUUID, vault.getUniqueId(), this.vaultsManager.getOwnerResolver().getType(vault.getOwner().getClass()), vault.getOwner().getUniqueId(), vault.getSize(), vault.isInfinite());
+            VaultCreateRequest createRequest = new VaultCreateRequest(serverUUID, vault.getUniqueId(), this.vaultsManager.getOwnerResolver().getType(vault.getOwner().getClass()), vault.getOwner().getUniqueId(), vault.getSize(), vault.isInfinite(), vault.getId());
             publisher.publish(CREATE_CHANNEL_NAME, gson.toJson(createRequest, VaultCreateRequest.class));
         }
     }
@@ -240,7 +240,7 @@ public class ZDistributedManager implements DistributedManager {
             VaultsLogger.info("Received create request for vault " + createRequest.vault());
         }
         var owner = this.vaultsManager.getOwnerResolver().resolveOwner(createRequest.ownerType(), createRequest.owner());
-        this.vaultsManager.createVault(createRequest.vault(), owner, createRequest.size(), createRequest.infinite());
+        this.vaultsManager.createVault(createRequest.vault(), owner, createRequest.size(), createRequest.infinite(), createRequest.id());
     }
 
     private void handleVaultShareRequest(VaultShareRequest shareRequest) {

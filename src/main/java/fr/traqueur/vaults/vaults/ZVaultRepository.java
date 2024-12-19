@@ -4,10 +4,7 @@ import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.data.VaultDTO;
 import fr.traqueur.vaults.api.storage.Repository;
-import fr.traqueur.vaults.api.vaults.OwnerResolver;
-import fr.traqueur.vaults.api.vaults.Vault;
-import fr.traqueur.vaults.api.vaults.VaultItem;
-import fr.traqueur.vaults.api.vaults.VaultOwner;
+import fr.traqueur.vaults.api.vaults.*;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -17,9 +14,11 @@ import java.util.stream.Collectors;
 
 public class ZVaultRepository implements Repository<Vault, VaultDTO> {
 
+    private final VaultsManager manager;
     private final OwnerResolver ownerResolver;
 
-    public ZVaultRepository(OwnerResolver ownerResolver) {
+    public ZVaultRepository(VaultsManager manager, OwnerResolver ownerResolver) {
+        this.manager = manager;
         this.ownerResolver = ownerResolver;
     }
 
@@ -53,7 +52,12 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
             name = Configuration.get(VaultsConfiguration.class).getDefaultVaultName();
         }
 
-        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite(), vaultDTO.autoPickup() != null && vaultDTO.autoPickup(), maxStackSize, name);
+        Long id = vaultDTO.id();
+        if (id == null) {
+            id = this.manager.generateId(owner);
+        }
+
+        return new ZVault(vaultDTO.uniqueId(), owner, icon, content, vaultDTO.size(), vaultDTO.infinite(), vaultDTO.autoPickup() != null && vaultDTO.autoPickup(), maxStackSize, name, id);
     }
 
     @Override
@@ -66,6 +70,7 @@ public class ZVaultRepository implements Repository<Vault, VaultDTO> {
                             entity.isInfinite(),
                             entity.isAutoPickup(),
                             entity.getMaxStackSize(),
-                            entity.getName());
+                            entity.getName(),
+                            entity.getId());
     }
 }

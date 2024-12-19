@@ -91,7 +91,7 @@ public class ZUserManager implements UserManager, Saveable {
         VaultOwner owner = vaultsManager.generateOwner("player", user);
         int maxVaults = Configuration.get(VaultsConfiguration.class).getMaxVaultsByOwnerType("player");
         for (VaultPreset vault : config.vaults()) {
-            vaultsManager.createVault(user, owner, vault.size(), maxVaults, vault.infinite(), true);
+            vaultsManager.createVault(user, owner, vault.size(), maxVaults, vault.infinite(), true, this.getPlugin().getManager(VaultsManager.class).generateId(owner));
         }
     }
 
