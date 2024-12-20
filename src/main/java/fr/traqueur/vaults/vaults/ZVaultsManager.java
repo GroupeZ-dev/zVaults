@@ -325,6 +325,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     public Vault getVault(User receiver, int vaultNum) throws IndexOutOfBoundVaultException {
         var list = this.getVaults(receiver);
         Vault vault = list.stream()
+                .filter(vault1 -> vault1.getOwner() instanceof ZPlayerOwner)
                 .filter(vault1 -> vault1.getId() == vaultNum)
                 .findFirst()
                 .orElse(null);
