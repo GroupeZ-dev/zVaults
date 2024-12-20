@@ -20,6 +20,8 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class VaultItemButton extends ZButton {
@@ -64,19 +66,25 @@ public class VaultItemButton extends ZButton {
             int vaultSize = vault.getSize();
             for (int slot : this.slots) {
                 ItemStack item;
+                List<VaultItem> freshContent = new ArrayList<>();
                 if (slot < vaultSize) {
+                    VaultItem vaultItem;
                     if (vault.getContent().size() <= slot || vault.getContent().isEmpty()) {
-                        item = new VaultItem(new ItemStack(Material.AIR), 1, slot).toItem(player, vault.isInfinite());
-                    } else {
-                        var vaultItem = vault.getContent().get(slot);
-                        if(vaultItem.item() == null || vaultItem.item().getType().isAir()) {
-                            continue;
-                        }
+                        vaultItem = new VaultItem(new ItemStack(Material.AIR), 1, slot);
                         item = vaultItem.toItem(player, vault.isInfinite());
+                    } else {
+                        vaultItem = vault.getContent().get(slot);
+                        if(vaultItem.item() == null || vaultItem.item().getType().isAir()) {
+                            item = new ItemStack(Material.AIR);
+                        } else {
+                            item = vaultItem.toItem(player, vault.isInfinite());
+                        }
                     }
+                    freshContent.add(vaultItem);
                 } else {
                     item = Configuration.get(VaultsConfiguration.class).getIcon("empty-item").build(player);
                 }
+                vault.setContent(freshContent);
                 inventory.addItem(slot, item).setClick(event -> event.setCancelled(true));
             }
         });

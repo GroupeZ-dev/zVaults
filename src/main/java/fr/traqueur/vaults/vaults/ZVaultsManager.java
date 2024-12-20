@@ -284,6 +284,11 @@ public class ZVaultsManager implements VaultsManager, Saveable {
     public void createVault(UUID vaultId, VaultOwner owner, int size, boolean infinite, long id) {
         var config = Configuration.get(VaultsConfiguration.class);
         Vault vault = new ZVault(vaultId, owner, config.getVaultIcon(), size, infinite, config.getDefaultVaultName(), id);
+        List<VaultItem> content = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            content.add(new VaultItem(new ItemStack(Material.AIR), 1, i));
+        }
+        vault.setContent(content);
         this.vaults.put(vaultId, vault);
     }
 
