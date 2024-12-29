@@ -29,7 +29,7 @@ public class CreateCommand extends VaultCommand {
         this.vaultsManager = plugin.getManager(VaultsManager.class);
 
         this.setPermission("zvaults.admin.create");
-        this.setUsage("/vaults create <receiver> <size> (infinite) [type]");
+        this.setUsage("/vaults create <receiver> <size> (infinite) <id> [type]");
         this.setDescription(plugin.getMessageResolver().convertToLegacySectionFormat(Message.CREATE_COMMAND_DESCRIPTION.translate()));
 
         this.addArgs("receiver:user");

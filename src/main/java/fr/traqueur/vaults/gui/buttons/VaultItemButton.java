@@ -64,9 +64,9 @@ public class VaultItemButton extends ZButton {
         this.plugin.getManager(UserManager.class).getUser(player.getUniqueId()).ifPresent(user -> {
             Vault vault = this.plugin.getManager(VaultsManager.class).getOpenedVault(user);
             int vaultSize = vault.getSize();
+            List<VaultItem> freshContent = new ArrayList<>();
             for (int slot : this.slots) {
                 ItemStack item;
-                List<VaultItem> freshContent = new ArrayList<>();
                 if (slot < vaultSize) {
                     VaultItem vaultItem;
                     if (vault.getContent().size() <= slot || vault.getContent().isEmpty()) {
@@ -84,9 +84,10 @@ public class VaultItemButton extends ZButton {
                 } else {
                     item = Configuration.get(VaultsConfiguration.class).getIcon("empty-item").build(player);
                 }
-                vault.setContent(freshContent);
                 inventory.addItem(slot, item).setClick(event -> event.setCancelled(true));
             }
+            vault.setContent(freshContent);
+            System.out.println(vault.getContent());
         });
     }
 
