@@ -2,6 +2,7 @@ package fr.traqueur.vaults.api.vaults;
 
 import fr.maxlego08.menu.MenuItemStack;
 import fr.maxlego08.menu.api.utils.Placeholders;
+import fr.traqueur.vaults.api.MinecraftVersion;
 import fr.traqueur.vaults.api.config.Configuration;
 import fr.traqueur.vaults.api.config.VaultsConfiguration;
 import fr.traqueur.vaults.api.serialization.Base64;
@@ -46,13 +47,16 @@ public record VaultItem(ItemStack item, int amount, int slot) {
 
             Placeholders placeholders = new Placeholders();
             String materialName = MaterialLocalization.getTranslateName(this.item.getType());
-            if(meta != null && meta.hasItemName()) {
-                materialName = meta.getItemName();
-                System.out.println("Item name: " + meta.getItemName());
+
+
+            if(MinecraftVersion.newerThan(MinecraftVersion.V.v1_20)) {
+                if(meta != null && meta.hasItemName()) {
+                    materialName = meta.getItemName();
+                }
             }
+
             if(meta != null && meta.hasDisplayName()) {
                 materialName = meta.getDisplayName();
-                System.out.println("Display name: " + meta.getDisplayName());
             }
 
             placeholders.register("material_name", materialName.replace("§", "&").replace("&x", ""));
@@ -62,11 +66,8 @@ public record VaultItem(ItemStack item, int amount, int slot) {
             ItemStack templateItem = item.build(player, false, placeholders);
             ItemMeta templateMeta = templateItem.getItemMeta();
 
-            System.out.println(placeholders.getPlaceholders());
-
             if(meta != null && templateMeta != null) {
                 meta.setDisplayName(templateMeta.getDisplayName());
-                System.out.println("Display name: " + templateMeta.getDisplayName());
             }
 
             ArrayList<String> lore = new ArrayList<>();
