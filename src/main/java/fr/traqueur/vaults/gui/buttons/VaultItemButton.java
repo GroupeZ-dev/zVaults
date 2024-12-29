@@ -87,7 +87,6 @@ public class VaultItemButton extends ZButton {
                 inventory.addItem(slot, item).setClick(event -> event.setCancelled(true));
             }
             vault.setContent(freshContent);
-            System.out.println(vault.getContent());
         });
     }
 

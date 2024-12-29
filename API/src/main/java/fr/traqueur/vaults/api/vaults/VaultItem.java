@@ -46,25 +46,39 @@ public record VaultItem(ItemStack item, int amount, int slot) {
 
             Placeholders placeholders = new Placeholders();
             String materialName = MaterialLocalization.getTranslateName(this.item.getType());
+            if(meta != null && meta.hasItemName()) {
+                materialName = meta.getItemName();
+                System.out.println("Item name: " + meta.getItemName());
+            }
             if(meta != null && meta.hasDisplayName()) {
                 materialName = meta.getDisplayName();
+                System.out.println("Display name: " + meta.getDisplayName());
             }
 
-            placeholders.register("material_name", materialName);
+            placeholders.register("material_name", materialName.replace("§", "&").replace("&x", ""));
             placeholders.register("amount", this.formatNumber(this.amount));
             placeholders.register("material", this.item.getType().name());
 
-            ItemStack templateItem = item.build(player, true, placeholders);
+            ItemStack templateItem = item.build(player, false, placeholders);
             ItemMeta templateMeta = templateItem.getItemMeta();
 
-            meta.setDisplayName(templateMeta.getDisplayName());
+            System.out.println(placeholders.getPlaceholders());
+
+            if(meta != null && templateMeta != null) {
+                meta.setDisplayName(templateMeta.getDisplayName());
+                System.out.println("Display name: " + templateMeta.getDisplayName());
+            }
 
             ArrayList<String> lore = new ArrayList<>();
-            if(meta.hasLore()) {
+            if(meta != null && meta.hasLore()) {
                 lore.addAll(meta.getLore());
             }
-            lore.addAll(templateMeta.getLore());
-            meta.setLore(lore);
+            if(templateMeta != null && templateMeta.hasLore()) {
+                lore.addAll(templateMeta.getLore());
+            }
+            if(meta != null) {
+                meta.setLore(lore);
+            }
 
             menuItem.setItemMeta(meta);
             menuItem.setAmount(1);

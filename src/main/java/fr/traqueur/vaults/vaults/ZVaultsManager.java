@@ -155,7 +155,6 @@ public class ZVaultsManager implements VaultsManager, Saveable {
 
     @Override
     public void saveVault(Vault vault) {
-        System.out.println(vault.getContent());
         this.vaultService.save(vault);
     }
 
