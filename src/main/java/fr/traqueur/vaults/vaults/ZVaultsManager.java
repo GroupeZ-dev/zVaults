@@ -474,7 +474,7 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             if (slot < vault.getSize()) {
                 this.shiftClickFromVault(event, player, cursor, current, slot, vault, user);
             } else if (slot >= inventorySize) {
-                if(cursor == null || cursor.getType().isAir() && current == null || current.getType().isAir()) {
+                if((cursor == null || cursor.getType().isAir()) && (current == null || current.getType().isAir())) {
                     return;
                 }
                 int slotToAdd = this.findCorrespondingSlot(event.getInventory(), current, vault);

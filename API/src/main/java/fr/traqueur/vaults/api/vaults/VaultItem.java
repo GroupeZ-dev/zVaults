@@ -59,7 +59,6 @@ public record VaultItem(ItemStack item, int amount, int slot) {
                 materialName = meta.getDisplayName();
             }
 
-            placeholders.register("material_name", materialName.replace("§", "&").replace("&x", ""));
             placeholders.register("amount", this.formatNumber(this.amount));
             placeholders.register("material", this.item.getType().name());
 
@@ -67,7 +66,7 @@ public record VaultItem(ItemStack item, int amount, int slot) {
             ItemMeta templateMeta = templateItem.getItemMeta();
 
             if(meta != null && templateMeta != null) {
-                meta.setDisplayName(templateMeta.getDisplayName());
+                meta.setDisplayName(templateMeta.getDisplayName().replace("%material_name%", materialName));
             }
 
             ArrayList<String> lore = new ArrayList<>();
