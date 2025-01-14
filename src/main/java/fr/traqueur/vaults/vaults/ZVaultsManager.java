@@ -828,6 +828,14 @@ public class ZVaultsManager implements VaultsManager, Saveable {
             }
         }
 
+        while (remainingAmount > 0) {
+            int amountToAdd = Math.min(maxStackSize, remainingAmount);
+            ItemStack item = cursor.clone();
+            item.setAmount(amountToAdd);
+            user.getPlayer().getInventory().addItem(item);
+            remainingAmount -= amountToAdd;
+        }
+
         return newVaultItem;
     }
 
