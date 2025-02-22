@@ -1,0 +1,49 @@
+config-version: '16'
+
+no_permission_message: <red>Je hebt geen toestemming.
+only_in_game_message: <red>Je kan deze command enkel in-game gebruiken.
+missing_args_message: <redJe mist argumenten..
+arg_not_recognized_message: <red>Het argument %arg% bestaat niet.
+no_requirement_message: <red>Je voldoet niet aan de vereisten.
+
+reload_plugin_success: <green>Plugin succesvol herladen.
+
+max_vaults_reached: <red>Deze speler heeft het maximum aantal kluizen.
+vault_created: <green>Kluis aangemaakt.
+receive_new_vault: <green>Je hebt een nieuwe kluis ontvangen.
+size_not_available: <red>De grootte %size% is niet beschikbaar.
+vault_growed: <green>Je kluis is gegroeid naar de grootte %size%.
+vault_growed_success: <green>Je kluis is gegroeid naar de grootte %size%.
+vault_not_found: <red>Kluis niet gevonden.
+vault_set_size: <green>Kluis grootte naar %size% gezet.
+vault_set_size_success: <green>Kluis grootte naar %size% gezet.
+not_permission_configure_vault: <red>Je hebt geen toestemming om deze kluis te bewerken.
+already_access_to_vault: <red>De speler %player% heeft al toegang tot deze kluis.
+successfully_added_access_to_vault: <green>Toegang succesvol toegevoegd aan %player%.
+successfully_removed_access_to_vault: <green>Toegang succesvol verwijderd van %player%.
+item_cant_be_null: <red>Je moet hiervoor een item vast hebben.
+vault_icon_change: <green>Kluis icoon veranderd naar <yellow>%new_icon%<green>.
+vault_deleted: <green>Kluis verwijderd.
+vault_not_infinite: <red>Deze kluis is niet oneindig.
+stacklimit_set: <green>Stacklimiet ingesteld op %stacklimit%.
+stacklimit_add: <green>Stacklimiet toegevoegd aan %stacklimit%.
+vault_name_already_set: <red>De kluis heeft al deze naam.
+vault_name_changed: <green>Kluis naam veranderd naar <yellow>%name%<green>.
+user_not_owner: <red>Speler %user% is niet de eigenaar van deze kluis.
+vault_bound: <green>Kluis verbonden aan ID %id%.
+vault_id_already_exists: <red>Dit ID %id% bestaat al.
+vault_no_access: <red>Je hebt geen toegang tot deze kluis.
+vault_bind: <green>Kluis verbonden aan ID %id%.
+
+plugin_to_convert_not_enable: <red>De plugin die je probeert te converteren is niet ingeschakeld.
+convert_command_success: <green>Plugin %plugin% succesvol geconverteerd.
+
+set_size_command_description: Stel de grootte van een kluis in.
+grow_size_command_description: Vergroot de grootte van een kluis.
+create_command_description: Maak een nieuwe kluis aan.
+open_command_description: Open een kluis.
+stacklimit_command_description: Stel de stapellimiet van een kluis in.
+addstacklimit_command_description: Voeg een stapellimiet toe aan een kluis.
+convert_command_description: Converteer een kluisplugin naar zVault-gegevens.
+bind_command_description: Koppel een kluis aan een specifiek ID.
+
