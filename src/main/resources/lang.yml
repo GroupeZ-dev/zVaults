@@ -15,3 +15,4 @@ lang: en_US
 langs:
   fr_FR: "languages/fr_FR.yml"
   en_US: "languages/en_US.yml"
+  nl_NL: "languages/nl_NL.yml"
