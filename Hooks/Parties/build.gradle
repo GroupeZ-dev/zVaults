@@ -1,0 +1,4 @@
+
+dependencies {
+    compileOnly files('libs/Parties-3.2.16.jar')
+}

@@ -5,4 +5,6 @@ include 'Hooks:SuperiorSkyblock'
 findProject(':Hooks:SuperiorSkyblock')?.name = 'SuperiorSkyblock'
 include 'Distributed'
 include 'Converters'
+include 'Hooks:Parties'
+findProject(':Hooks:Parties')?.name = 'Parties'
 

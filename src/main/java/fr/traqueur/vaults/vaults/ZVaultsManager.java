@@ -21,6 +21,7 @@ import fr.traqueur.vaults.api.storage.Service;
 import fr.traqueur.vaults.api.users.User;
 import fr.traqueur.vaults.api.users.UserManager;
 import fr.traqueur.vaults.api.vaults.*;
+import fr.traqueur.vaults.hooks.ZPartyOwner;
 import fr.traqueur.vaults.hooks.ZSuperiorOwner;
 import fr.traqueur.vaults.storage.migrations.VaultsMigration;
 import org.bukkit.Bukkit;
@@ -852,6 +853,9 @@ public class ZVaultsManager implements VaultsManager, Saveable {
         ownerResolver.registerOwnerType("player", ZPlayerOwner.class);
         if(Plugins.SUPERIOR.isEnable()) {
             ownerResolver.registerOwnerType("superiorskyblock", ZSuperiorOwner.class);
+        }
+        if(Plugins.PARTIES.isEnable()) {
+            ownerResolver.registerOwnerType("parties", ZPartyOwner.class);
         }
     }
 

@@ -113,6 +113,9 @@ public final class ZVaultsPlugin extends VaultsPlugin {
         Configuration.REGISTRY.values().forEach(configuration -> {
             if(!configuration.isLoad()) {
                 configuration.load();
+                if(config.isDebug()) {
+                    VaultsLogger.info("Loaded configuration: " + configuration.getClass().getSimpleName());
+                }
             }
         });
 
